@@ -53,3 +53,68 @@ The current prototype applies four leading-product standards:
 - No claim that the UI, incentive system or Silent Task flow improves wellbeing without a local pilot.
 - No claim that social-media discussions represent Singapore caregivers.
 - No claim that volunteers replace clinicians, counsellors, family support, AIC, NUHS or AH pathways.
+
+## Extended implementation standard — research synthesis
+
+### 1. A task is a contract, not a public plea
+
+Caregiver-support products such as [Give InKind](https://www.giveinkind.com/features) and [Lotsa Helping Hands](https://lotsahelpinghands.com/how-it-works) turn help into specific time-bound activities with instructions, claim status and reminders. This validates the CareKaki task-first model.
+
+**Proposed state machine:**
+
+`Draft → Submitted → Safety / scope check → Matching → Offered → Accepted → In progress → Completed → Recipient confirmation / coordinator review → Closed`
+
+Branch states: `Needs AH referral`, `Withdrawn`, `No suitable volunteer`, `Cancelled`, `Incident / safeguarding review`.
+
+Each operational transition should retain actor, timestamp, reason and the minimum information disclosed. A **claim is not automatically an assignment**: direct claim is suitable only for low-risk, generic tasks; an in-person or sensitive task moves from “Request to help” to coordinator confirmation.
+
+### 2. Match transparently, after eligibility gates
+
+[Connect@TOUCH](https://play.google.com/store/apps/details?id=sg.vm.touchvolunteer.tebs.pro&hl=en_US), [VolunteerMatch](https://www.volunteermatch.org/volunteers/services/) and [CiviVolunteer](https://docs.civicrm.org/volunteer/en/latest/) show the durable pattern: browse/filter by locality, schedule, role and capability, with a coordinator able to intervene.
+
+CareKaki should hard-filter before ranking:
+
+- active / screened volunteer status;
+- safe-task category and completed micro-training;
+- availability and travel-radius band;
+- language and accessibility preference;
+- safeguarding, capacity, block and supervision constraints.
+
+Then present an explainable recommendation — *“available Tuesday, trained for Digital Help, near your area”* — alongside manual choice / coordinator help. Do not pitch opaque AI matching. Exact address, diagnosis and personal circumstance remain hidden until an approved assignment and just-in-time consent.
+
+### 3. Use a visible Trust Passport, not a magical safety badge
+
+[CareProtect](https://www.care.com/about/safety/) and volunteer-onboarding platforms treat checks as one element of a continuing safety system. The suggested Trust Passport is: **Identity checked · Orientation complete · Safeguarding / Silent Task training complete · eligible task tiers · expiry / renewal status**. It must say “screened, trained and coordinator-supported”, not “guaranteed safe”.
+
+A practical tiering pattern:
+
+| Tier | Example | Allocation |
+|---|---|---|
+| 1 | remote/digital navigation, general public-event support | coordinator approval or low-risk self-claim |
+| 2 | public pickup/drop-off, wayfinding, appointment reminders | coordinator-confirmed |
+| 3 | private / in-home interaction, if policy permits it | named adult supervision and explicit safeguarding controls |
+| Out of scope | medication administration, clinical advice, personal care, transfers/lifting, cash/financial handling, emergency response | **do not match; refer / escalate** |
+
+For an initial encounter or a higher-vulnerability request, use coordinator review, optional recipient approval, mentor/paired support where policy requires it, arrival/departure check-ins and a short private comfort/safety follow-up.
+
+### 4. Singapore data, safeguarding and referral boundary
+
+Singapore’s [PDPC social-service guidance](https://www.pdpc.gov.sg/-/media/files/pdpc/pdf-files/advisory-guidelines/advisory-guidelines-for-the-social-service-sector_18-january-2024.pdf) says the social-service agency remains responsible for volunteers acting on its behalf; its [volunteer guide](https://file.go.gov.sg/pdpaguideforvolunteer.pdf) supports data minimisation, explicit consent, training, secure disposal and incident reporting. This is programme guidance, not legal advice.
+
+Design consequence:
+
+- pre-match show zone / transport burden, not a full address;
+- collect only task-relevant details; reveal contact/address only to the approved helper via explicit consent;
+- no photos or social posts; no personal WhatsApp account as the record for sensitive instructions;
+- coordinator owns retention/deletion, incident review and escalation;
+- model professional/community pathways as a separate consent-based **referral lane**, rather than pretending that a volunteer completion equals a clinical/service referral.
+
+[Open Referral HSDS](https://github.com/openreferral/specification) is the useful future data model for a provider directory: `organization`, `service`, `location` and `service_at_location`, kept separate from volunteer tasks.
+
+### 5. Accessibility is part of safety
+
+The public [WCAG 2.2](https://www.w3.org/TR/WCAG22/) baseline is relevant to caregivers and older recipients: generous targets (design critical actions at 44×44px or larger), no colour-only status, visible keyboard focus, plain-language errors, no drag-only workflow, zoom/reflow support and review/edit/cancel before submission. Use accessible primitives (e.g. [React Aria](https://react-spectrum.adobe.com/react-aria/) or [Radix](https://www.radix-ui.com/primitives)) when the prototype becomes a production application.
+
+### Social evidence limitation, updated
+
+A [Reddit corpus analysis](https://www.mdpi.com/1660-4601/20/3/1933) supports the *hypothesis* that caregiver discourse includes both emotional toll and logistical burdens; it is US-centric and not a prevalence estimate for Singapore. No defensible X-specific finding was recoverable in this research pass, so CareKaki makes **no X-derived claim**. Use social discourse for wording tests only, and validate through AH caregivers and programme staff.
