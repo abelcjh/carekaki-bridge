@@ -1,170 +1,258 @@
+from pathlib import Path
 from pptx import Presentation
 from pptx.util import Inches, Pt
-from pptx.dml.color import RGBColor
-from pptx.enum.text import PP_ALIGN
+from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
 from pptx.enum.shapes import MSO_SHAPE
-from pathlib import Path
+from pptx.dml.color import RGBColor
 
-OUT = Path('/home/abel/carekaki-bridge/CareKaki_Bridge_pitch_deck_v2.pptx')
+ROOT = Path('/home/abel/carekaki-bridge')
+OUT = ROOT / 'CareKaki_Bridge_pitch_deck_v2.pptx'
+PHOTO = ROOT / 'src/assets/carekaki-hero.png'
+
 prs = Presentation()
 prs.slide_width = Inches(13.333)
 prs.slide_height = Inches(7.5)
 
-NAVY = RGBColor(8, 24, 41)
-BLUE = RGBColor(20, 93, 160)
-CYAN = RGBColor(113, 215, 255)
-PALE = RGBColor(235, 247, 255)
-TEXT = RGBColor(27, 45, 65)
-MUTED = RGBColor(87, 111, 134)
-WHITE = RGBColor(255,255,255)
-GREEN = RGBColor(33,128,71)
-ORANGE = RGBColor(180,91,25)
+INK = RGBColor(25, 37, 42)
+FOREST = RGBColor(37, 62, 57)
+SAGE = RGBColor(220, 233, 218)
+PAPER = RGBColor(247, 244, 238)
+WHITE = RGBColor(255, 253, 248)
+CLAY = RGBColor(220, 161, 126)
+RUST = RGBColor(166, 83, 48)
+MUTED = RGBColor(99, 112, 108)
+LINE = RGBColor(210, 205, 194)
+MONO = 'Aptos Mono'
+SANS = 'Aptos Display'
+SERIF = 'Georgia'
 
 
-def set_bg(slide, color=RGBColor(244, 247, 251)):
-    fill = slide.background.fill
-    fill.solid(); fill.fore_color.rgb = color
-
-def add_text(slide, text, x, y, w, h, size=24, bold=False, color=TEXT, align=None):
-    box = slide.shapes.add_textbox(Inches(x), Inches(y), Inches(w), Inches(h))
-    tf = box.text_frame
-    tf.clear()
-    p = tf.paragraphs[0]
-    p.text = text
-    p.font.size = Pt(size)
-    p.font.bold = bold
-    p.font.color.rgb = color
-    p.font.name = 'Aptos Display' if size >= 28 else 'Aptos'
-    if align:
-        p.alignment = align
-    return box
-
-def add_title(slide, kicker, title, subtitle=None):
-    add_text(slide, kicker.upper(), .55, .35, 5.8, .35, 10, True, BLUE)
-    add_text(slide, title, .55, .72, 8.0, 1.2, 38, True, NAVY)
-    if subtitle:
-        add_text(slide, subtitle, .58, 1.82, 8.7, .6, 15, False, MUTED)
-
-def pill(slide, text, x, y, w, color=PALE, font=BLUE):
-    shape = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(x), Inches(y), Inches(w), Inches(.42))
-    shape.fill.solid(); shape.fill.fore_color.rgb = color
-    shape.line.color.rgb = color
-    p = shape.text_frame.paragraphs[0]
-    p.text = text
-    p.font.size = Pt(11); p.font.bold = True; p.font.color.rgb = font
-    p.alignment = PP_ALIGN.CENTER
+def rect(slide, x, y, w, h, fill, radius=False, line=None):
+    shape = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE if radius else MSO_SHAPE.RECTANGLE, Inches(x), Inches(y), Inches(w), Inches(h))
+    shape.fill.solid(); shape.fill.fore_color.rgb = fill
+    shape.line.color.rgb = line or fill
     return shape
 
-def card(slide, title, body, x, y, w, h, accent=BLUE):
-    s = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(x), Inches(y), Inches(w), Inches(h))
-    s.fill.solid(); s.fill.fore_color.rgb = WHITE
-    s.line.color.rgb = RGBColor(219,231,242)
-    bar = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(x), Inches(y), Inches(.08), Inches(h))
-    bar.fill.solid(); bar.fill.fore_color.rgb = accent
-    bar.line.color.rgb = accent
-    add_text(slide, title, x+.22, y+.18, w-.35, .4, 16, True, NAVY)
-    add_text(slide, body, x+.22, y+.66, w-.35, h-.85, 11.8, False, MUTED)
 
-slides = []
-# 1 cover
-slide = prs.slides.add_slide(prs.slide_layouts[6]); set_bg(slide, NAVY)
-add_text(slide, 'SPARKX⁺CHANGE · ALEXANDRA HOSPITAL CAREGIVER RESPITE', .7, .55, 8, .35, 11, True, CYAN)
-add_text(slide, 'CareKaki Bridge', .7, 1.15, 8.5, 1.0, 50, True, WHITE)
-add_text(slide, 'Silent-help task marketplace for male caregivers and trained student volunteers', .72, 2.1, 8.0, .65, 21, False, RGBColor(215,236,255))
-pill(slide, 'Post one task · claim one task · generate one AH-safe receipt', .75, 3.05, 5.3, CYAN, NAVY)
-card(slide, '10-second demo loop', 'Need help → post Silent Task → student claims → task completed → receipt + escalation record', 7.8, 1.0, 4.7, 2.4, CYAN)
-card(slide, 'Final team direction', 'TaskRabbit-adjacent app, Silent Task option, different task categories, VIA/reward incentives, weighted points by difficulty.', 7.8, 3.7, 4.7, 2.35, CYAN)
+def text(slide, value, x, y, w, h, size=18, color=INK, bold=False, font=SANS, align=None, valign=MSO_ANCHOR.TOP):
+    box = slide.shapes.add_textbox(Inches(x), Inches(y), Inches(w), Inches(h))
+    tf = box.text_frame
+    tf.clear(); tf.word_wrap = True; tf.vertical_anchor = valign
+    p = tf.paragraphs[0]; p.text = value
+    p.font.name = font; p.font.size = Pt(size); p.font.bold = bold; p.font.color.rgb = color
+    p.space_after = Pt(0)
+    if align is not None: p.alignment = align
+    return box
 
-# 2 problem
-slide = prs.slides.add_slide(prs.slide_layouts[6]); set_bg(slide)
-add_title(slide, 'Problem', 'Caregivers know help exists, but still do not use it', 'The gap is not only information. It is activation friction: shame, cost, effort, uncertainty, and lack of one clear next action.')
-card(slide, 'Respite awareness ≠ respite usage', 'SMU ROSA: only 50.09% of caregivers knew of respite resources; 82.83% of those aware had never used respite.', .7, 2.55, 3.8, 2.0, ORANGE)
-card(slide, 'Care load is heavy', 'Duke-NUS CARE TraCE: primary caregivers averaged 33 care hours/week; about 26% had no family/MDW help; only 5% attended caregiver training.', 4.78, 2.55, 3.8, 2.0, BLUE)
-card(slide, 'Asking is emotionally expensive', 'CNA reported caregivers may hold back because of stigma, duty/filial piety, and not identifying themselves as caregivers.', 8.85, 2.55, 3.8, 2.0, GREEN)
-add_text(slide, 'Insight: make help feel like a concrete task, not a confession of burnout.', 1.05, 5.45, 11.1, .55, 24, True, NAVY, PP_ALIGN.CENTER)
 
-# 3 male caregiver insight
-slide = prs.slides.add_slide(prs.slide_layouts[6]); set_bg(slide)
-add_title(slide, 'User insight', 'Male caregivers need help that protects competence', 'Research suggests male caregivers engage better with practical, flexible, solution-oriented support.')
-card(slide, 'Practical framing', 'A 2025 male caregiver scoping review recommends solution-oriented, practical language over emotion-first help-seeking frames.', .75, 2.3, 3.7, 2.2, BLUE)
-card(slide, 'Control matters', 'Male carers may fear perceived failure or loss of control. CareKaki lets them choose task, silence level, timing, and helper.', 4.85, 2.3, 3.7, 2.2, ORANGE)
-card(slide, 'Task-focused approach', 'Male dementia caregiver research finds men often adopt a task-focused approach to gain control over caregiving.', 8.95, 2.3, 3.7, 2.2, GREEN)
-add_text(slide, 'Design principle: “I need one task done” is easier to say than “I need emotional support.”', .9, 5.35, 11.5, .55, 24, True, NAVY, PP_ALIGN.CENTER)
+def tag(slide, value, x=.62, y=.45, color=RUST):
+    return text(slide, value.upper(), x, y, 6.7, .25, 9, color, True, MONO)
 
-# 4 solution
-slide = prs.slides.add_slide(prs.slide_layouts[6]); set_bg(slide, RGBColor(238,247,255))
-add_title(slide, 'Solution', 'CareKaki Bridge: Silent Task marketplace', 'Male caregivers post scoped, non-clinical tasks. Trained students claim them for VIA hours, points, and verified care-service receipts.')
-card(slide, 'Caregiver app', 'Post help requests, choose category, turn on Silent Task mode, set no-call/no-chat preferences, track completion.', .7, 2.25, 3.8, 2.4, BLUE)
-card(slide, 'Volunteer board', 'Students pick OTOT tasks by category, difficulty, location, time, and points/VIA hours.', 4.78, 2.25, 3.8, 2.4, GREEN)
-card(slide, 'AH dashboard', 'Staff see task receipts, accepted/declined support, clinical escalations, and follow-up owners.', 8.85, 2.25, 3.8, 2.4, ORANGE)
-add_text(slide, 'Positioning: practical respite between “formal services exist” and “I need help tonight.”', 1.05, 5.38, 11.1, .55, 23, True, NAVY, PP_ALIGN.CENTER)
 
-# 5 core loop
-slide = prs.slides.add_slide(prs.slide_layouts[6]); set_bg(slide)
-add_title(slide, 'Core loop', 'One silent request becomes measurable relief', 'This is the live demo path judges can understand in 10 seconds.')
-steps = [('1', 'Caregiver posts task', 'e.g. “pick up discharge supplies”'), ('2', 'Silent mode lowers paisehness', 'no phone call, minimal explanation'), ('3', 'Volunteer claims task', 'matched by skill/category/time'), ('4', 'Safety gate checks scope', 'clinical issues escalated'), ('5', 'Receipt generated', 'points, VIA, AH follow-up record')]
-for i,(n,t,b) in enumerate(steps):
-    x=.55+i*2.55
-    pill(slide, n, x, 2.35, .55, CYAN, NAVY)
-    card(slide, t, b, x, 2.95, 2.25, 1.55, BLUE if i%2==0 else GREEN)
-add_text(slide, 'Metric story: silent tasks accepted · micro-respite hours delivered · clinical advice violations = 0.', .85, 5.55, 11.6, .55, 22, True, NAVY, PP_ALIGN.CENTER)
+def divider(slide, y, x=.62, w=12.08, color=LINE):
+    rect(slide, x, y, w, .012, color)
 
-# 6 task categories
-slide = prs.slides.add_slide(prs.slide_layouts[6]); set_bg(slide)
-add_title(slide, 'Product design', 'Different tasks for different student skills', 'The app is not “volunteers do everything”. It is a scoped matching layer.')
-cats = [('Errands', 'pharmacy queue, supplies, meals'), ('Transport / escort', 'wayfinding, AIC Link, clinic route'), ('Tech help', 'calendar, WhatsApp, teleconsult setup'), ('Admin', 'forms, notes, questions for nurse'), ('Companionship', 'walk, coffee, no-pressure check-in'), ('Home setup', 'non-clinical organisation after discharge')]
-for i,(t,b) in enumerate(cats):
-    card(slide, t, b, .7+(i%3)*4.05, 2.2+(i//3)*1.65, 3.55, 1.25, [BLUE,GREEN,ORANGE][i%3])
-add_text(slide, 'Bigger / less convenient tasks earn more points and VIA hours; unsafe tasks are blocked or escalated.', .95, 5.85, 11.2, .45, 18, True, NAVY, PP_ALIGN.CENTER)
 
-# 7 safety
-slide = prs.slides.add_slide(prs.slide_layouts[6]); set_bg(slide)
-add_title(slide, 'Safety and trust', 'Volunteers help with tasks, not treatment', 'The clinical boundary is a product feature, not a disclaimer.')
-card(slide, 'Allowed', 'Errands, reminders, meal pickup, wayfinding, form help, companionship, non-clinical tech setup.', .7, 2.35, 3.8, 2.2, GREEN)
-card(slide, 'Escalate', 'Medication timing, wound care, symptoms, insulin, falls, mental health crisis, diagnosis, clinical interpretation.', 4.78, 2.35, 3.8, 2.2, ORANGE)
-card(slide, 'Receipt', 'Every task logs owner, action, status, volunteer, points, escalation, follow-up staff/team.', 8.85, 2.35, 3.8, 2.2, BLUE)
-add_text(slide, 'Trust promise: 0 clinical advice by students, 100% task-level accountability.', 1.05, 5.5, 11.1, .55, 24, True, NAVY, PP_ALIGN.CENTER)
+def number(slide, n, x, y, color=RUST):
+    return text(slide, n, x, y, .5, .3, 10, color, True, MONO)
 
-# 8 pilot
-slide = prs.slides.add_slide(prs.slide_layouts[6]); set_bg(slide, RGBColor(245,249,252))
-add_title(slide, 'Pilot plan', 'Start narrow, prove uptake, then scale', 'Six-month AH pilot designed for feasibility and judge credibility.')
-card(slide, 'Pilot site', 'One ward/discharge route first, e.g. Geriatric Ward 2 or AH-selected caregiver-heavy route.', .75, 2.25, 3.7, 2.1, BLUE)
-card(slide, 'Users', '20–30 male/primary caregivers; trained student volunteers; AH nurse/MSW/C3U escalation owners.', 4.85, 2.25, 3.7, 2.1, GREEN)
-card(slide, 'Success metrics', 'Task acceptance, silent-task rate, repeat requests, VIA hours, caregiver confidence, escalation safety, staff feasibility.', 8.95, 2.25, 3.7, 2.1, ORANGE)
-add_text(slide, 'First proof target: 30 caregivers, 100 completed non-clinical tasks, 0 volunteer clinical-advice incidents.', .9, 5.4, 11.5, .6, 24, True, NAVY, PP_ALIGN.CENTER)
 
-# 9 volunteer management
-slide = prs.slides.add_slide(prs.slide_layouts[6]); set_bg(slide, RGBColor(238,247,255))
-add_title(slide, 'Volunteer management', 'Recruit youth. Train them. Match safely. Recognise real service.', 'Volunteer supply is not assumed: CareKaki includes an operating system for recruitment, safeguarding and retention.')
-card(slide, '1. Recruit + screen', 'Youth sign up through schools/community partners. Verify availability, motivation and role-fit.', .7, 2.25, 2.9, 2.35, BLUE)
-card(slide, '2. AH briefing', 'Confidentiality, respectful communication, no-clinical-advice boundary, incident/escalation SOP.', 3.87, 2.25, 2.9, 2.35, ORANGE)
-card(slide, '3. Skill-tag + match', 'Tag tech, errands, escort, admin or companionship; match by time, task scope and readiness.', 7.04, 2.25, 2.9, 2.35, GREEN)
-card(slide, '4. Supervise + retain', 'Completion receipt, reliability, weekly review, verified VIA hours and portfolio recognition.', 10.21, 2.25, 2.4, 2.35, BLUE)
-add_text(slide, 'Volunteer outcome: a trusted youth cohort, not an unmoderated task board.', .85, 5.42, 11.7, .55, 23, True, NAVY, PP_ALIGN.CENTER)
+def quote(slide, value, x, y, w, h, color=INK):
+    return text(slide, value, x, y, w, h, 25, color, False, SERIF)
 
-# 10 project management + integration
-slide = prs.slides.add_slide(prs.slide_layouts[6]); set_bg(slide)
-add_title(slide, 'Project management', 'Operate CareKaki as an AH-linked pilot, not just an app', 'Named owners, weekly routines, clinical escalation and measurable review keep the programme accountable.')
-card(slide, 'Set-up · Weeks 0–2', 'Recruit 20 youth volunteers; finalise safe task list; train; agree AH/C3U escalation owner.', .7, 2.3, 3.7, 2.15, BLUE)
-card(slide, 'Launch · Weeks 3–4', 'One ward/discharge route; daily task moderation; receipt review; referral to existing AH/NUHS/AIC support.', 4.82, 2.3, 3.7, 2.15, GREEN)
-card(slide, 'Learn · Month 2–6', 'Weekly ops huddle: uptake, caregiver confidence/stress, repeated use, volunteer retention, incidents and fixes.', 8.94, 2.3, 3.7, 2.15, ORANGE)
-add_text(slide, 'CareKaki activates existing support. It does not replace counselling, education programmes or official referral pathways.', .75, 5.45, 11.9, .6, 19, True, NAVY, PP_ALIGN.CENTER)
 
-# 11 prototype
-slide = prs.slides.add_slide(prs.slide_layouts[6]); set_bg(slide, NAVY)
-add_text(slide, 'PROTOTYPE', .7, .55, 4, .35, 11, True, CYAN)
-add_text(slide, 'Working web app is already live', .7, 1.0, 7.2, .75, 36, True, WHITE)
-add_text(slide, 'GitHub repo: github.com/abelcjh/carekaki-bridge\nLive demo: abelcjh.github.io/carekaki-bridge/', .75, 1.9, 7.2, .75, 18, False, RGBColor(215,236,255))
-card(slide, 'Demo actions built', 'Create Silent Task · claim and complete task · AH-safe clinical flag · volunteer training roster · skill tags · VIA receipt · project milestones.', .75, 3.15, 5.45, 2.15, CYAN)
-card(slide, 'Programme dashboard built', 'Open requests · trained volunteers ready · Silent Task uptake · VIA hours · task owner/receipt · impact metrics to validate with AH.', 6.85, 3.15, 5.55, 2.15, CYAN)
+def footer(slide, number_text):
+    divider(slide, 7.02)
+    text(slide, 'CAREKAKI BRIDGE', .62, 7.15, 2, .16, 7.5, MUTED, True, MONO)
+    text(slide, number_text, 12.1, 7.15, .6, .16, 7.5, MUTED, True, MONO, PP_ALIGN.RIGHT)
 
-# 12 close
-slide = prs.slides.add_slide(prs.slide_layouts[6]); set_bg(slide)
-add_title(slide, 'Ask / close', 'Make respite as easy as posting one task', 'CareKaki Bridge gives AH a practical, measurable, youth-powered way to help male caregivers accept support.')
-card(slide, 'Why now', 'Care burden is rising, formal-respite uptake is low, and NUHS/AH support needs an easier activation layer.', .7, 2.4, 3.8, 2.1, BLUE)
-card(slide, 'Why it is credible', 'Bounded youth roles, volunteer management, project owners, official referrals, and measurable impact—not a generic volunteer app.', 4.78, 2.4, 3.8, 2.1, GREEN)
-card(slide, 'What we need', 'AH pilot owner, volunteer onboarding partner, safe task list, escalation SOP, and a caregiver feedback/measurement cycle.', 8.85, 2.4, 3.8, 2.1, ORANGE)
-add_text(slide, 'CareKaki Bridge: silent help, visible relief, managed with care.', 1.15, 5.55, 10.9, .6, 28, True, NAVY, PP_ALIGN.CENTER)
+# 01 / cover
+slide = prs.slides.add_slide(prs.slide_layouts[6]); rect(slide, 0, 0, 13.333, 7.5, FOREST)
+slide.shapes.add_picture(str(PHOTO), Inches(7.3), Inches(0), width=Inches(6.033), height=Inches(7.5))
+rect(slide, 7.3, 0, 2.8, 7.5, FOREST).fill.transparency = 32
+text(slide, 'SPARKX⁺CHANGE · ALEXANDRA HOSPITAL CAREGIVER RESPITE', .72, .62, 5.9, .25, 9, CLAY, True, MONO)
+text(slide, 'CareKaki\nBridge', .7, 1.34, 6.1, 1.75, 48, WHITE, True, SANS)
+quote(slide, 'Help, on your own terms.', .75, 3.42, 5.3, .52, WHITE)
+text(slide, 'A quiet, practical way for caregivers to offload one thing today — matched with trained youth volunteers, never clinical care.', .75, 4.42, 5.3, .68, 16, RGBColor(217, 228, 220))
+rect(slide, .75, 5.62, 3.35, .48, CLAY, True)
+text(slide, 'ONE SMALL ASK  ·  VISIBLE RELIEF', .95, 5.76, 3.0, .15, 9, FOREST, True, MONO)
+text(slide, '01', .75, 6.75, .4, .2, 9, CLAY, True, MONO)
+
+# 02 / tension
+slide = prs.slides.add_slide(prs.slide_layouts[6]); rect(slide, 0, 0, 13.333, 7.5, PAPER)
+tag(slide, 'The tension')
+text(slide, 'Caregivers know help exists.\nThey still do not use it.', .62, 1.05, 8.9, 1.32, 36, INK, True)
+quote(slide, 'The gap is not information.\nIt is activation friction.', .63, 2.78, 4.4, .78, RUST)
+text(slide, 'Shame · effort · cost · uncertainty · no clear next action', .65, 3.79, 5.4, .28, 12, MUTED)
+rect(slide, 7.25, 1.12, 5.42, 4.9, WHITE)
+text(slide, 'THE EVIDENCE', 7.65, 1.55, 2, .2, 9, RUST, True, MONO)
+text(slide, '50.09%', 7.65, 2.02, 2.5, .63, 38, FOREST, True)
+text(slide, 'of caregivers knew respite resources', 7.67, 2.72, 3.6, .3, 12, MUTED)
+divider(slide, 3.33, 7.65, 4.5)
+text(slide, '82.83%', 7.65, 3.66, 2.8, .63, 38, FOREST, True)
+text(slide, 'of those aware had never used respite', 7.67, 4.35, 3.6, .3, 12, MUTED)
+text(slide, 'SMU ROSA research · caregiver awareness is not activation', 7.65, 5.37, 4.25, .25, 8.5, RUST, False, MONO)
+footer(slide, '02')
+
+# 03 / design insight
+slide = prs.slides.add_slide(prs.slide_layouts[6]); rect(slide, 0, 0, 13.333, 7.5, SAGE)
+tag(slide, 'The insight')
+text(slide, 'Make help feel like\na task — not a confession.', .62, 1.05, 8.0, 1.35, 38, INK, True)
+quote(slide, '“I need one thing done”\nis easier to say than\n“I need emotional support.”', .66, 3.05, 4.75, 1.35, INK)
+for i, (head, body) in enumerate([
+    ('PRACTICAL', 'Use solution-oriented language.'),
+    ('PRIVATE', 'Let people choose silence and timing.'),
+    ('PREDICTABLE', 'Show exactly what happens next.'),
+]):
+    x = 6.15 + i*2.16
+    number(slide, f'0{i+1}', x, 2.97)
+    text(slide, head, x, 3.36, 1.75, .22, 10, FOREST, True, MONO)
+    text(slide, body, x, 3.75, 1.7, .8, 12, MUTED)
+footer(slide, '03')
+
+# 04 / solution
+slide = prs.slides.add_slide(prs.slide_layouts[6]); rect(slide, 0, 0, 13.333, 7.5, PAPER)
+tag(slide, 'The response')
+text(slide, 'CareKaki Bridge', .62, 1.03, 6.6, .58, 38, INK, True)
+quote(slide, 'A silent-help task layer between “formal services exist” and “I need help tonight.”', .65, 1.78, 8.45, .65, RUST)
+steps = [
+    ('01', 'POST', 'One bounded non-clinical task.'),
+    ('02', 'MATCH', 'A trained volunteer fits skill + time.'),
+    ('03', 'COMPLETE', 'A receipt makes relief visible.'),
+]
+for i, (n, head, body) in enumerate(steps):
+    x = .64 + i*4.14
+    rect(slide, x, 3.15, 3.75, 2.1, WHITE)
+    number(slide, n, x+.27, 3.47)
+    text(slide, head, x+.27, 3.91, 2.6, .3, 18, FOREST, True)
+    text(slide, body, x+.27, 4.46, 3.05, .45, 12, MUTED)
+text(slide, 'CAREGIVER', .65, 5.84, 3.7, .2, 9, RUST, True, MONO)
+text(slide, 'VOLUNTEER', 4.79, 5.84, 3.7, .2, 9, RUST, True, MONO)
+text(slide, 'AH / C3U', 8.93, 5.84, 3.7, .2, 9, RUST, True, MONO)
+footer(slide, '04')
+
+# 05 / product moment
+slide = prs.slides.add_slide(prs.slide_layouts[6]); rect(slide, 0, 0, 13.333, 7.5, FOREST)
+tag(slide, 'The product moment', .65, .5, CLAY)
+text(slide, 'Silence is a setting.', .63, 1.02, 7.2, .62, 38, WHITE, True)
+quote(slide, 'No call needed.\nJust message me.', .66, 2.05, 4.2, .86, WHITE)
+text(slide, 'Silent Task lets a caregiver request practical help without a conversation, explanation, or pressure to perform gratitude.', .65, 3.48, 4.6, .78, 14, RGBColor(210, 222, 214))
+rect(slide, 7.1, 1.08, 5.55, 4.95, WHITE)
+text(slide, 'CAREGIVER REQUEST', 7.53, 1.48, 2.1, .2, 9, RUST, True, MONO)
+text(slide, 'Pick up a simple dinner\nand leave it at the ward counter', 7.53, 1.97, 4.3, .66, 21, INK, True)
+divider(slide, 2.95, 7.53, 4.2)
+text(slide, 'ERRANDS', 7.53, 3.25, 1.3, .18, 9, MUTED, True, MONO)
+text(slide, '50 points', 10.7, 3.25, 1.05, .18, 10, RUST, True, MONO)
+rect(slide, 7.53, 3.84, 4.25, .82, SAGE)
+text(slide, '●   SILENT TASK', 7.8, 4.05, 2.3, .18, 10, FOREST, True, MONO)
+text(slide, 'NO CALL OR CONVERSATION EXPECTED', 7.8, 4.31, 3.2, .14, 7.8, MUTED, False, MONO)
+rect(slide, 7.53, 5.06, 4.25, .48, FOREST, True)
+text(slide, 'PLACE MY REQUEST   ↗', 7.53, 5.19, 4.25, .15, 9, WHITE, True, MONO, PP_ALIGN.CENTER)
+footer(slide, '05')
+
+# 06 / safety
+slide = prs.slides.add_slide(prs.slide_layouts[6]); rect(slide, 0, 0, 13.333, 7.5, SAGE)
+tag(slide, 'Safety is the feature')
+text(slide, 'Warmth needs\nclear edges.', .62, 1.05, 4.3, 1.16, 40, INK, True)
+for i, (symbol, head, body, col) in enumerate([
+    ('↳', 'WE DO', 'Errands, reminders, meals, wayfinding, forms, companionship and home organisation.', FOREST),
+    ('×', 'WE DO NOT', 'Medication, wound care, lifting, diagnosis, personal care, medical interpretation or crisis support.', RUST),
+    ('!', 'WE ESCALATE', 'Every concern has a named AH-linked owner, a clinical route and an accountable receipt.', FOREST),
+]):
+    x = 5.55 + i*2.38
+    rect(slide, x, 2.07, 1.86, 2.95, PAPER)
+    text(slide, symbol, x+.25, 2.4, .35, .3, 23, col, False, SERIF)
+    text(slide, head, x+.25, 3.02, 1.35, .2, 10, INK, True, MONO)
+    text(slide, body, x+.25, 3.47, 1.35, 1.15, 10.5, MUTED)
+footer(slide, '06')
+
+# 07 / supply operating system
+slide = prs.slides.add_slide(prs.slide_layouts[6]); rect(slide, 0, 0, 13.333, 7.5, PAPER)
+tag(slide, 'Volunteer operating system')
+text(slide, 'The supply side is\nnot assumed.', .62, 1.05, 6.5, 1.14, 38, INK, True)
+text(slide, 'Leading volunteer-management patterns: clear opportunity scopes, screening, skill matching, shift / availability fit, verified hours and feedback loops.', .65, 2.63, 5.35, .72, 14, MUTED)
+flow = [('1', 'RECRUIT', 'role fit'), ('2', 'BRIEF', 'safeguard'), ('3', 'TAG', 'skills'), ('4', 'MATCH', 'time + task'), ('5', 'RECOGNISE', 'VIA receipt')]
+for i, (n, head, body) in enumerate(flow):
+    x=.64+i*2.45
+    number(slide, n, x, 4.45)
+    text(slide, head, x, 4.84, 2.0, .2, 12, FOREST, True, MONO)
+    text(slide, body, x, 5.18, 1.7, .22, 11, MUTED)
+    if i < 4: text(slide, '→', x+1.82, 4.84, .24, .2, 13, RUST, False, MONO)
+footer(slide, '07')
+
+# 08 / pilot
+slide = prs.slides.add_slide(prs.slide_layouts[6]); rect(slide, 0, 0, 13.333, 7.5, CLAY)
+tag(slide, 'Pilot: narrow on purpose', .62, .5, FOREST)
+text(slide, 'Start small.\nLearn quickly.\nEarn trust.', .62, 1.04, 5.15, 1.7, 41, INK, True)
+quote(slide, 'One discharge route.\nOne named operating lead.\nOne weekly rhythm.', .66, 3.34, 4.4, 1.15, INK)
+for i, (n, head, body) in enumerate([
+    ('0–2', 'WEEKS', '20 youth volunteers · safe task list · escalation briefing'),
+    ('3–4', 'WEEKS', 'one route · daily moderation · completion review'),
+    ('2–6', 'MONTHS', 'uptake · confidence · repeat use · incidents'),
+]):
+    x = 6.22
+    y = 1.23 + i*1.72
+    text(slide, n, x, y, .82, .35, 19, FOREST, True, MONO)
+    text(slide, head, x+1.0, y+.04, 1.0, .2, 10, INK, True, MONO)
+    text(slide, body, x+2.1, y+.02, 3.6, .4, 12, INK)
+    divider(slide, y+.66, x, 5.5, RGBColor(190,132,101))
+footer(slide, '08')
+
+# 09 / standards
+slide = prs.slides.add_slide(prs.slide_layouts[6]); rect(slide, 0, 0, 13.333, 7.5, PAPER)
+tag(slide, 'What leading systems teach us')
+text(slide, 'Trust before choice.\nClarity before complexity.', .62, 1.05, 7.7, 1.12, 38, INK, True)
+items = [
+    ('CARE MARKETPLACES', 'Pre-filled task templates, visible trust signals and progressive disclosure reduce first-post friction.'),
+    ('VOLUNTEER PLATFORMS', 'Skill + time matching, screening, verified service hours and coordinator dashboards make supply dependable.'),
+    ('CAREGIVER SERVICES', 'Triage, clear boundaries, baseline / closure measures and referral back to professionals protect care quality.'),
+]
+for i, (head, body) in enumerate(items):
+    y = 3.12+i*1.06
+    number(slide, f'0{i+1}', .65, y)
+    text(slide, head, 1.2, y, 2.65, .2, 10, RUST, True, MONO)
+    text(slide, body, 4.1, y-.02, 7.95, .45, 12.5, MUTED)
+footer(slide, '09')
+
+# 10 / measurement
+slide = prs.slides.add_slide(prs.slide_layouts[6]); rect(slide, 0, 0, 13.333, 7.5, FOREST)
+tag(slide, 'The scorecard', .62, .5, CLAY)
+text(slide, 'Relief should be\nvisible.', .62, 1.05, 5.3, 1.1, 40, WHITE, True)
+quote(slide, 'Measure the help\nthat actually lands.', .66, 2.76, 4.55, .75, WHITE)
+metrics=[('TASKS', 'accepted + completed'), ('SILENT', 'low-contact uptake'), ('PEOPLE', 'repeat caregiver use'), ('SAFETY', 'clinical advice incidents = 0')]
+for i,(head,body) in enumerate(metrics):
+    x=6.15+(i%2)*3.1; y=1.5+(i//2)*2.14
+    rect(slide,x,y,2.62,1.62,RGBColor(47, 77, 70))
+    text(slide,head,x+.26,y+.32,2.0,.2,10,CLAY,True,MONO)
+    text(slide,body,x+.26,y+.8,2.0,.35,13,WHITE,True)
+footer(slide, '10')
+
+# 11 / demo
+slide = prs.slides.add_slide(prs.slide_layouts[6]); rect(slide, 0, 0, 13.333, 7.5, PAPER)
+tag(slide, 'What we built')
+text(slide, 'A working pilot\nexperience — live.', .62, 1.05, 6.55, 1.14, 38, INK, True)
+rect(slide, .64, 3.1, 5.0, 1.42, SAGE)
+text(slide, 'POST A SILENT TASK', .95, 3.47, 2.7, .2, 10, RUST, True, MONO)
+text(slide, 'Then claim, complete and record the help.', .95, 3.85, 3.95, .25, 14, FOREST, True)
+text(slide, 'LIVE DEMO', 7.08, 1.64, 1.3, .18, 10, RUST, True, MONO)
+text(slide, 'abelcjh.github.io/\ncarekaki-bridge', 7.08, 2.1, 5.2, .7, 26, FOREST, True)
+divider(slide, 3.2, 7.08, 4.7)
+text(slide, 'BUILT INTO THE PROTOTYPE', 7.08, 3.56, 2.55, .16, 9, RUST, True, MONO)
+text(slide, 'Silent Task · moderated task board · safe scope · volunteer recognition · pilot scorecard', 7.08, 3.98, 4.72, .75, 14, MUTED)
+footer(slide, '11')
+
+# 12 / close
+slide = prs.slides.add_slide(prs.slide_layouts[6]); rect(slide, 0, 0, 13.333, 7.5, CLAY)
+tag(slide, 'The ask', .62, .55, FOREST)
+text(slide, 'Make respite as easy\nas posting one task.', .62, 1.08, 8.3, 1.25, 42, INK, True)
+quote(slide, 'Silent help.\nVisible relief.', .66, 3.08, 4.5, .75, INK)
+text(slide, 'To pilot well, we need:', 7.22, 3.0, 2.5, .2, 11, INK, True, MONO)
+for i, item in enumerate(['an AH pilot owner', 'a safe task list + escalation SOP', 'a youth onboarding partner', 'a caregiver feedback loop']):
+    y=3.5+i*.48
+    text(slide, f'0{i+1}', 7.22, y, .42, .16, 9, RUST, True, MONO)
+    text(slide, item, 7.78, y-.03, 3.4, .22, 13, INK, True)
+text(slide, 'CAREKAKI BRIDGE', .65, 6.8, 2.5, .18, 9, FOREST, True, MONO)
+text(slide, '12', 12.1, 6.8, .6, .18, 9, FOREST, True, MONO, PP_ALIGN.RIGHT)
 
 prs.save(OUT)
 print(OUT)

@@ -1,140 +1,136 @@
 import { useMemo, useState } from 'react'
+import heroImage from './assets/carekaki-hero.png'
 import './App.css'
 
-type TaskCategory = 'Errands' | 'Transport' | 'Tech help' | 'Meal support' | 'Companionship' | 'Admin' | 'Home setup'
 type TaskStatus = 'Open' | 'Matched' | 'Done'
-type VolunteerStatus = 'Ready' | 'Training due' | 'Assigned'
+type Category = 'Errands' | 'Tech set-up' | 'Wayfinding' | 'Meals & home'
 
-type HelpTask = {
+type Task = {
   id: string
   title: string
-  category: TaskCategory
-  location: string
+  category: Category
   time: string
-  points: number
-  viaHours: number
+  location: string
   silent: boolean
-  clinicalRisk: boolean
-  caregiver: string
   status: TaskStatus
-  notes: string
-  owner: string
+  points: number
+  volunteer: string
 }
 
-type Volunteer = {
-  name: string
-  skill: string
-  status: VolunteerStatus
-  hours: number
-  reliability: number
+const initialTasks: Task[] = [
+  { id: 'CK-1024', title: 'Collect discharge essentials', category: 'Errands', time: 'Today · 7:30 pm', location: 'AH Lobby B', silent: true, status: 'Open', points: 40, volunteer: '' },
+  { id: 'CK-1025', title: 'Set gentle appointment reminders', category: 'Tech set-up', time: 'Tomorrow · 8:00 pm', location: 'Remote / bedside', silent: false, status: 'Matched', points: 25, volunteer: 'Arjun L.' },
+  { id: 'CK-1026', title: 'Walk with me to AIC Link', category: 'Wayfinding', time: 'Fri · 4:15 pm', location: 'AH Clinic Exit', silent: true, status: 'Open', points: 55, volunteer: '' },
+]
+
+const categories: Category[] = ['Errands', 'Tech set-up', 'Wayfinding', 'Meals & home']
+
+function Mark() {
+  return <div className="mark" aria-label="CareKaki Bridge"><span></span><span></span><span></span></div>
 }
 
-const categories: TaskCategory[] = ['Errands', 'Transport', 'Tech help', 'Meal support', 'Companionship', 'Admin', 'Home setup']
+function Arrow() { return <span className="arrow">↗</span> }
 
-const starterTasks: HelpTask[] = [
-  { id: 'T-1024', title: 'Pick up discharge supplies from pharmacy', category: 'Errands', location: 'Alexandra Hospital, Lobby B', time: 'Today, 7:30 PM', points: 40, viaHours: 1, silent: true, clinicalRisk: false, caregiver: 'Mr L, son caring for father', status: 'Open', notes: 'No need to call me. Please message when queue number is close.', owner: 'Volunteer Ops Lead' },
-  { id: 'T-1025', title: 'Set up calendar reminders for wound dressing appointments', category: 'Tech help', location: 'Ward 2 demo bedside', time: 'Tomorrow, 8:00 PM', points: 25, viaHours: 0.5, silent: false, clinicalRisk: false, caregiver: 'Albert, working son', status: 'Matched', notes: 'Use Google Calendar / WhatsApp reminders only. Clinical questions go to nurse.', owner: 'Student Tech Kaki' },
-  { id: 'T-1026', title: 'Walk with caregiver to AIC Link counter after appointment', category: 'Admin', location: 'AH clinic exit', time: 'Fri, 4:15 PM', points: 55, viaHours: 1.5, silent: true, clinicalRisk: false, caregiver: 'Only-child caregiver', status: 'Open', notes: 'Caregiver feels paiseh asking family. Just accompany and help take notes.', owner: 'Volunteer Ops Lead' },
-]
+export default function App() {
+  const [tasks, setTasks] = useState(initialTasks)
+  const [isSilent, setIsSilent] = useState(true)
+  const [category, setCategory] = useState<Category>('Errands')
+  const [request, setRequest] = useState('Pick up a simple dinner and leave it at the ward counter')
+  const [submitted, setSubmitted] = useState(false)
+  const [filter, setFilter] = useState<'All' | TaskStatus>('All')
 
-const starterVolunteers: Volunteer[] = [
-  { name: 'Maya Tan', skill: 'Errands · escort', status: 'Ready', hours: 4.5, reliability: 98 },
-  { name: 'Arjun Lim', skill: 'Tech setup · admin', status: 'Assigned', hours: 3, reliability: 100 },
-  { name: 'Haziq Rahman', skill: 'Companionship · meal support', status: 'Training due', hours: 0, reliability: 0 },
-]
+  const visibleTasks = filter === 'All' ? tasks : tasks.filter((task) => task.status === filter)
+  const openCount = tasks.filter((task) => task.status === 'Open').length
+  const silentRate = Math.round((tasks.filter((task) => task.silent).length / tasks.length) * 100)
+  const points = useMemo(() => (category === 'Wayfinding' ? 55 : category === 'Tech set-up' ? 25 : category === 'Meals & home' ? 35 : 40) + (isSilent ? 10 : 0), [category, isSilent])
 
-function App() {
-  const [tasks, setTasks] = useState<HelpTask[]>(starterTasks)
-  const [volunteers, setVolunteers] = useState<Volunteer[]>(starterVolunteers)
-  const [silent, setSilent] = useState(true)
-  const [category, setCategory] = useState<TaskCategory>('Errands')
-  const [title, setTitle] = useState('Buy dinner and leave it at ward counter')
-  const [notes, setNotes] = useState('No conversation needed, just message after drop-off')
-  const [triageFlag, setTriageFlag] = useState(false)
-
-  const openTasks = tasks.filter((task) => task.status === 'Open')
-  const totalVia = tasks.reduce((sum, task) => sum + (task.status === 'Done' ? task.viaHours : 0), 0)
-  const silentShare = Math.round((tasks.filter((task) => task.silent).length / tasks.length) * 100)
-  const readyVolunteers = volunteers.filter((volunteer) => volunteer.status === 'Ready').length
-  const suggestedPoints = useMemo(() => {
-    const base = category === 'Transport' ? 70 : category === 'Tech help' ? 30 : category === 'Companionship' ? 35 : 45
-    return base + (silent ? 10 : 0) + (triageFlag ? 0 : 5)
-  }, [category, silent, triageFlag])
-
-  function createTask() {
-    const newTask: HelpTask = {
-      id: `T-${1027 + tasks.length}`,
-      title,
+  function postTask() {
+    const newTask: Task = {
+      id: `CK-${1027 + tasks.length}`,
+      title: request,
       category,
-      location: 'AH / home recovery route',
-      time: 'Next available volunteer slot',
-      points: suggestedPoints,
-      viaHours: suggestedPoints >= 60 ? 1.5 : suggestedPoints >= 40 ? 1 : 0.5,
-      silent,
-      clinicalRisk: triageFlag,
-      caregiver: 'New male caregiver',
-      status: triageFlag ? 'Matched' : 'Open',
-      notes: triageFlag ? 'Flagged: volunteer supports logistics only. Clinical concern escalated to nurse/MSW.' : notes,
-      owner: triageFlag ? 'AH clinical escalation owner' : 'Volunteer Ops Lead',
+      time: 'Next available slot',
+      location: 'AH / recovery route',
+      silent: isSilent,
+      status: 'Open',
+      points,
+      volunteer: '',
     }
     setTasks([newTask, ...tasks])
+    setSubmitted(true)
   }
 
-  function claimTask(id: string) {
-    setTasks(tasks.map((task) => task.id === id ? { ...task, status: 'Matched', owner: 'Matched volunteer · completion due' } : task))
-  }
-
-  function completeTask(id: string) {
-    setTasks(tasks.map((task) => task.id === id ? { ...task, status: 'Done', owner: 'Receipt issued · AH review queue' } : task))
-  }
-
-  function completeTraining(index: number) {
-    setVolunteers(volunteers.map((volunteer, i) => i === index ? { ...volunteer, status: 'Ready', reliability: 100 } : volunteer))
+  function advanceTask(task: Task) {
+    setTasks(tasks.map((item) => {
+      if (item.id !== task.id) return item
+      if (item.status === 'Open') return { ...item, status: 'Matched', volunteer: 'Maya T.' }
+      if (item.status === 'Matched') return { ...item, status: 'Done' }
+      return item
+    }))
   }
 
   return (
-    <main className="app-shell">
-      <section className="hero">
-        <div>
-          <p className="eyebrow">SparkX⁺Change · Alexandra Hospital caregiver respite</p>
-          <h1>CareKaki Bridge</h1>
-          <p className="hero-copy">A silent-help task marketplace where male caregivers offload small burdens without paisehness, while trained youth volunteers deliver scoped support and earn verified VIA hours.</p>
-          <div className="hero-actions"><a href="#request" className="primary">Post a silent task</a><a href="#ops" className="secondary">View volunteer ops</a></div>
+    <main>
+      <nav className="nav-shell">
+        <a className="brand" href="#top"><Mark /><span>carekaki<span className="brand-light">bridge</span></span></a>
+        <div className="nav-links"><a href="#how">How it works</a><a href="#tasks">Task board</a><a href="#safety">Safety</a></div>
+        <a className="nav-cta" href="#request">Post a task <Arrow /></a>
+      </nav>
+
+      <section className="hero" id="top">
+        <div className="hero-copy">
+          <p className="eyebrow">ALEXANDRA HOSPITAL · CAREGIVER RESPITE PILOT</p>
+          <h1>Help, on your<br /><em>own terms.</em></h1>
+          <p className="lede">A quiet, practical way for caregivers to offload one thing today — matched with trained youth volunteers, never clinical care.</p>
+          <div className="hero-actions"><a className="button button-dark" href="#request">Post a silent task <Arrow /></a><a className="text-link" href="#how">See how it works <span>↓</span></a></div>
+          <div className="trust-row"><span><b>01</b> one small ask</span><i></i><span><b>02</b> a trusted match</span><i></i><span><b>03</b> visible relief</span></div>
         </div>
-        <aside className="impact-card"><span>Programme-fit loop</span><strong>Request → match → safely complete → measure relief</strong><p>CareKaki turns AH’s existing support and youth recruitment into a managed, measurable caregiver-respite programme.</p></aside>
-      </section>
-
-      <section className="stats-grid" aria-label="pilot metrics">
-        <div><strong>{openTasks.length}</strong><span>open help requests</span></div>
-        <div><strong>{readyVolunteers}</strong><span>trained volunteers ready</span></div>
-        <div><strong>{silentShare}%</strong><span>silent / low-contact tasks</span></div>
-        <div><strong>{totalVia.toFixed(1)}</strong><span>VIA hours completed</span></div>
-      </section>
-
-      <section className="programme-strip"><strong>Programme requirements built in:</strong><span>male-friendly respite</span><span>youth tech enablement</span><span>volunteer management</span><span>project management</span><span>measurable 6-month impact</span></section>
-
-      <section className="split" id="request">
-        <div className="panel form-panel">
-          <p className="eyebrow">Caregiver side</p><h2>Request help without needing to explain yourself</h2>
-          <label>Task title<input value={title} onChange={(e) => setTitle(e.target.value)} /></label>
-          <label>Category<select value={category} onChange={(e) => setCategory(e.target.value as TaskCategory)}>{categories.map((item) => <option key={item}>{item}</option>)}</select></label>
-          <label>Notes shown to volunteer<textarea value={notes} onChange={(e) => setNotes(e.target.value)} /></label>
-          <div className="toggle-row"><button className={silent ? 'toggle active' : 'toggle'} onClick={() => setSilent(!silent)}>{silent ? 'Silent Task ON' : 'Silent Task OFF'}</button><button className={triageFlag ? 'toggle danger' : 'toggle'} onClick={() => setTriageFlag(!triageFlag)}>{triageFlag ? 'Clinical concern flagged' : 'No clinical concern'}</button></div>
-          <button className="primary wide" onClick={createTask}>Create request · {suggestedPoints} pts</button>
+        <div className="hero-visual">
+          <img src={heroImage} alt="A caregiver and youth volunteer reviewing a practical checklist together" />
+          <div className="image-wash"></div>
+          <div className="floating-card"><span className="soft-label">QUIETLY DONE</span><strong>“No call needed.<br />Just message me.”</strong><div><span className="mini-dot"></span> Silent Task enabled</div></div>
+          <div className="hero-stamp"><span>CAREKAKI</span><b>24</b><span>BRIDGE</span></div>
         </div>
-        <div className="panel safety-panel"><p className="eyebrow">AH-safe task guardrail</p><h2>Volunteers help with tasks, not treatment</h2><ul><li>Medication, wounds, symptoms, insulin, falls → nurse/pharmacist/MSW.</li><li>Allowed: errands, wayfinding, reminder setup, meal pickup, forms, companionship.</li><li>Every task creates an owner, receipt, and escalation path.</li></ul></div>
       </section>
 
-      <section className="panel" id="board"><div className="section-head"><div><p className="eyebrow">Volunteer side</p><h2>Claim OTOT tasks, earn VIA hours, build a verified care portfolio</h2></div><span className="badge">Gamified but bounded</span></div><div className="task-grid">{tasks.map((task) => <article className="task-card" key={task.id}><div className="task-topline"><span>{task.id}</span><strong className={`status ${task.status.toLowerCase()}`}>{task.status}</strong></div><h3>{task.title}</h3><p>{task.notes}</p><div className="chips"><span>{task.category}</span><span>{task.points} pts</span><span>{task.viaHours} VIA hr</span>{task.silent && <span>silent</span>}{task.clinicalRisk && <span className="risk">escalated</span>}</div><dl><div><dt>Caregiver</dt><dd>{task.caregiver}</dd></div><div><dt>When</dt><dd>{task.time}</dd></div><div><dt>Owner</dt><dd>{task.owner}</dd></div></dl><div className="card-actions">{task.status === 'Open' && <button onClick={() => claimTask(task.id)}>Claim task</button>}{task.status === 'Matched' && <button onClick={() => completeTask(task.id)}>Mark done</button>}{task.status === 'Done' && <span className="done-note">Receipt generated</span>}</div></article>)}</div></section>
-
-      <section className="ops-grid" id="ops">
-        <div className="panel"><p className="eyebrow">Volunteer management</p><h2>Recruit, train, deploy, recognise</h2><p>Every youth volunteer moves through a lightweight safe-service pathway before claiming caregiver tasks.</p><div className="roster">{volunteers.map((volunteer, index) => <div className="roster-row" key={volunteer.name}><div><strong>{volunteer.name}</strong><span>{volunteer.skill} · {volunteer.hours} VIA hrs</span></div><span className={`roster-status ${volunteer.status.toLowerCase().replace(' ', '-')}`}>{volunteer.status}</span>{volunteer.status === 'Training due' ? <button onClick={() => completeTraining(index)}>Complete briefing</button> : <small>{volunteer.reliability ? `${volunteer.reliability}% reliable` : 'Awaiting first task'}</small>}</div>)}</div><div className="mini-flow"><span>1. Screen</span><span>2. AH briefing</span><span>3. Skill-tag</span><span>4. Match</span><span>5. VIA receipt</span></div></div>
-        <div className="panel"><p className="eyebrow">Project management</p><h2>Run the pilot like an AH programme, not an unowned app</h2><div className="milestones"><div><b>Week 0–2</b><span>Recruit 20 youth volunteers, run safeguarding + escalation briefing.</span><em>Owner: Volunteer Ops</em></div><div><b>Week 3–4</b><span>Launch one discharge route; daily task moderation and receipt review.</span><em>Owner: AH/C3U liaison</em></div><div><b>Month 2–6</b><span>Review uptake, caregiver confidence/stress, repeat requests, and incidents weekly.</span><em>Owner: Impact lead</em></div></div><p className="impact-note">Impact dashboard: caregivers supported · tasks completed · silent-task uptake · VIA hours · caregiver stress/confidence change · clinical incidents = 0.</p></div>
+      <section className="principles" id="how">
+        <p className="eyebrow">DESIGNED FOR REAL LIFE</p>
+        <div className="section-heading"><h2>Not another place<br />to explain yourself.</h2><p>CareKaki turns the invisible load into a clear next action. Pick a small task. Keep it low-contact. Know exactly what happens next.</p></div>
+        <div className="principle-grid">
+          <article><span className="number">01</span><h3>Task-first</h3><p>Choose from familiar, concrete asks — an errand, a form, a reminder, a route.</p></article>
+          <article><span className="number">02</span><h3>Silence is a setting</h3><p>No call, no small talk, no need to share more than you want to.</p></article>
+          <article><span className="number">03</span><h3>Safe by design</h3><p>Trained volunteers help with logistics. Care concerns go straight back to the care team.</p></article>
+        </div>
       </section>
 
-      <section className="split"><div className="panel"><p className="eyebrow">Existing support, activated</p><h2>Not another directory</h2><p>NUHS already offers caregiver education, training, resources and tailored support-group/programme matching. CareKaki is the activation layer: a youth volunteer can help a caregiver set reminders, navigate the directory, or attend a practical programme without replacing clinical or counselling support.</p></div><div className="panel"><p className="eyebrow">Pilot model</p><h2>Start narrow at AH</h2><p>One ward/discharge route, 20–30 caregivers, trained youth volunteers, a weekly operations huddle, and an exportable receipt dashboard for AH safety, uptake and caregiver-relief review.</p></div></section>
+      <section className="request-section" id="request">
+        <div className="request-aside"><p className="eyebrow">CAREGIVER REQUEST</p><h2>What would make<br /><em>today</em> lighter?</h2><p>Start with a small, practical task. You can change the details later — this is only a safe first step.</p><div className="side-note"><span>✦</span><p><b>Silent Task</b><br />A private, low-contact request. Your volunteer sees only what is needed to help.</p></div></div>
+        <div className="request-card">
+          {submitted ? <div className="success-state"><span>✓</span><p className="eyebrow">REQUEST RECEIVED</p><h3>That is one thing off your plate.</h3><p>Your request is now in the moderated queue. We will only surface it to volunteers cleared for this task type.</p><button onClick={() => setSubmitted(false)} className="button button-dark">Post another <Arrow /></button></div> : <>
+            <div className="form-top"><span>01 / 01</span><span>about 30 seconds</span></div>
+            <label>What do you need help with?<textarea value={request} onChange={(event) => setRequest(event.target.value)} /></label>
+            <div className="form-row"><label>Task type<select value={category} onChange={(event) => setCategory(event.target.value as Category)}>{categories.map((item) => <option key={item}>{item}</option>)}</select></label><label>Suggested recognition <div className="points-box">{points} <small>points</small></div></label></div>
+            <button className={`silent-switch ${isSilent ? 'on' : ''}`} onClick={() => setIsSilent(!isSilent)}><span className="switch-knob"></span><span><b>Silent Task</b><small>No call or conversation expected</small></span><em>{isSilent ? 'ON' : 'OFF'}</em></button>
+            <button className="button button-dark full" onClick={postTask}>Place my request <Arrow /></button>
+            <p className="form-foot">Non-clinical help only. For symptoms, medication, falls or distress, please speak with your care team.</p>
+          </>}
+        </div>
+      </section>
+
+      <section className="board-section" id="tasks">
+        <div className="board-top"><div><p className="eyebrow">VOLUNTEER TASK BOARD</p><h2>Small asks.<br /><em>Real relief.</em></h2></div><div className="board-summary"><b>{openCount}</b><span>tasks ready<br />for a match</span></div></div>
+        <div className="filter-row">{(['All', 'Open', 'Matched', 'Done'] as const).map((item) => <button key={item} onClick={() => setFilter(item)} className={filter === item ? 'filter active' : 'filter'}>{item}</button>)}<span className="filter-note"><span className="mini-dot"></span> moderated daily</span></div>
+        <div className="task-stack">{visibleTasks.map((task) => <article className="task-row" key={task.id}><div className="task-index"><span>{task.id}</span><b>{task.silent ? 'S' : '·'}</b></div><div className="task-main"><div className="task-meta"><span>{task.category}</span><span>{task.location}</span><span>{task.time}</span></div><h3>{task.title}</h3></div><div className="task-reward"><b>{task.points}</b><span>points</span></div><div className="task-status"><span className={`status ${task.status.toLowerCase()}`}>{task.status}</span>{task.volunteer && <small>{task.status === 'Done' ? 'Receipt issued' : task.volunteer}</small>}</div><button className="task-action" onClick={() => advanceTask(task)} disabled={task.status === 'Done'}>{task.status === 'Open' ? 'Claim' : task.status === 'Matched' ? 'Complete' : 'Done'} <Arrow /></button></article>)}</div>
+      </section>
+
+      <section className="safety-section" id="safety">
+        <div><p className="eyebrow">THE CAREKAKI PROMISE</p><h2>Warmth needs<br /><em>clear edges.</em></h2></div>
+        <div className="safety-grid"><article><span>↳</span><h3>We do</h3><p>Errands, meals, reminder setup, wayfinding, basic forms, companionship and home organisation.</p></article><article><span>×</span><h3>We do not</h3><p>Medication, wound care, lifting, personal care, diagnosis, medical interpretation or crisis support.</p></article><article><span>!</span><h3>We escalate</h3><p>Every concern has a named AH-linked owner, an incident route and an accountable receipt.</p></article></div>
+      </section>
+
+      <section className="pilot-banner"><div><p className="eyebrow">ONE NARROW PILOT. DONE WELL.</p><h2>Built with caregivers,<br />not just for them.</h2></div><div className="pilot-metrics"><span><b>{silentRate}%</b> silent task uptake</span><span><b>0</b> clinical advice incidents</span><span><b>20–30</b> caregiver pilot cohort</span></div></section>
+
+      <footer><a className="brand" href="#top"><Mark /><span>carekaki<span className="brand-light">bridge</span></span></a><p>Silent help. Visible relief. Managed with care.</p><span>SparkX⁺Change · Alexandra Hospital</span></footer>
     </main>
   )
 }
-
-export default App

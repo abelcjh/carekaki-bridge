@@ -1,68 +1,62 @@
 # CareKaki Bridge
 
-A SparkX⁺Change prototype for Alexandra Hospital's caregiver-respite challenge.
+> **Help, on your own terms.** A high-trust, AH-linked caregiver-respite pilot for small, bounded non-clinical tasks.
 
-**CareKaki Bridge** is an AH-safe, TaskRabbit-adjacent **youth volunteer programme and task marketplace**. Male caregivers request small practical help without the social friction of asking directly; trained student volunteers claim bounded non-clinical tasks and earn verified VIA-style hours, points and care-service receipts.
+[Live prototype](https://abelcjh.github.io/carekaki-bridge/) · [Editable V2 deck](https://docs.google.com/presentation/d/1Be8o3WgWZ4HiMO0bN_4A_JVgpNycGeqs/edit) · [Research and standards](./RESEARCH.md)
 
-## Programme alignment
+![CareKaki Bridge hero](./src/assets/carekaki-hero.png)
 
-| Required element | In the prototype |
-|---|---|
-| Male-friendly caregiver respite | Silent Task, no-call preference and practical task-first framing |
-| Youth technology component | Reminder, teleconsult/platform, WhatsApp and support-directory navigation help |
-| Volunteer management | Recruit, screen, briefing, skill tag, task match, supervision, recognition/VIA receipt |
-| Project management | Named pilot owners, milestones, weekly operating huddle, moderation, escalation and metrics |
-| Measurable impact | Tasks completed, silent-task uptake, caregivers supported, repeat use, VIA hours, caregiver confidence/stress and incidents |
-| Existing-service integration | AH/C3U and official NUHS/AIC referral/programme pathways, rather than copying clinical services |
+## What this prototype demonstrates
 
-## Judge-visible flow
+CareKaki Bridge is not a generic gig app or substitute for clinical care. It is an **activation layer** that makes it easier for caregivers — especially people uncomfortable asking for help — to turn one practical burden into a safely managed request.
 
-> caregiver has a burden → posts a Silent Task → trained volunteer claims → safety guardrail prevents clinical advice → receipt/points/VIA record → weekly AH operations review.
+### Core experience
 
-## Volunteer-management model
+1. **Post a bounded task** — errands, tech setup, wayfinding, meals/home help.
+2. **Choose Silent Task** — no call or conversation expected; only operational details are shared.
+3. **Match safely** — youth volunteers are screened, briefed and matched by task scope, skill and time.
+4. **Complete visibly** — an accountable completion / escalation record and volunteer recognition are created.
 
-1. **Recruit** youth through school/community partners.
-2. **Screen and brief** on confidentiality, boundaries, escalation and safeguarding.
-3. **Skill-tag** volunteers (tech, errands, escort, admin, companionship).
-4. **Match and supervise** through availability, task category, completion receipt and incident route.
-5. **Recognise** verified VIA hours, reliability and service portfolio outcomes.
+## Product standards implemented
 
-No volunteer may provide medication, wound care, personal care, lifting, diagnosis or mental-health/crisis support. These route to AH professionals and/or official pathways.
+- **Caregiver-first UX:** low cognitive load, concrete request language, a single primary action and progressive disclosure.
+- **Trust at the point of decision:** task scope, moderation, status, recognition and safety boundaries are visible.
+- **Volunteer operations:** recruit → brief → skill-tag → match → recognise, rather than an unmoderated task board.
+- **Clinical boundary:** volunteers provide non-clinical practical help only. Symptoms, medication, personal care, lifting, falls, mental-health crisis and medical interpretation are escalated.
+- **Pilot accountability:** named operational / escalation owners, daily moderation, task receipts and outcome measurement.
 
-## Why this direction
+## Interaction demo
 
-The team’s final solution calls for:
+The front-end prototype supports:
 
-- male caregivers posting different kinds of help tasks;
-- a **Silent Task** option to reduce paisehness;
-- student-volunteer matching by skill/category;
-- gamified VIA/reward incentives;
-- heavier tasks earning more points/VIA hours.
+- creating a new request and toggling **Silent Task**;
+- filtering the task board by status;
+- claiming an open task and completing a matched task;
+- seeing pilot-facing safety and impact logic.
 
-NUHS already provides caregiver support information, education, programme matching and referral pathways. CareKaki is the **activation layer**, not a replacement for counselling, medical care or official programme referral: youth can assist with digital setup, wayfinding, registration and reminders while professionals retain clinical responsibility.
+All data is in-memory demo data; no personal or health data is collected.
 
 ## Local development
 
 ```bash
 npm install
 npm run dev
+npm run build
+npm run lint
 ```
 
-## Verification
+## Deck
+
+`scripts_make_deck.py` generates `CareKaki_Bridge_pitch_deck_v2.pptx`. The deck is a 12-slide editable PPTX and uses the same visual system as the web experience.
 
 ```bash
-npm run build
+python3 -m venv .venv
+.venv/bin/python -m pip install python-pptx
+.venv/bin/python scripts_make_deck.py
 ```
 
-## Demo script
+## Research discipline
 
-1. Show the programme-fit strip: youth tech enablement, volunteer management, project management and impact.
-2. Toggle **Silent Task ON** and create a task.
-3. Show the new task on the volunteer board, then claim and complete it.
-4. Open **Volunteer Ops**: training gate, skill tags, readiness and reliability.
-5. Show **Project Management**: named owners, pilot milestones and measurable impact dashboard.
-6. Explain that any clinical concern is escalated, not answered by students.
+See [RESEARCH.md](./RESEARCH.md) for the LinkedIn, GitHub, Singapore-sector and caregiver-marketplace signals used in the redesign, source links, operational standards and explicit evidence caveats.
 
-## Research
-
-See [RESEARCH.md](./RESEARCH.md) for the source audit, NUHS/FormSG findings, local ecosystem fit and validation plan.
+Before a real pilot, validate the safe-task taxonomy, escalation SOP, data handling, volunteer screening and caregiver measures with AH / clinical stakeholders and caregivers themselves.

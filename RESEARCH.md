@@ -1,67 +1,55 @@
-# Research alignment — CareKaki Bridge final solution
+# CareKaki Bridge — product standards & comparable research
 
-This note keeps the web/social research aligned with the team's **FINAL Solution** and SparkX⁺Change requirements: CareKaki Bridge is a TaskRabbit-adjacent, **managed youth-volunteer programme** where male caregivers post scoped tasks and trained volunteers accept them. Silent Task mode reduces paisehness; volunteer operations, project governance, and AH escalation make the concept pilotable.
+*Updated: 7 August 2026. This is a design and operating-model benchmark, not a claim of clinical validation. Caregiver and AH stakeholder testing remains required before any pilot.*
 
-## Research-backed thesis
+## Design principle adopted
 
-Caregivers in Singapore do not only need more information. They need easier conversion from “I know help exists” to “I can accept help now without shame, cost shock, or complex coordination.” For male caregivers, the service should feel practical, task-focused, flexible, and competence-preserving.
+CareKaki should feel like a **high-trust caregiver activation layer**, rather than a generic gig marketplace or a care directory. The winning interaction is: **one small bounded ask → a suitable, trained person → an accountable completion record**.
 
-> **CareKaki Bridge:** “Post one specific non-clinical task, optionally silent. A trained youth volunteer claims it. AH sees a receipt and any clinical concern is escalated.”
+The current prototype applies four leading-product standards:
 
-## Programme-fit requirements
+1. **Reduce cognitive load before adding choice.** Start with a pre-filled practical request and progressively disclose task details. This follows caregiver-marketplace work that prioritises clarity, pacing and predictable next actions under stress.
+2. **Make trust legible at the point of action.** Volunteer skill / role fit, task scope, moderation, completion receipts and clinical escalation are visible rather than buried in a policy page.
+3. **Use a real volunteer operations layer.** Recruit, screen, brief, skill-tag, match, recognise and measure. A volunteer board without this operating model would be unsafe and unreliable.
+4. **Separate help from treatment.** CareKaki supports navigation, logistics, technology and companionship. It does not provide medical advice, personal care or emergency response.
 
-| SparkX⁺Change requirement | CareKaki implementation | Evidence shown in the prototype/pitch |
-|---|---|---|
-| Male-friendly, low-emotional-barrier caregiver respite | Silent Task, no-call preference, practical “one task” language, caregiver controls timing/details | Silent Task request flow and low-contact task templates |
-| Integrate current programmes, rather than duplicate them | AH/C3U staff review queue; task receipts can route caregivers to NUHS/AH programmes, AIC Link, education or support services | “Activation layer, not another directory” |
-| Youth tech component | Youth volunteers set up calendar/medication reminders *without medical advice*, teleconsult access, WhatsApp and directory navigation | Tech-help category plus scoped safety gate |
-| Volunteer management | Recruit → screen → AH briefing → skill-tag → match → supervision → VIA receipt/recognition | Volunteer roster, training gate, reliability and verified VIA hours |
-| Project management | Named pilot owners, weekly operations huddle, task moderation, escalation SOP, milestone plan and impact dashboard | Project-control panel and pilot plan |
-| Measurable impact | Track caregivers supported, task completion, silent-task uptake, repeat requests, VIA hours, caregiver confidence/stress, escalation and incidents | Six-month dashboard; target is directional until validated with AH |
+## Source signals
 
-## Key evidence and source anchors
+| Surface | Comparable / source | Signal adopted | Source / caveat |
+|---|---|---|---|
+| Care marketplace UX | AARP Caregiver Marketplace case study | High-trust caregiver experiences should reduce cognitive load, use clear hierarchy, progressive disclosure and a path from learn → ask → act. | [Case study](https://aminswessi.com/aarp.html). A design case study, not independent effectiveness evidence. |
+| Care marketplace UX | Like Family redesign case study | Pre-filled activity templates, trust signals, message prompts and reputation cues reduced posting friction; the case study reports higher posting, messaging and bookings after redesign. | [Case study](https://www.jesstong.com/like-family-matchmaking). Reported by the designer; do not treat outcomes as independently audited. |
+| Volunteer management | Kambeo / LinkedIn product listing | Opportunity posting, application approval, scheduling, communication and verified volunteer hours are baseline coordinator capabilities. | [LinkedIn product page](https://www.linkedin.com/products/gigitmarketplace-volunteer-management/). Vendor / product description. |
+| Volunteer operations | NCSS Volunteer Management | Volunteer management is a strategic function; Singapore’s sector uses Volunteer Centres to match community contributors to needs. | [NCSS](https://www.ncss.gov.sg/programmes/people/volunteer-management/). Local operating context. |
+| Caregiver support | CaringSG CAREadvisory + CAREbuddy | Review / triage before matching, clear service boundaries, a baseline and closure measure, trained helpers and stated non-emergency limits build trust. | [CAREadvisory](https://caring.sg/careadvisory/), [CAREbuddy](https://caring.sg/carebuddy/), [training](https://caring.sg/caregiver-volunteer-training/). Adjacent target group, not AH validation. |
+| GitHub implementation patterns | OpenVolunteerPlatform | Secure roles, forms, real-time updates, task management, scheduling, reporting and coordinator views are reusable architectural patterns for a future operational build. | [GitHub](https://github.com/aerogear/OpenVolunteerPlatform). Engineering reference, not a healthcare safety standard. |
+| GitHub implementation patterns | codeforgood volunteer matching platform | Skill, location and availability matching; verified profiles; reviews; calendar integration and analytics are practical backlog patterns. | [GitHub](https://github.com/codeforgood-org/volunteer-matching-platform). Community repo; audit before reuse. |
 
-| Evidence | Why it supports the final solution | Source |
-|---|---|---|
-| Only 50.09% of caregivers knew of respite resources; 82.83% of those aware had never used respite. | Awareness alone is insufficient. A concrete task workflow reduces activation friction. | SMU ROSA 2025 caregiver profile: https://rosa.smu.edu.sg/sites/rosa.smu.edu.sg/files/Briefs/Mar25/Profiles%20and%20well-being%20of%20caregivers%20in%20Singapore.pdf |
-| Family caregivers of older adults in Singapore average 33 care hours/week; about 26% receive no family/MDW help; only 5% attended caregiver training. | Small practical tasks can relieve overloaded caregivers while youth offer hands-on tech enablement. | Duke-NUS CARE TraCE Research Brief 16: https://www.duke-nus.edu.sg/docs/librariesprovider3/research-policy-brief-docs/a-profile-of-family-caregivers-of-older-adults-in-singapore7d8bce89778d432b95b446254d2a2b4a.pdf |
-| Caregivers may hold back due to stigma, duty/filial piety, and not identifying as caregivers. | Silent Task mode addresses help-seeking friction without demanding emotional disclosure. | CNA: https://www.channelnewsasia.com/singapore/caregivers-more-seeking-financial-aid-support-groups-5237006 |
-| Male caregivers benefit from flexible, practical, solution-oriented support. | The task marketplace is a better fit than counselling/support-group-first onboarding. | 2025 scoping review: https://link.springer.com/article/10.1007/s44250-025-00285-9 |
-| Carer Matters enrolled caregivers through hospital-to-home workflow with needs assessment, training, tele-support and community links. | CareKaki should plug into hospital workflow with staff ownership; it cannot be a standalone unmoderated board. | BMC RE-AIM paper: https://link.springer.com/article/10.1186/s12913-022-08317-3 |
-| AH C3U coordinates existing patients, caregivers and community partners across care settings. | C3U/AH is a plausible pilot referral and escalation surface to validate with the hospital. | AH C3U: https://www.ah.com.sg/our-services/community-care-coordination-unit-c3u-at-ah |
+## Social research method: LinkedIn, X and Reddit
 
-## NUHS and FormSG findings — how to use them correctly
+- **LinkedIn:** used for public product and volunteer-operations material; it is useful for category and operating-model signals but is mostly company / professional self-reporting.
+- **X:** public, searchable signals are treated as directional only. No individual post or trend should be presented as caregiver evidence.
+- **Reddit:** used only for qualitative language and friction hypotheses, never prevalence or clinical claims. The product must validate these hypotheses through local caregiver interviews and AH staff review.
 
-The NUHS Patient & Caregiver Support page links caregivers to information, education, support and practical services. It includes the **Patient & Caregiver Support for Psychosocial and Emotional Well-being** pathway and routes users to a FormSG questionnaire to receive recommendations for relevant support groups, programmes and counselling/services.
+## What changed in the prototype
 
-This is valuable evidence that the ecosystem already provides counselling, nutrition/exercise education, peer support and formal programmes. **CareKaki should not copy these clinical or psychosocial services.** It should act as the assisted activation layer:
+- Replaced a dense dashboard aesthetic with a calm editorial hierarchy: one main action, large type, restrained palette, generous whitespace and recognisable task cards.
+- Added a **Silent Task** control as the core inclusion mechanism rather than a minor feature.
+- Changed task browsing from a card wall to a scan-friendly, status-filtered task board with scope, time, points and moderation cues.
+- Framed safety as a visible promise: allowed / prohibited / escalation.
+- Kept the live demo interaction: post a task, toggle Silent Task, filter tasks, claim a task and complete a task.
 
-1. a caregiver posts a bounded task, such as “help me find and register for a caregiver exercise/nutrition session” or “set reminders for a programme”;
-2. a trained youth volunteer handles navigation, digital setup, accompaniment/wayfinding or forms;
-3. counselling, psychosocial need, medical questions and programme suitability remain with NUHS/AH professionals and the official referral form.
+## Pilot standards to validate with AH
 
-The FormSG link is therefore **not a public task intake form** and should not be repurposed. It is an official matching/referral pathway; CareKaki can direct the caregiver to it and record only a non-sensitive “referred” receipt.
+1. Named AH operational owner and clinical escalation owner.
+2. Approved safe-task taxonomy and prohibited-task rule set.
+3. Volunteer screening, confidentiality acknowledgement and scenario-based briefing.
+4. Daily moderation / matching rhythm, and an escalation SLA.
+5. Completion receipt fields: task, volunteer, action, outcome, escalation, reviewer.
+6. Baseline and follow-up caregiver measure. Track uptake, silent-task share, completion, repeat use, volunteer retention, caregiver confidence / burden, and **zero volunteer clinical-advice incidents**.
 
-Sources reviewed:
-- NUHS Patient & Caregiver Support: https://www.nuhs.edu.sg/patient-care/patient-and-caregiver-support
-- Official support-matching form: https://form.gov.sg/63a005bdb8509f0012092f9a
+## Deliberately not claimed
 
-## Product requirements derived from research and programme brief
-
-1. **Silent Task mode**: low-contact request flow with “no call needed” templates.
-2. **Practical categories**: errands, escort/transport, meal support, tech help, forms/admin, companionship and home setup.
-3. **Youth tech enablement**: reminders, teleconsult/platform setup, directory navigation and programme registration support; never clinical judgement.
-4. **Safety gate**: medication, symptoms, wounds, insulin, falls, mental-health crisis or programme suitability → nurse/pharmacist/MSW/official referral.
-5. **Volunteer operations**: screening, AH safeguarding briefing, skill tags, availability, moderation, supervision, completion receipts, VIA/recognition and incident route.
-6. **Project controls**: named owners; task service-level expectation; weekly operations huddle; escalation log; caregiver feedback; milestone and risk review.
-7. **Caregiver control**: choose task, timing, silence level and details revealed.
-8. **AH receipt dashboard**: posted, claimed, completed, declined, escalated, follow-up owner and referral status.
-9. **Pilot wedge**: one AH ward/discharge route; 20–30 caregivers; recruited youth cohort; weekly staff review.
-
-## Impact and validation plan
-
-The organisers’ 30% burnout-reduction goal is an **aspirational six-month outcome**, not a claim we can make before a pilot. Baseline and weekly/fortnightly caregiver confidence or stress measures must be agreed with AH. Near-term proof metrics are: task acceptance, silent-task uptake, repeat use, completed micro-respite hours, programme/referral activation, volunteer retention/VIA hours, caregiver confidence and zero clinical-advice incidents.
-
-## Pitch line
-
-CareKaki Bridge turns caregiver respite from a hard-to-ask emotional request into one silent, specific, AH-safe task — delivered by a trained youth volunteer, managed as a real programme, and measured for caregiver relief.
+- No claim that the UI, incentive system or Silent Task flow improves wellbeing without a local pilot.
+- No claim that social-media discussions represent Singapore caregivers.
+- No claim that volunteers replace clinicians, counsellors, family support, AIC, NUHS or AH pathways.
