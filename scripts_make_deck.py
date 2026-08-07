@@ -5,7 +5,7 @@ from pptx.enum.text import PP_ALIGN
 from pptx.enum.shapes import MSO_SHAPE
 from pathlib import Path
 
-OUT = Path('/home/abel/carekaki-bridge/CareKaki_Bridge_pitch_deck.pptx')
+OUT = Path('/home/abel/carekaki-bridge/CareKaki_Bridge_pitch_deck_v2.pptx')
 prs = Presentation()
 prs.slide_width = Inches(13.333)
 prs.slide_height = Inches(7.5)
@@ -133,21 +133,38 @@ card(slide, 'Users', '20–30 male/primary caregivers; trained student volunteer
 card(slide, 'Success metrics', 'Task acceptance, silent-task rate, repeat requests, VIA hours, caregiver confidence, escalation safety, staff feasibility.', 8.95, 2.25, 3.7, 2.1, ORANGE)
 add_text(slide, 'First proof target: 30 caregivers, 100 completed non-clinical tasks, 0 volunteer clinical-advice incidents.', .9, 5.4, 11.5, .6, 24, True, NAVY, PP_ALIGN.CENTER)
 
-# 9 prototype
+# 9 volunteer management
+slide = prs.slides.add_slide(prs.slide_layouts[6]); set_bg(slide, RGBColor(238,247,255))
+add_title(slide, 'Volunteer management', 'Recruit youth. Train them. Match safely. Recognise real service.', 'Volunteer supply is not assumed: CareKaki includes an operating system for recruitment, safeguarding and retention.')
+card(slide, '1. Recruit + screen', 'Youth sign up through schools/community partners. Verify availability, motivation and role-fit.', .7, 2.25, 2.9, 2.35, BLUE)
+card(slide, '2. AH briefing', 'Confidentiality, respectful communication, no-clinical-advice boundary, incident/escalation SOP.', 3.87, 2.25, 2.9, 2.35, ORANGE)
+card(slide, '3. Skill-tag + match', 'Tag tech, errands, escort, admin or companionship; match by time, task scope and readiness.', 7.04, 2.25, 2.9, 2.35, GREEN)
+card(slide, '4. Supervise + retain', 'Completion receipt, reliability, weekly review, verified VIA hours and portfolio recognition.', 10.21, 2.25, 2.4, 2.35, BLUE)
+add_text(slide, 'Volunteer outcome: a trusted youth cohort, not an unmoderated task board.', .85, 5.42, 11.7, .55, 23, True, NAVY, PP_ALIGN.CENTER)
+
+# 10 project management + integration
+slide = prs.slides.add_slide(prs.slide_layouts[6]); set_bg(slide)
+add_title(slide, 'Project management', 'Operate CareKaki as an AH-linked pilot, not just an app', 'Named owners, weekly routines, clinical escalation and measurable review keep the programme accountable.')
+card(slide, 'Set-up · Weeks 0–2', 'Recruit 20 youth volunteers; finalise safe task list; train; agree AH/C3U escalation owner.', .7, 2.3, 3.7, 2.15, BLUE)
+card(slide, 'Launch · Weeks 3–4', 'One ward/discharge route; daily task moderation; receipt review; referral to existing AH/NUHS/AIC support.', 4.82, 2.3, 3.7, 2.15, GREEN)
+card(slide, 'Learn · Month 2–6', 'Weekly ops huddle: uptake, caregiver confidence/stress, repeated use, volunteer retention, incidents and fixes.', 8.94, 2.3, 3.7, 2.15, ORANGE)
+add_text(slide, 'CareKaki activates existing support. It does not replace counselling, education programmes or official referral pathways.', .75, 5.45, 11.9, .6, 19, True, NAVY, PP_ALIGN.CENTER)
+
+# 11 prototype
 slide = prs.slides.add_slide(prs.slide_layouts[6]); set_bg(slide, NAVY)
 add_text(slide, 'PROTOTYPE', .7, .55, 4, .35, 11, True, CYAN)
 add_text(slide, 'Working web app is already live', .7, 1.0, 7.2, .75, 36, True, WHITE)
 add_text(slide, 'GitHub repo: github.com/abelcjh/carekaki-bridge\nLive demo: abelcjh.github.io/carekaki-bridge/', .75, 1.9, 7.2, .75, 18, False, RGBColor(215,236,255))
-card(slide, 'Demo actions built', 'Create Silent Task · claim task · mark done · points/VIA hours · AH-safe clinical flag · volunteer board · pilot metrics.', .75, 3.15, 5.2, 2.0, CYAN)
-card(slide, 'Next build sprint', 'Auth roles, receipt export, volunteer leaderboard, caregiver SMS/WhatsApp link, admin dashboard, Supabase backend.', 6.6, 3.15, 5.8, 2.0, CYAN)
+card(slide, 'Demo actions built', 'Create Silent Task · claim and complete task · AH-safe clinical flag · volunteer training roster · skill tags · VIA receipt · project milestones.', .75, 3.15, 5.45, 2.15, CYAN)
+card(slide, 'Programme dashboard built', 'Open requests · trained volunteers ready · Silent Task uptake · VIA hours · task owner/receipt · impact metrics to validate with AH.', 6.85, 3.15, 5.55, 2.15, CYAN)
 
-# 10 close
+# 12 close
 slide = prs.slides.add_slide(prs.slide_layouts[6]); set_bg(slide)
 add_title(slide, 'Ask / close', 'Make respite as easy as posting one task', 'CareKaki Bridge gives AH a practical, measurable, youth-powered way to help male caregivers accept support.')
-card(slide, 'Why now', 'Singapore caregiver burden is rising, respite uptake is low, and AH already has caregiver/community coordination surfaces.', .7, 2.4, 3.8, 2.1, BLUE)
-card(slide, 'Why us', 'Youth volunteer supply + AI/full-stack build speed + lived Southeast Asia community execution through Abel/Nyala Labs.', 4.78, 2.4, 3.8, 2.1, GREEN)
-card(slide, 'What we need', 'AH pilot owner, volunteer onboarding path, safe task list, escalation SOP, and first caregiver feedback cycle.', 8.85, 2.4, 3.8, 2.1, ORANGE)
-add_text(slide, 'CareKaki Bridge: silent help, visible relief.', 1.15, 5.55, 10.9, .6, 28, True, NAVY, PP_ALIGN.CENTER)
+card(slide, 'Why now', 'Care burden is rising, formal-respite uptake is low, and NUHS/AH support needs an easier activation layer.', .7, 2.4, 3.8, 2.1, BLUE)
+card(slide, 'Why it is credible', 'Bounded youth roles, volunteer management, project owners, official referrals, and measurable impact—not a generic volunteer app.', 4.78, 2.4, 3.8, 2.1, GREEN)
+card(slide, 'What we need', 'AH pilot owner, volunteer onboarding partner, safe task list, escalation SOP, and a caregiver feedback/measurement cycle.', 8.85, 2.4, 3.8, 2.1, ORANGE)
+add_text(slide, 'CareKaki Bridge: silent help, visible relief, managed with care.', 1.15, 5.55, 10.9, .6, 28, True, NAVY, PP_ALIGN.CENTER)
 
 prs.save(OUT)
 print(OUT)
