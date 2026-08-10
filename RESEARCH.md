@@ -1,6 +1,6 @@
 # CareKaki Bridge — product standards & comparable research
 
-*Updated: 7 August 2026. This is a design and operating-model benchmark, not a claim of clinical validation. Caregiver and AH stakeholder testing remains required before any pilot.*
+*Updated: 10 August 2026. This is a design and operating-model benchmark, not a claim of clinical validation. Caregiver and AH stakeholder testing remains required before any pilot.*
 
 ## Design principle adopted
 
@@ -118,3 +118,9 @@ The public [WCAG 2.2](https://www.w3.org/TR/WCAG22/) baseline is relevant to car
 ### Social evidence limitation, updated
 
 A [Reddit corpus analysis](https://www.mdpi.com/1660-4601/20/3/1933) supports the *hypothesis* that caregiver discourse includes both emotional toll and logistical burdens; it is US-centric and not a prevalence estimate for Singapore. No defensible X-specific finding was recoverable in this research pass, so CareKaki makes **no X-derived claim**. Use social discourse for wording tests only, and validate through AH caregivers and programme staff.
+
+### 6. Singapore support-care volunteering is gated, not an open claim board (10 August 2026)
+
+Singapore’s public [SG Healthcare Corps listing](https://www.volunteer.gov.sg/scheme-detail/?code=SHC-MOH) says Care Volunteers apply only after an information session and training. A current [SGH Nursing Care Buddies listing](https://www.volunteer.gov.sg/volunteer/opportunity/details/?id=9737d219-924a-f111-ac85-027d80ecb760) adds interview, orientation, certified training and defined service-session commitments before hospital-ward support. The tasks in that SGH programme include patient-care activities that remain outside CareKaki’s boundary; it is **not** evidence that CareKaki volunteers should undertake them.
+
+**Product consequence adopted:** the post-request confirmation now makes the three gates visible: coordinator scope check, offer only to a volunteer cleared for that task type, and minimum practical details only after an approved match. This is a prototype transparency improvement, not a claim that CareKaki has an accredited programme, screening process or operational approval. The Ministry of Health’s [caregiving overview](https://www.moh.gov.sg/ageing-well/caregiving/) also describes caregiver support as spanning resources, respite, financial, workplace, training and community-network support; it does not validate this product or replace formal referral pathways.
