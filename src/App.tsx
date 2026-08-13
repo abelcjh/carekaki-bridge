@@ -22,13 +22,14 @@ type Task = {
   difficulty: Difficulty
   skill: string
   volunteer: string
+  safetyCleared: boolean
 }
 
 const initialTasks: Task[] = [
-  { id: 'CK-204', title: 'Collect discharge essentials from AH pharmacy counter', category: 'Errands', time: 'Today · 7:30 pm', zone: 'AH campus', silent: true, urgent: false, femalePreferred: false, status: 'Open', points: 40, viaHours: 1, difficulty: 'Light', skill: 'Errands ready', volunteer: '' },
-  { id: 'CK-205', title: 'Escort mum from clinic reception to booked taxi pickup', category: 'Sensitive accompaniment', time: 'Today · 5:45 pm', zone: 'AH campus', silent: true, urgent: true, femalePreferred: true, status: 'Open', points: 60, viaHours: 1.5, difficulty: 'Weightier', skill: 'Safeguarding + accompaniment', volunteer: '' },
-  { id: 'CK-206', title: 'Set gentle appointment reminders on my phone', category: 'Digital help', time: 'Tomorrow · 8:00 pm', zone: 'Remote', silent: false, urgent: false, femalePreferred: false, status: 'Matched', points: 35, viaHours: 0.5, difficulty: 'Skilled', skill: 'Digital help ready', volunteer: 'Arjun L.' },
-  { id: 'CK-207', title: 'Help complete a non-clinical transport form', category: 'Admin & forms', time: 'Fri · 4:15 pm', zone: 'Queenstown · 2 km band', silent: true, urgent: false, femalePreferred: false, status: 'Open', points: 50, viaHours: 1, difficulty: 'Skilled', skill: 'Forms briefing', volunteer: '' },
+  { id: 'CK-204', title: 'Collect discharge essentials from AH pharmacy counter', category: 'Errands', time: 'Today · 7:30 pm', zone: 'AH campus', silent: true, urgent: false, femalePreferred: false, status: 'Open', points: 40, viaHours: 1, difficulty: 'Light', skill: 'Errands ready', volunteer: '', safetyCleared: true },
+  { id: 'CK-205', title: 'Escort mum from clinic reception to booked taxi pickup', category: 'Sensitive accompaniment', time: 'Today · 5:45 pm', zone: 'AH campus', silent: true, urgent: true, femalePreferred: true, status: 'Open', points: 60, viaHours: 1.5, difficulty: 'Weightier', skill: 'Safeguarding + accompaniment', volunteer: '', safetyCleared: false },
+  { id: 'CK-206', title: 'Set gentle appointment reminders on my phone', category: 'Digital help', time: 'Tomorrow · 8:00 pm', zone: 'Remote', silent: false, urgent: false, femalePreferred: false, status: 'Matched', points: 35, viaHours: 0.5, difficulty: 'Skilled', skill: 'Digital help ready', volunteer: 'Arjun L.', safetyCleared: true },
+  { id: 'CK-207', title: 'Help complete a non-clinical transport form', category: 'Admin & forms', time: 'Fri · 4:15 pm', zone: 'Queenstown · 2 km band', silent: true, urgent: false, femalePreferred: false, status: 'Open', points: 50, viaHours: 1, difficulty: 'Skilled', skill: 'Forms briefing', volunteer: '', safetyCleared: true },
 ]
 
 const categories: Category[] = ['Errands', 'Digital help', 'Wayfinding', 'Meals & home', 'Admin & forms', 'Companionship', 'Sensitive accompaniment']
@@ -37,6 +38,7 @@ const roleCopy: Record<Role, { label: string; eyebrow: string }> = {
   volunteer: { label: 'Volunteer', eyebrow: 'CHOOSE A TASK THAT FITS' },
   admin: { label: 'AH admin', eyebrow: 'OVERSEE SAFETY & FULFILMENT' },
 }
+const volunteerReadiness = ['Errands ready', 'Digital help ready', 'Safeguarding + accompaniment']
 
 function Mark() {
   return <div className="mark" aria-label="CareKaki Bridge"><span></span><span></span><span></span></div>
@@ -61,7 +63,7 @@ export default function App() {
   const [accountState, setAccountState] = useState<Record<string, string>>({ 'MC-204': 'Active', 'VL-031': 'Active', 'VL-044': 'Training due' })
 
   const openCount = tasks.filter((task) => task.status === 'Open').length
-  const reviewCount = tasks.filter((task) => task.status === 'Review' || task.urgent).length
+  const reviewCount = tasks.filter((task) => task.status === 'Review' || ((task.urgent || task.category === 'Sensitive accompaniment') && !task.safetyCleared)).length
   const points = useMemo(() => {
     const base: Record<Category, number> = { Errands: 40, 'Digital help': 35, Wayfinding: 45, 'Meals & home': 45, 'Admin & forms': 50, Companionship: 55, 'Sensitive accompaniment': 60 }
     return base[category]
@@ -84,13 +86,22 @@ export default function App() {
       difficulty: urgent || category === 'Sensitive accompaniment' ? 'Weightier' : category === 'Digital help' ? 'Skilled' : 'Light',
       skill: category === 'Sensitive accompaniment' ? 'Safeguarding + accompaniment' : `${category} ready`,
       volunteer: '',
+      safetyCleared: !urgent && category !== 'Sensitive accompaniment',
     }
     setTasks([newTask, ...tasks])
     setSubmitted(true)
   }
 
   function acceptTask(id: string) {
-    setTasks(tasks.map((task) => task.id === id ? { ...task, status: 'Review', volunteer: 'Maya T.' } : task))
+    setTasks(tasks.map((task) => {
+      if (task.id !== id || task.status !== 'Open' || !task.safetyCleared || !volunteerReadiness.includes(task.skill)) return task
+      return { ...task, status: 'Review', volunteer: 'Maya T.' }
+    }))
+  }
+
+  function releaseTask(id: string) {
+    setTasks(tasks.map((task) => task.id === id ? { ...task, status: 'Open', safetyCleared: true } : task))
+    setAdminNotice(`${id} scope cleared: released only to volunteers with the required readiness.`)
   }
 
   function approveTask(id: string) {
@@ -155,14 +166,20 @@ export default function App() {
 
         {role === 'volunteer' && <div className="volunteer-view">
           <div className="volunteer-strip"><article><span>PRIVATE PROGRESS</span><b>620</b><small>Level 3 · Steady Kaki</small></article><article><span>VERIFIED SERVICE</span><b>8.5h</b><small>VIA subject to partner approval</small></article><article><span>RELIABILITY</span><b>96%</b><small>11 of 12 tasks completed</small></article><article className="league-card"><span>OPT-IN TEAM GOAL</span><b>14/20</b><small>SMU Care Crew · completed tasks</small></article></div>
-          <div className="section-split"><div><p className="eyebrow">ELIGIBLE FOR YOU</p><h3>Offer help where your training and time fit.</h3></div><div className="skill-pills"><Badge tone="green">✓ Errands</Badge><Badge tone="green">✓ Digital help</Badge><Badge tone="blue">✓ Safeguarding</Badge><Badge tone="amber">Accompaniment supervised</Badge></div></div>
-          <div className="task-grid">{tasks.filter((task) => task.status !== 'Done').map((task) => <article className={`volunteer-task ${task.urgent ? 'urgent' : ''}`} key={task.id}>
-            <div className="task-card-top"><div>{task.silent && <Badge tone="blue">Silent · anonymous</Badge>}{task.urgent && <Badge tone="red">Admin triage</Badge>}{task.femalePreferred && <Badge tone="amber">Female support requested</Badge>}</div><span>{task.id}</span></div>
-            <p className="task-category">{task.category} · {task.difficulty}</p><h3>{task.title}</h3><div className="task-facts"><span>◷ {task.time}</span><span>⌖ {task.zone}</span><span>✓ {task.skill}</span></div>
-            {task.femalePreferred && <p className="boundary-callout">No personal care or lifting. Admin confirms that the request is a bounded accompaniment task and assigns an appropriately cleared volunteer.</p>}
-            <div className="reward-row"><div><b>{task.points}</b><small>impact points</small></div><div><b>{task.viaHours}h</b><small>service estimate</small></div><div><b>{task.status === 'Open' ? 'Available' : task.status === 'Review' ? 'Offer pending' : 'Matched'}</b><small>{task.status === 'Review' && task.volunteer ? 'Admin confirmation needed' : 'task state'}</small></div></div>
-            {task.status === 'Open' ? <button className="button button-dark full" onClick={() => acceptTask(task.id)}>Offer to help <Arrow /></button> : task.status === 'Matched' && task.volunteer === 'Maya T.' ? <button className="button button-dark full" onClick={() => completeTask(task.id)}>Mark complete <Arrow /></button> : <button className="button button-muted full" disabled>{task.status === 'Review' && task.volunteer === 'Maya T.' ? 'Offered · awaiting admin' : task.status}</button>}
-          </article>)}</div>
+          <div className="section-split"><div><p className="eyebrow">ELIGIBLE FOR YOU</p><h3>Offer help where your training and time fit.</h3></div><div className="skill-pills"><Badge tone="green">✓ Errands ready</Badge><Badge tone="green">✓ Digital help ready</Badge><Badge tone="blue">✓ Safeguarding + accompaniment</Badge><Badge tone="plain">Forms briefing not completed</Badge></div></div>
+          <div className="readiness-rule"><span>DETERMINISTIC READINESS GATE</span><p>Every offer checks active training tags first. Sensitive tasks also stay locked until AH clears the exact bounded scope; gender preference never substitutes for readiness.</p></div>
+          <div className="task-grid">{tasks.filter((task) => task.status !== 'Done').map((task) => {
+            const isEligible = volunteerReadiness.includes(task.skill)
+            const awaitingSafetyReview = !task.safetyCleared && (task.urgent || task.category === 'Sensitive accompaniment')
+            return <article className={`volunteer-task ${task.urgent ? 'urgent' : ''} ${!isEligible || awaitingSafetyReview ? 'locked' : ''}`} key={task.id}>
+              <div className="task-card-top"><div>{task.silent && <Badge tone="blue">Silent · anonymous</Badge>}{task.urgent && <Badge tone="red">Admin triage</Badge>}{task.femalePreferred && <Badge tone="amber">Female support requested</Badge>}</div><span>{task.id}</span></div>
+              <p className="task-category">{task.category} · {task.difficulty}</p><h3>{task.title}</h3><div className="task-facts"><span>◷ {task.time}</span><span>⌖ {task.zone}</span><span>✓ {task.skill}</span></div>
+              {task.femalePreferred && <p className="boundary-callout">No personal care or lifting. Admin confirms that the request is a bounded accompaniment task and assigns an appropriately cleared volunteer.</p>}
+              {awaitingSafetyReview ? <p className="eligibility-callout review"><b>Locked · AH safety review</b><span>Scope and comfort preference must be cleared before any volunteer can offer.</span></p> : !isEligible ? <p className="eligibility-callout"><b>Not eligible yet</b><span>Complete {task.skill} before this task can be offered.</span></p> : <p className="eligibility-callout ready"><b>Eligible</b><span>Your active readiness tags satisfy this task gate.</span></p>}
+              <div className="reward-row"><div><b>{task.points}</b><small>impact points</small></div><div><b>{task.viaHours}h</b><small>service estimate</small></div><div><b>{task.status === 'Open' ? 'Available' : task.status === 'Review' ? 'Offer pending' : 'Matched'}</b><small>{task.status === 'Review' && task.volunteer ? 'Admin confirmation needed' : 'task state'}</small></div></div>
+              {task.status === 'Open' && isEligible && task.safetyCleared ? <button className="button button-dark full" onClick={() => acceptTask(task.id)}>Offer to help <Arrow /></button> : task.status === 'Matched' && task.volunteer === 'Maya T.' ? <button className="button button-dark full" onClick={() => completeTask(task.id)}>Mark complete <Arrow /></button> : <button className="button button-muted full" disabled>{awaitingSafetyReview ? 'Locked · AH review first' : !isEligible ? `Locked · ${task.skill} required` : task.status === 'Review' && task.volunteer === 'Maya T.' ? 'Offered · awaiting admin' : task.status}</button>}
+            </article>
+          })}</div>
           <p className="ethics-note">Service time is verified after completion and reflection; partner schools decide whether it qualifies for VIA. Impact points recognise approved effort, reliability and contribution, never urgency, caregiver distress or risk. Progress stays private and team goals reveal no caregiver data.</p>
         </div>}
 
@@ -171,7 +188,7 @@ export default function App() {
           <div className="admin-metrics"><article><span>OPEN TASKS</span><b>{openCount}</b><small>across approved categories</small></article><article><span>NEEDS REVIEW</span><b>{reviewCount}</b><small>volunteer offers + sensitive tasks</small></article><article><span>ACTIVE VOLUNTEERS</span><b>18</b><small>5 skill groups</small></article><article><span>SAFETY INCIDENTS</span><b>0</b><small>illustrative pilot dashboard</small></article></div>
           <div className="admin-columns">
             <section className="admin-panel"><div className="panel-head"><div><p className="eyebrow">TRIAGE & MATCHING</p><h3>One accountable queue</h3></div><Badge tone="red">1 urgent</Badge></div>
-              <div className="admin-task-list">{tasks.filter((task) => task.status === 'Review' || task.urgent).map((task) => <article key={task.id}><div className="admin-task-title"><span>{task.id}</span><div><b>{task.title}</b><small>{task.category} · {task.zone}</small></div></div><div className="admin-flags">{task.silent && <Badge tone="blue">Identity vaulted</Badge>}{task.urgent && <Badge tone="red">Time-sensitive</Badge>}{task.femalePreferred && <Badge tone="amber">Female support preference</Badge>}</div><p>{task.femalePreferred ? 'Confirm no personal care, lifting or clinical work. Route to a suitably trained female volunteer, or redirect to formal care support if the need crosses scope.' : 'Confirm scope, volunteer eligibility and minimum-detail release.'}</p><div className="admin-actions">{task.status === 'Review' && task.volunteer ? <button className="button button-dark" onClick={() => approveTask(task.id)}>Approve match <Arrow /></button> : <button className="button button-outline" onClick={() => setAdminNotice(`${task.id} routed for direct coordinator outreach.`)}>Find suitable volunteer</button>}<button className="text-action" onClick={() => setAdminNotice(`${task.id} escalated to the AH service lane; volunteer matching paused.`)}>Escalate / redirect</button></div></article>)}</div>
+              <div className="admin-task-list">{tasks.filter((task) => task.status === 'Review' || ((task.urgent || task.category === 'Sensitive accompaniment') && !task.safetyCleared)).map((task) => <article key={task.id}><div className="admin-task-title"><span>{task.id}</span><div><b>{task.title}</b><small>{task.category} · {task.zone}</small></div></div><div className="admin-flags">{task.silent && <Badge tone="blue">Identity vaulted</Badge>}{task.urgent && <Badge tone="red">Time-sensitive</Badge>}{task.femalePreferred && <Badge tone="amber">Female support preference</Badge>}<Badge tone={task.safetyCleared ? 'green' : 'red'}>{task.safetyCleared ? 'Scope cleared' : 'Offer gate locked'}</Badge></div><p>{task.femalePreferred ? 'Confirm no personal care, lifting or clinical work. If bounded, release only to volunteers with Safeguarding + accompaniment readiness; otherwise redirect to formal care support.' : 'Confirm scope, volunteer eligibility and minimum-detail release.'}</p><div className="admin-actions">{task.status === 'Review' && task.volunteer ? <button className="button button-dark" onClick={() => approveTask(task.id)}>Approve match <Arrow /></button> : !task.safetyCleared ? <button className="button button-dark" onClick={() => releaseTask(task.id)}>Clear bounded scope <Arrow /></button> : <button className="button button-outline" onClick={() => setAdminNotice(`${task.id} routed for direct coordinator outreach.`)}>Find suitable volunteer</button>}<button className="text-action" onClick={() => setAdminNotice(`${task.id} escalated to the AH service lane; volunteer matching paused.`)}>Escalate / redirect</button></div></article>)}</div>
             </section>
             <section className="admin-panel"><div className="panel-head"><div><p className="eyebrow">ACCOUNT ADMINISTRATION</p><h3>People, access, readiness</h3></div><Badge tone="green">Protected</Badge></div>
               <div className="account-list">{[{ id: 'MC-204', name: 'Male caregiver account', role: 'Caregiver · identity verified' }, { id: 'VL-031', name: 'Maya Tan', role: 'Volunteer · 4 skill badges' }, { id: 'VL-044', name: 'Arjun Lee', role: 'Volunteer · renewal due' }].map((account) => <article key={account.id}><div className="account-avatar">{account.id.slice(0, 2)}</div><div><b>{account.name}</b><small>{account.id} · {account.role}</small></div><Badge tone={accountState[account.id] === 'Active' ? 'green' : 'amber'}>{accountState[account.id]}</Badge><button onClick={() => toggleAccount(account.id)}>{accountState[account.id] === 'Active' ? 'Pause' : 'Activate'}</button></article>)}</div>
