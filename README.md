@@ -14,7 +14,7 @@ CareKaki Bridge is not a generic gig app or substitute for clinical care. It is 
 
 1. **Caregiver interface:** post a bounded task across seven practical categories and optionally choose a task-specific comfort preference.
 2. **Silent Task:** the volunteer sees a request alias, approximate zone and minimum instructions, never the caregiver's name, photo, phone number or exact address.
-3. **Volunteer interface:** accept only tasks that fit training, category and time; see honest points and verified VIA recognition before accepting.
+3. **Volunteer interface:** offer help only where training, category and time fit; see private progress and a service-time estimate before coordinator confirmation.
 4. **Hospital-admin interface:** administer accounts, triage urgent/sensitive requests, approve matches, protect identity and redirect anything outside scope.
 5. **Complete visibly:** create an accountable completion / escalation record and volunteer recognition receipt.
 
@@ -22,8 +22,8 @@ CareKaki Bridge is not a generic gig app or substitute for clinical care. It is 
 
 - **Caregiver-first UX:** low cognitive load, concrete request language, a single primary action and progressive disclosure.
 - **Trust at the point of decision:** task scope, moderation, status, recognition and safety boundaries are visible.
-- **Volunteer operations:** recruit → verify → brief → skill-tag → accept → coordinator approval → completion → recognition, rather than an unmoderated task board.
-- **Ethical incentives:** impact points can reflect difficulty or inconvenience; VIA hours reflect verified time only. Rankings are opt-in and never expose caregiver data.
+- **Volunteer operations:** recruit → verify → brief → skill-tag → offer → coordinator approval → completion → reflection → recognition, rather than an unmoderated task board.
+- **Ethical incentives:** impact points recognise approved effort, reliability and contribution, never urgency or caregiver distress. Service time is verified after completion and reflection; only a partner school can determine VIA recognition. Public individual rankings are deliberately excluded.
 - **Sensitive-task routing:** urgency is an admin-triage signal, not a bigger public bounty. A female-support preference is task-specific and never permits personal care, lifting or clinical work.
 - **Clinical boundary:** volunteers provide non-clinical practical help only. Symptoms, medication, personal care, lifting, falls, mental-health crisis and medical interpretation are escalated.
 - **Pilot accountability:** named operational / escalation owners, daily moderation, task receipts and outcome measurement.
@@ -34,9 +34,9 @@ The front-end prototype supports:
 
 - switching among separate caregiver, volunteer and AH-admin interfaces;
 - creating a private request, toggling **Silent Task**, and setting time-sensitive or task-specific comfort preferences;
-- accepting an eligible volunteer task, with the acceptance held for coordinator approval;
+- offering help for an eligible task, with assignment held for coordinator approval;
 - approving / redirecting a sensitive request and administering caregiver / volunteer account status;
-- seeing points, verified VIA, reliability, opt-in team recognition and explicit safety boundaries.
+- seeing private progress, verified service time, reliability, an opt-in team goal and explicit safety boundaries.
 
 All data is in-memory demo data; no personal or health data is collected.
 

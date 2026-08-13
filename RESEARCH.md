@@ -12,8 +12,37 @@ The current prototype applies six leading-product standards:
 2. **Make trust legible at the point of action.** Volunteer skill / role fit, task scope, moderation, completion receipts and clinical escalation are visible rather than buried in a policy page.
 3. **Use a real volunteer operations layer.** Recruit, screen, brief, skill-tag, match, recognise and measure. A volunteer board without this operating model would be unsafe and unreliable.
 4. **Separate help from treatment.** CareKaki supports navigation, logistics, technology and companionship. It does not provide medical advice, personal care or emergency response.
-5. **Separate the interfaces and authority.** Caregivers control requests, volunteers control which eligible tasks they accept, and an AH admin controls accounts, sensitive matches, disclosure and escalation.
-6. **Reward contribution without gaming care.** Points may acknowledge skill, inconvenience and task weight; VIA hours must follow verified service/training time. Urgent tasks are admin-triaged rather than made into higher public bounties.
+5. **Separate the interfaces and authority.** Caregivers control requests, volunteers control which eligible tasks they offer to help with, and an AH admin controls accounts, sensitive matches, disclosure and escalation.
+6. **Reward contribution without gaming care.** Points may acknowledge approved effort, reliability and contribution; verified service time and reflection may be submitted for partner-school VIA approval. Urgent tasks are admin-triaged rather than made into higher public bounties.
+
+## August 2026 research update — what changed after the deeper benchmark
+
+The newest pass reviewed public Singapore LinkedIn material, Reddit language, official Singapore evidence and related winning/finalist projects. X could not be retrieved defensibly, so **no X-derived claim is made**.
+
+### Strongest local signals
+
+- [MOM’s 2026 parliamentary answer](https://www.mom.gov.sg/newsroom/parliament-questions-and-replies/2026/0224-written-answer-to-pq-on-mandating-eldercare-leave) reports that men were 40.1% of residents outside the labour force due to caring for parents in 2025, up from 27.8% in 2021. This establishes a material male-caregiving context, not a preference for this product.
+- The [NCSS–SMU volunteer-experience study](https://ink.library.smu.edu.sg/lien_reports/19) surveyed 180 volunteers across 112 social-service agencies and identified enjoyment, exposure, impact, connectedness and flexibility as qualities of a good volunteer experience. CareKaki therefore profiles skill, availability and role preference rather than relying on points alone.
+- [MOE’s VIA definition](https://www.moe.gov.sg/education-in-sg/our-programmes/values-in-action) centres meaningful contribution, student ownership and reflection. The prototype now labels time as verified service pending partner approval; it does not claim authority to award VIA.
+- [Let’s Kaypoh](https://www.build.gov.sg/bfg2024/lets-kaypoh/) is the strongest Singapore pilot comparator: its SASCO West Coast AAC pilot facilitated 10 senior visits by 20 volunteers. Its reported barriers — commitment, language and time — support nearby, bounded and flexible task design.
+
+### What related winners visibly prove
+
+Related caregiver, discharge and social-impact winners repeatedly demonstrate one complete transaction instead of a broad feature list: a specific ask becomes an accepted action, a staff dashboard records it, and a completion or escalation follows. CareKaki’s judge path therefore remains **ask → scope check → offer → admin confirmation → completion receipt**, plus a visible unsafe-request redirect.
+
+The defensible differentiation is a **hospital-governed, socially pseudonymous ask-to-closure system** for practical caregiver burdens. It is not another resource directory, family calendar, generic volunteer board or points app.
+
+### Incentive correction adopted
+
+- No urgency bonus and no higher reward for caregiver distress, diagnosis or risk.
+- No public individual leaderboard. The volunteer surface uses private progression and an opt-in aggregate team goal.
+- Points may recognise approved effort, inconvenience, training, reliability, continuity or leadership only after safety eligibility.
+- Service time is verified after completion and reflection; VIA recognition remains subject to partner-school approval.
+- A volunteer’s offer is never an automatic assignment. The hospital administrator retains human override and the reason for sensitive-task routing.
+
+### Social evidence caveat
+
+Reddit supports only directional hypotheses: practical delegation may feel lower-pressure than publicly narrating distress; broad caregiving burdens benefit from decomposition into bounded tasks; and points/leaderboards can create exploitation or gaming concerns. The available posts are not representative of Singapore male caregivers. X was inaccessible during this pass, so its sentiment is not inferred.
 
 ## Source signals
 
@@ -38,10 +67,10 @@ The current prototype applies six leading-product standards:
 - Replaced a dense dashboard aesthetic with a calm editorial hierarchy: one main action, large type, restrained palette, generous whitespace and recognisable task cards.
 - Added a **Silent Task** control as the core inclusion mechanism rather than a minor feature, with explicit identity fields hidden from volunteers.
 - Split the demo into caregiver, volunteer and AH-admin interfaces so account administration, matching authority and privacy custody are visible.
-- Added varied categories, skill readiness, honest weighted points / VIA, reliability and opt-in team recognition.
+- Added varied categories, skill readiness, private progress, verified service-time estimates, reliability and an opt-in team goal.
 - Added urgent and task-specific female-support routing as an admin-reviewed safeguarding flow, never as permission for personal or clinical care.
 - Framed safety as a visible promise: allowed / prohibited / escalation.
-- Kept the live judge path: create a private task, accept an eligible task, approve or redirect it in the AH-admin queue, administer accounts and complete a matched task.
+- Kept the live judge path: create a private task, offer help for an eligible task, approve or redirect it in the AH-admin queue, administer accounts and complete a matched task.
 
 ## Pilot standards to validate with AH
 
