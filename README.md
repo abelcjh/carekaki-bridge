@@ -12,16 +12,19 @@ CareKaki Bridge is not a generic gig app or substitute for clinical care. It is 
 
 ### Core experience
 
-1. **Post a bounded task** — errands, tech setup, wayfinding, meals/home help.
-2. **Choose Silent Task** — no call or conversation expected; only operational details are shared.
-3. **Match safely** — youth volunteers are screened, briefed and matched by task scope, skill and time.
-4. **Complete visibly** — an accountable completion / escalation record and volunteer recognition are created.
+1. **Caregiver interface:** post a bounded task across seven practical categories and optionally choose a task-specific comfort preference.
+2. **Silent Task:** the volunteer sees a request alias, approximate zone and minimum instructions, never the caregiver's name, photo, phone number or exact address.
+3. **Volunteer interface:** accept only tasks that fit training, category and time; see honest points and verified VIA recognition before accepting.
+4. **Hospital-admin interface:** administer accounts, triage urgent/sensitive requests, approve matches, protect identity and redirect anything outside scope.
+5. **Complete visibly:** create an accountable completion / escalation record and volunteer recognition receipt.
 
 ## Product standards implemented
 
 - **Caregiver-first UX:** low cognitive load, concrete request language, a single primary action and progressive disclosure.
 - **Trust at the point of decision:** task scope, moderation, status, recognition and safety boundaries are visible.
-- **Volunteer operations:** recruit → brief → skill-tag → match → recognise, rather than an unmoderated task board.
+- **Volunteer operations:** recruit → verify → brief → skill-tag → accept → coordinator approval → completion → recognition, rather than an unmoderated task board.
+- **Ethical incentives:** impact points can reflect difficulty or inconvenience; VIA hours reflect verified time only. Rankings are opt-in and never expose caregiver data.
+- **Sensitive-task routing:** urgency is an admin-triage signal, not a bigger public bounty. A female-support preference is task-specific and never permits personal care, lifting or clinical work.
 - **Clinical boundary:** volunteers provide non-clinical practical help only. Symptoms, medication, personal care, lifting, falls, mental-health crisis and medical interpretation are escalated.
 - **Pilot accountability:** named operational / escalation owners, daily moderation, task receipts and outcome measurement.
 
@@ -29,10 +32,11 @@ CareKaki Bridge is not a generic gig app or substitute for clinical care. It is 
 
 The front-end prototype supports:
 
-- creating a new request and toggling **Silent Task**;
-- filtering the task board by status;
-- claiming an open task and completing a matched task;
-- seeing pilot-facing safety and impact logic.
+- switching among separate caregiver, volunteer and AH-admin interfaces;
+- creating a private request, toggling **Silent Task**, and setting time-sensitive or task-specific comfort preferences;
+- accepting an eligible volunteer task, with the acceptance held for coordinator approval;
+- approving / redirecting a sensitive request and administering caregiver / volunteer account status;
+- seeing points, verified VIA, reliability, opt-in team recognition and explicit safety boundaries.
 
 All data is in-memory demo data; no personal or health data is collected.
 

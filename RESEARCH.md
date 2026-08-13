@@ -6,12 +6,14 @@
 
 CareKaki should feel like a **high-trust caregiver activation layer**, rather than a generic gig marketplace or a care directory. The winning interaction is: **one small bounded ask → a suitable, trained person → an accountable completion record**.
 
-The current prototype applies four leading-product standards:
+The current prototype applies six leading-product standards:
 
 1. **Reduce cognitive load before adding choice.** Start with a pre-filled practical request and progressively disclose task details. This follows caregiver-marketplace work that prioritises clarity, pacing and predictable next actions under stress.
 2. **Make trust legible at the point of action.** Volunteer skill / role fit, task scope, moderation, completion receipts and clinical escalation are visible rather than buried in a policy page.
 3. **Use a real volunteer operations layer.** Recruit, screen, brief, skill-tag, match, recognise and measure. A volunteer board without this operating model would be unsafe and unreliable.
 4. **Separate help from treatment.** CareKaki supports navigation, logistics, technology and companionship. It does not provide medical advice, personal care or emergency response.
+5. **Separate the interfaces and authority.** Caregivers control requests, volunteers control which eligible tasks they accept, and an AH admin controls accounts, sensitive matches, disclosure and escalation.
+6. **Reward contribution without gaming care.** Points may acknowledge skill, inconvenience and task weight; VIA hours must follow verified service/training time. Urgent tasks are admin-triaged rather than made into higher public bounties.
 
 ## Source signals
 
@@ -34,10 +36,12 @@ The current prototype applies four leading-product standards:
 ## What changed in the prototype
 
 - Replaced a dense dashboard aesthetic with a calm editorial hierarchy: one main action, large type, restrained palette, generous whitespace and recognisable task cards.
-- Added a **Silent Task** control as the core inclusion mechanism rather than a minor feature.
-- Changed task browsing from a card wall to a scan-friendly, status-filtered task board with scope, time, points and moderation cues.
+- Added a **Silent Task** control as the core inclusion mechanism rather than a minor feature, with explicit identity fields hidden from volunteers.
+- Split the demo into caregiver, volunteer and AH-admin interfaces so account administration, matching authority and privacy custody are visible.
+- Added varied categories, skill readiness, honest weighted points / VIA, reliability and opt-in team recognition.
+- Added urgent and task-specific female-support routing as an admin-reviewed safeguarding flow, never as permission for personal or clinical care.
 - Framed safety as a visible promise: allowed / prohibited / escalation.
-- Kept the live demo interaction: post a task, toggle Silent Task, filter tasks, claim a task and complete a task.
+- Kept the live judge path: create a private task, accept an eligible task, approve or redirect it in the AH-admin queue, administer accounts and complete a matched task.
 
 ## Pilot standards to validate with AH
 
