@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import heroImage from './assets/carekaki-hero.png'
 import './App.css'
 
-type TaskStatus = 'Open' | 'Matched' | 'Done'
+type TaskStatus = 'Open' | 'Review' | 'Matched' | 'Done'
 type Category = 'Errands' | 'Tech set-up' | 'Wayfinding' | 'Meals & home'
 
 type Task = {
@@ -24,6 +24,13 @@ const initialTasks: Task[] = [
 ]
 
 const categories: Category[] = ['Errands', 'Tech set-up', 'Wayfinding', 'Meals & home']
+
+const readinessByCategory: Record<Category, string> = {
+  Errands: 'Orientation + errands briefing',
+  'Tech set-up': 'Orientation + digital-help briefing',
+  Wayfinding: 'Orientation + wayfinding briefing',
+  'Meals & home': 'Orientation + home-support briefing',
+}
 
 function Mark() {
   return <div className="mark" aria-label="CareKaki Bridge"><span></span><span></span><span></span></div>
@@ -63,7 +70,7 @@ export default function App() {
   function advanceTask(task: Task) {
     setTasks(tasks.map((item) => {
       if (item.id !== task.id) return item
-      if (item.status === 'Open') return { ...item, status: 'Matched', volunteer: 'Maya T.' }
+      if (item.status === 'Open') return { ...item, status: 'Review', volunteer: 'Maya T.' }
       if (item.status === 'Matched') return { ...item, status: 'Done' }
       return item
     }))
@@ -119,8 +126,8 @@ export default function App() {
 
       <section className="board-section" id="tasks">
         <div className="board-top"><div><p className="eyebrow">VOLUNTEER TASK BOARD</p><h2>Small asks.<br /><em>Real relief.</em></h2></div><div className="board-summary"><b>{openCount}</b><span>tasks ready<br />for a match</span></div></div>
-        <div className="filter-row">{(['All', 'Open', 'Matched', 'Done'] as const).map((item) => <button key={item} onClick={() => setFilter(item)} className={filter === item ? 'filter active' : 'filter'}>{item}</button>)}<span className="filter-note"><span className="mini-dot"></span> moderated daily</span></div>
-        <div className="task-stack">{visibleTasks.map((task) => <article className="task-row" key={task.id}><div className="task-index"><span>{task.id}</span><b>{task.silent ? 'S' : '·'}</b></div><div className="task-main"><div className="task-meta"><span>{task.category}</span><span>{task.location}</span><span>{task.time}</span></div><h3>{task.title}</h3></div><div className="task-reward"><b>{task.points}</b><span>points</span></div><div className="task-status"><span className={`status ${task.status.toLowerCase()}`}>{task.status}</span>{task.volunteer && <small>{task.status === 'Done' ? 'Receipt issued' : task.volunteer}</small>}</div><button className="task-action" onClick={() => advanceTask(task)} disabled={task.status === 'Done'}>{task.status === 'Open' ? 'Claim' : task.status === 'Matched' ? 'Complete' : 'Done'} <Arrow /></button></article>)}</div>
+        <div className="filter-row">{(['All', 'Open', 'Review', 'Matched', 'Done'] as const).map((item) => <button key={item} onClick={() => setFilter(item)} className={filter === item ? 'filter active' : 'filter'}>{item}</button>)}<span className="filter-note"><span className="mini-dot"></span> coordinator-confirmed matches</span></div>
+        <div className="task-stack">{visibleTasks.map((task) => <article className="task-row" key={task.id}><div className="task-index"><span>{task.id}</span><b>{task.silent ? 'S' : '·'}</b></div><div className="task-main"><div className="task-meta"><span>{task.category}</span><span>{task.location}</span><span>{task.time}</span></div><h3>{task.title}</h3><p className="task-readiness">Required: {readinessByCategory[task.category]}</p></div><div className="task-reward"><b>{task.points}</b><span>points</span></div><div className="task-status"><span className={`status ${task.status.toLowerCase()}`}>{task.status === 'Review' ? 'Awaiting review' : task.status}</span>{task.volunteer && <small>{task.status === 'Done' ? 'Receipt issued' : task.status === 'Review' ? 'Offer received' : task.volunteer}</small>}</div><button className="task-action" onClick={() => advanceTask(task)} disabled={task.status === 'Review' || task.status === 'Done'}>{task.status === 'Open' ? 'Offer help' : task.status === 'Review' ? 'Coordinator review' : task.status === 'Matched' ? 'Complete' : 'Done'} <Arrow /></button></article>)}</div>
       </section>
 
       <section className="safety-section" id="safety">
