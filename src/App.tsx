@@ -6,6 +6,7 @@ type Role = 'caregiver' | 'volunteer' | 'admin'
 type TaskStatus = 'Open' | 'Review' | 'Matched' | 'Done'
 type Category = 'Errands' | 'Digital help' | 'Wayfinding' | 'Meals & home' | 'Admin & forms' | 'Companionship' | 'Sensitive accompaniment'
 type Difficulty = 'Light' | 'Skilled' | 'Weightier'
+type PrivacySignal = { label: string; guidance: string }
 
 type Task = {
   id: string
@@ -40,6 +41,18 @@ const roleCopy: Record<Role, { label: string; eyebrow: string }> = {
 }
 const volunteerReadiness = ['Errands ready', 'Digital help ready', 'Safeguarding + accompaniment']
 
+function findDirectIdentifiers(value: string): PrivacySignal[] {
+  const checks: Array<PrivacySignal & { pattern: RegExp }> = [
+    { label: 'Phone number', guidance: 'Remove phone numbers; AH keeps contact details in the protected account.', pattern: /(?:\+?65[\s-]?)?(?:[689]\d{3}[\s-]?\d{4})\b/i },
+    { label: 'Email address', guidance: 'Remove email addresses; volunteers should not contact you outside CareKaki.', pattern: /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i },
+    { label: 'NRIC or FIN', guidance: 'Remove identity numbers. They are never needed in a volunteer task.', pattern: /\b[STFGM]\d{7}[A-Z]\b/i },
+    { label: 'Postal code or exact block', guidance: 'Use an approximate zone only; AH releases a meeting point after approval if needed.', pattern: /\b(?:singapore\s*)?\d{6}\b|\b(?:blk|block)\s*\d+[A-Z]?\b/i },
+    { label: 'Stated personal name', guidance: 'Remove your or your care recipient’s name; use “me”, “mum”, “dad” or “my family member”.', pattern: /\b(?:my name is|i am|i'm|ask for|contact)\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+)?\b/ },
+  ]
+
+  return checks.filter((check) => check.pattern.test(value)).map(({ label, guidance }) => ({ label, guidance }))
+}
+
 function Mark() {
   return <div className="mark" aria-label="CareKaki Bridge"><span></span><span></span><span></span></div>
 }
@@ -59,6 +72,7 @@ export default function App() {
   const [femalePreferred, setFemalePreferred] = useState(false)
   const [urgent, setUrgent] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [privacyBlocked, setPrivacyBlocked] = useState(false)
   const [adminNotice, setAdminNotice] = useState('')
   const [accountState, setAccountState] = useState<Record<string, string>>({ 'MC-204': 'Active', 'VL-031': 'Active', 'VL-044': 'Training due' })
 
@@ -69,8 +83,13 @@ export default function App() {
     return base[category]
   }, [category])
   const viaHours = category === 'Digital help' ? 0.5 : category === 'Sensitive accompaniment' ? 1.5 : 1
+  const privacySignals = useMemo(() => isSilent ? findDirectIdentifiers(request) : [], [isSilent, request])
 
   function postTask() {
+    if (privacySignals.length > 0) {
+      setPrivacyBlocked(true)
+      return
+    }
     const newTask: Task = {
       id: `CK-${208 + tasks.length}`,
       title: request,
@@ -89,6 +108,7 @@ export default function App() {
       safetyCleared: !urgent && category !== 'Sensitive accompaniment',
     }
     setTasks([newTask, ...tasks])
+    setPrivacyBlocked(false)
     setSubmitted(true)
   }
 
@@ -153,9 +173,10 @@ export default function App() {
           <div className="request-card">
             {submitted ? <div className="success-state"><span className="success-icon">✓</span><p className="eyebrow">REQUEST RECEIVED</p><h3>{urgent ? 'An AH admin is reviewing this now.' : 'That is one thing off your plate.'}</h3><p>{isSilent ? 'Volunteers see your task alias, approximate zone and the minimum instructions only. Your name, photo, phone number and care details stay hidden.' : 'Your request is in the moderated matching queue.'}</p><ol className="request-steps"><li><b>Scope check</b><span>Admin confirms the request is bounded and non-clinical.</span></li><li><b>Eligible offer</b><span>Only a trained volunteer with the required skill can offer to help.</span></li><li><b>Protected handoff</b><span>Task details unlock after approval; identity remains hidden in Silent mode.</span></li></ol><button onClick={() => setSubmitted(false)} className="button button-dark">Post another <Arrow /></button></div> : <>
               <div className="form-top"><span>ONE SMALL ASK</span><span>about 30 seconds</span></div>
-              <label>What would make today lighter?<textarea value={request} onChange={(event) => setRequest(event.target.value)} /></label>
+              <label>What would make today lighter?<textarea value={request} onChange={(event) => { setRequest(event.target.value); setPrivacyBlocked(false) }} /></label>
               <div className="form-row"><label>Task category<select value={category} onChange={(event) => { const next = event.target.value as Category; setCategory(next); if (next !== 'Sensitive accompaniment') setFemalePreferred(false) }}>{categories.map((item) => <option key={item}>{item}</option>)}</select></label><label>Volunteer recognition<div className="points-box">{points} <small>impact points · {viaHours}h service estimate</small></div></label></div>
-              <button className={`silent-switch ${isSilent ? 'on' : ''}`} onClick={() => setIsSilent(!isSilent)}><span className="switch-knob"></span><span><b>Silent Task</b><small>Volunteer cannot see your identity or contact details</small></span><em>{isSilent ? 'ON' : 'OFF'}</em></button>
+              <button className={`silent-switch ${isSilent ? 'on' : ''}`} onClick={() => { setIsSilent(!isSilent); setPrivacyBlocked(false) }}><span className="switch-knob"></span><span><b>Silent Task</b><small>Volunteer cannot see your identity or contact details</small></span><em>{isSilent ? 'ON' : 'OFF'}</em></button>
+              {isSilent && <div className={`privacy-preflight ${privacyBlocked ? 'blocked' : ''}`} aria-live="polite"><div><span>{privacyBlocked ? 'BLOCKED BEFORE POSTING' : 'SILENT TASK PRIVACY PREFLIGHT'}</span><b>{privacySignals.length ? `${privacySignals.length} direct identifier ${privacySignals.length === 1 ? 'type' : 'types'} detected` : 'No obvious direct identifiers detected'}</b></div>{privacySignals.length > 0 ? <ul>{privacySignals.map((signal) => <li key={signal.label}><b>{signal.label}</b><span>{signal.guidance}</span></li>)}</ul> : <p>We check the task text for obvious phone, email, identity-number, exact-location and stated-name patterns. AH still reviews the request before matching.</p>}</div>}
               <div className="option-row"><label className="check-option"><input type="checkbox" checked={urgent} onChange={(event) => setUrgent(event.target.checked)} /><span><b>Time-sensitive today</b><small>Routes to AH admin triage, not a public urgency bounty.</small></span></label>{category === 'Sensitive accompaniment' && <label className="check-option"><input type="checkbox" checked={femalePreferred} onChange={(event) => setFemalePreferred(event.target.checked)} /><span><b>Female support requested</b><small>For task-specific privacy or comfort; admin checks suitability.</small></span></label>}</div>
               <button className="button button-dark full" onClick={postTask}>Send private request <Arrow /></button>
               <p className="form-foot">No medication, personal care, clinical advice, lifting, money handling or emergencies. Those go to the appropriate AH service.</p>

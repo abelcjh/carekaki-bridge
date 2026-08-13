@@ -13,7 +13,7 @@ CareKaki Bridge is not a generic gig app or substitute for clinical care. It is 
 ### Core experience
 
 1. **Caregiver interface:** post a bounded task across seven practical categories and optionally choose a task-specific comfort preference.
-2. **Silent Task:** the volunteer sees a request alias, approximate zone and minimum instructions, never the caregiver's name, photo, phone number or exact address.
+2. **Silent Task:** a deterministic preflight blocks obvious direct identifiers in free text before posting; the volunteer then sees a request alias, approximate zone and minimum instructions, never the caregiver's structured name, photo, phone number or exact address.
 3. **Volunteer interface:** a deterministic readiness gate permits offers only when the active volunteer has the task's required training tag; see private progress and a service-time estimate before coordinator confirmation.
 4. **Hospital-admin interface:** administer accounts, triage urgent/sensitive requests, approve matches, protect identity and redirect anything outside scope.
 5. **Complete visibly:** create an accountable completion / escalation record and volunteer recognition receipt.
@@ -21,6 +21,7 @@ CareKaki Bridge is not a generic gig app or substitute for clinical care. It is 
 ## Product standards implemented
 
 - **Caregiver-first UX:** low cognitive load, concrete request language, a single primary action and progressive disclosure.
+- **Privacy before matching:** Silent Task checks for obvious phone, email, NRIC/FIN, postal-code/exact-block and stated-name patterns before submission, while keeping AH human review as the authority for indirect or contextual disclosure risk.
 - **Trust at the point of decision:** task scope, moderation, status, recognition and safety boundaries are visible.
 - **Volunteer operations:** recruit → verify → brief → skill-tag → offer → coordinator approval → completion → reflection → recognition, rather than an unmoderated task board.
 - **Ethical incentives:** impact points recognise approved effort, reliability and contribution, never urgency or caregiver distress. Service time is verified after completion and reflection; only a partner school can determine VIA recognition. Public individual rankings are deliberately excluded.
