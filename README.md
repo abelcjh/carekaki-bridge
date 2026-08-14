@@ -14,11 +14,12 @@ CareKaki Bridge is not a generic gig app or substitute for clinical care. It is 
 
 1. **Public website:** explains the service, roles, lifecycle and safety boundaries without exposing operational forms, task queues or account controls.
 2. **Role-bound sign-in:** demo authentication maps each approved identity to exactly one caregiver, volunteer or AH-admin workspace; there is no post-login role switch.
-3. **Caregiver interface:** post a bounded task across seven practical categories and optionally choose a task-specific comfort preference.
-4. **Silent Task:** a deterministic preflight blocks obvious direct identifiers in free text before posting; the volunteer then sees a request alias, approximate zone and minimum instructions, never the caregiver's structured name, photo, phone number or exact address.
-5. **Volunteer interface:** a deterministic readiness gate permits offers only when the active volunteer has the task's required training tag; see private progress and a service-time estimate before coordinator confirmation.
-6. **Hospital-admin interface:** administer accounts, triage urgent/sensitive requests, approve matches, protect identity and redirect anything outside scope. A deterministic scope gate keeps medication, personal care, clinical advice, lifting/transfers, money handling and emergencies off the volunteer surface.
-7. **Complete visibly:** a matched volunteer submits a private reflection; hours and points remain pending until AH verifies the completion receipt, after which the record can go to the partner school for its own VIA decision.
+3. **Caregiver interface:** post a bounded task across seven practical categories, set a real Singapore date/time and choose a hospital, protected home, public meeting point or remote location.
+4. **Silent Task:** a deterministic preflight blocks obvious direct identifiers in free text before posting; the volunteer then sees a request alias, privacy-safe map zone and minimum instructions, never the caregiver's structured name, photo, phone number or exact home point.
+5. **Volunteer interface:** a deterministic readiness gate permits offers only when the active volunteer has the task's required training tag; see a ticking Singapore operations clock, scheduled task time, waiting age, Google map and confirmed-capacity count before coordinator confirmation.
+6. **Hospital-admin interface:** administer accounts, triage urgent/sensitive requests, approve matches, access protected operational map points and redirect anything outside scope. A deterministic scope gate keeps medication, personal care, clinical advice, lifting/transfers, money handling and emergencies off the volunteer surface.
+7. **Seven-day capacity lifecycle:** any unfinished task with fewer confirmed people than required is automatically referred to the AH capacity queue after seven days. AH can begin coordinator sourcing, record each sourced volunteer, resolve the alert when capacity is met, or close an unmet request after sourcing and issue a caregiver-facing notice.
+8. **Complete visibly:** a matched volunteer submits a private reflection; hours and points remain pending until AH verifies the completion receipt, after which the record can go to the partner school for its own VIA decision.
 
 ## Product standards implemented
 
@@ -32,6 +33,9 @@ CareKaki Bridge is not a generic gig app or substitute for clinical care. It is 
 - **Clinical boundary:** volunteers provide non-clinical practical help only. Symptoms, medication, personal care, lifting, falls, mental-health crisis and medical interpretation are escalated.
 - **Executable service redirect:** excluded request text creates an AH-admin-only redirect receipt; it cannot enter the volunteer offer pool. Life-threatening wording also displays the official SCDF 995 direction without asking the caregiver to wait for admin review.
 - **Verified completion:** task completion creates a minimum-detail receipt rather than instant credit. AH review is the deterministic release gate for service time and private impact points; the product does not award VIA.
+- **Time and geography:** every task stores an absolute scheduled instant and creation time, renders them in `Asia/Singapore`, and exposes a live second-by-second SGT clock. Google Maps embeds use verified service-point or zone coordinates; Silent home tasks disclose only a 2 km zone to volunteers while the caregiver and accountable AH admin can access the protected demo point.
+- **Capacity escalation:** insufficient confirmed capacity at seven elapsed days creates a deterministic AH notification. Closure is disabled until coordinator sourcing has begun, and closing creates a retained caregiver notice rather than silently removing the task.
+- **Maps credential boundary:** the prototype uses Google Maps embeds and deep links without a browser API key. Google Workspace OAuth is not treated as a Google Maps Platform credential; a production Maps JavaScript API integration would require its own domain-restricted key and billing controls.
 - **Pilot accountability:** named operational / escalation owners, daily moderation, task receipts and outcome measurement.
 - **Information architecture:** descriptive content lives on the public website; authenticated operations live in a separate portal shell with persistent account identity, role assurance and sign-out.
 - **Authentication honesty:** the static prototype demonstrates sign-in and authorization UX but explicitly says it is not connected to AH production identity systems.
@@ -43,7 +47,9 @@ The front-end prototype supports:
 
 - entering through a descriptive public website, then signing in with one of three role-bound demo accounts;
 - returning to the public website without exposing operational controls, or signing out to change demo identity;
-- creating a private request, toggling **Silent Task**, and setting time-sensitive or task-specific comfort preferences;
+- creating a private request, toggling **Silent Task**, choosing a Singapore task time and selecting a hospital, protected home, public meeting point or remote location;
+- watching the SGT clock tick, selecting every task on a role-aware Google map and comparing scheduled time, waiting age and confirmed headcount;
+- seeing an insufficient eight-day task appear automatically in AH capacity notifications, starting coordinator sourcing, recording sourced volunteers, resolving the alert, or closing it and viewing the caregiver notice;
 - seeing an ineligible task remain disabled, releasing a sensitive task through AH review, and offering only after both safety and readiness gates pass;
 - approving / redirecting a sensitive request and administering caregiver / volunteer account status;
 - submitting a completion reflection, seeing its time and points remain pending, and having AH verify the receipt before the private progress record updates;
