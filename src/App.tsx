@@ -1,8 +1,8 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import heroImage from './assets/carekaki-hero.png'
+import { authenticateDemo, demoAccounts, resolveInitialTheme, type AuthSession, type Role, type Screen, type Theme } from './app-state'
 import './App.css'
 
-type Role = 'caregiver' | 'volunteer' | 'admin'
 type TaskStatus = 'Open' | 'Review' | 'Matched' | 'Done'
 type Category = 'Errands' | 'Digital help' | 'Wayfinding' | 'Meals & home' | 'Admin & forms' | 'Companionship' | 'Sensitive accompaniment'
 type Difficulty = 'Light' | 'Skilled' | 'Weightier'
@@ -85,8 +85,116 @@ function Badge({ children, tone = 'plain' }: { children: React.ReactNode; tone?:
   return <span className={`badge ${tone}`}>{children}</span>
 }
 
+function ThemeToggle({ theme, onChange }: { theme: Theme; onChange: (theme: Theme) => void }) {
+  const nextTheme = theme === 'light' ? 'dark' : 'light'
+  return <button className="theme-toggle" type="button" onClick={() => onChange(nextTheme)} aria-label={`Switch to ${nextTheme} mode`}><span aria-hidden="true">{theme === 'light' ? '☾' : '☀'}</span><b>{theme === 'light' ? 'Dark' : 'Light'}</b></button>
+}
+
+function PublicHome({ theme, onThemeChange, onOpenPortal }: { theme: Theme; onThemeChange: (theme: Theme) => void; onOpenPortal: () => void }) {
+  return <main className="public-page">
+    <nav className="public-nav" aria-label="Primary navigation">
+      <a className="brand" href="#top"><Mark /><span>carekaki<span className="brand-light">bridge</span></span></a>
+      <div className="public-links"><a href="#how-it-works">How it works</a><a href="#safety">Safety</a><a href="#roles">Who it is for</a></div>
+      <div className="nav-actions"><ThemeToggle theme={theme} onChange={onThemeChange} /><button className="button button-dark" type="button" onClick={onOpenPortal}>Access portal <Arrow /></button></div>
+    </nav>
+
+    <section className="hero public-hero" id="top">
+      <div className="hero-copy">
+        <p className="eyebrow">ALEXANDRA HOSPITAL · CAREGIVER RESPITE PILOT</p>
+        <h1>One small ask.<br /><em>One lighter day.</em></h1>
+        <p className="lede">CareKaki turns a practical burden into a bounded, privacy-preserving task. Trained student volunteers can offer support while hospital administrators retain oversight.</p>
+        <div className="hero-actions"><button className="button button-dark" type="button" onClick={onOpenPortal}>Sign in to CareKaki <Arrow /></button><a className="button-link" href="#how-it-works">See how it works <span>↓</span></a></div>
+        <div className="trust-row"><span><b>01</b> private request</span><i></i><span><b>02</b> eligible offer</span><i></i><span><b>03</b> verified receipt</span></div>
+      </div>
+      <div className="hero-visual">
+        <img src={heroImage} alt="A caregiver and student volunteer reviewing a practical checklist together" />
+        <div className="image-wash"></div>
+        <div className="floating-card"><span className="soft-label">SILENT TASK</span><strong>“No public profile.<br />Just one clear ask.”</strong><div><span className="mini-dot"></span> Identity stays protected from volunteers</div></div>
+        <div className="hero-stamp"><span>CAREKAKI</span><b>24</b><span>BRIDGE</span></div>
+      </div>
+    </section>
+
+    <section className="public-section process-section" id="how-it-works">
+      <div className="section-intro"><p className="eyebrow">HOW THE SERVICE WORKS</p><h2>A clear handoff, not an open marketplace.</h2><p>Each person sees only what they need. A volunteer’s offer never becomes an assignment until an AH administrator checks the match.</p></div>
+      <ol className="process-grid">
+        <li><span>01</span><h3>Ask privately</h3><p>A caregiver chooses a hospital-approved task and can hide identity and contact details from the volunteer view.</p></li>
+        <li><span>02</span><h3>Check fit</h3><p>Training, availability, scope and safeguarding are checked before a volunteer can be confirmed.</p></li>
+        <li><span>03</span><h3>Complete safely</h3><p>The task closes with a private reflection and an AH-reviewed completion receipt.</p></li>
+      </ol>
+    </section>
+
+    <section className="role-explainer" id="roles">
+      <div className="section-intro compact"><p className="eyebrow">THREE RESPONSIBILITIES</p><h2>One service, three protected workspaces.</h2></div>
+      <div className="role-cards">
+        <article><span className="role-icon">C</span><p className="eyebrow">CAREGIVER</p><h3>Control the ask</h3><p>Request one bounded practical task, choose privacy settings and follow its status without publishing a personal story.</p></article>
+        <article><span className="role-icon">V</span><p className="eyebrow">VOLUNTEER</p><h3>Choose a safe fit</h3><p>See only tasks matched to active readiness, time and skills. Offer to help without bypassing coordinator approval.</p></article>
+        <article><span className="role-icon">AH</span><p className="eyebrow">HOSPITAL ADMIN</p><h3>Own the safeguards</h3><p>Triage scope, approve matches, monitor readiness, redirect excluded work and verify completion records.</p></article>
+      </div>
+    </section>
+
+    <section className="safety-section" id="safety"><div><p className="eyebrow">THE CAREKAKI PROMISE</p><h2>Warmth needs<br /><em>clear edges.</em></h2></div><div className="safety-grid"><article><span>↳</span><h3>We do</h3><p>Errands, meals, reminder setup, wayfinding, basic forms, companionship and bounded accompaniment.</p></article><article><span>×</span><h3>We do not</h3><p>Medication, personal care, clinical advice, lifting or transfers, finances, diagnosis or emergency response.</p></article><article><span>!</span><h3>We escalate</h3><p>Urgent and sensitive requests go to a named AH administrator for review, referral and recovery.</p></article></div></section>
+
+    <section className="access-banner"><div><p className="eyebrow">AUTHENTICATED OPERATIONS</p><h2>Ready to enter your workspace?</h2><p>Caregiver, volunteer and AH-admin tools stay behind a role-bound sign-in.</p></div><button className="button button-dark" type="button" onClick={onOpenPortal}>Access the demo portal <Arrow /></button></section>
+
+    <footer><a className="brand" href="#top"><Mark /><span>carekaki<span className="brand-light">bridge</span></span></a><p>Silent help. Visible relief. Managed with care.</p><span>SparkX⁺Change · Alexandra Hospital · interactive concept demo</span></footer>
+  </main>
+}
+
+function LoginPage({ theme, onThemeChange, onBack, onAuthenticated }: { theme: Theme; onThemeChange: (theme: Theme) => void; onBack: () => void; onAuthenticated: (session: AuthSession) => void }) {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [error, setError] = useState('')
+
+  function signIn(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const session = authenticateDemo(email, password)
+    if (!session) {
+      setError('Those demo details do not match an account. Choose a demo profile below and try again.')
+      return
+    }
+    setError('')
+    onAuthenticated(session)
+  }
+
+  function chooseDemo(index: number) {
+    const account = demoAccounts[index]
+    setEmail(account.email)
+    setPassword(account.password)
+    setError('')
+    document.getElementById('email')?.focus()
+  }
+
+  return <main className="login-page">
+    <nav className="public-nav login-nav" aria-label="Sign-in navigation">
+      <button className="brand brand-button" type="button" onClick={onBack}><Mark /><span>carekaki<span className="brand-light">bridge</span></span></button>
+      <div className="nav-actions"><ThemeToggle theme={theme} onChange={onThemeChange} /><button className="button button-outline" type="button" onClick={onBack}>Back to website</button></div>
+    </nav>
+    <section className="login-layout">
+      <div className="login-context"><p className="eyebrow">PROTECTED WORKSPACES</p><h1>Sign in to the role you have been approved for.</h1><p>CareKaki uses role-bound access: caregivers manage private requests, volunteers see eligible tasks, and AH administrators oversee safety and completion.</p><ul><li><span>✓</span> No role switching after sign-in</li><li><span>✓</span> Minimum necessary information by role</li><li><span>✓</span> Clear sign-out and account identity at all times</li></ul><div className="prototype-note"><b>Interactive prototype</b><span>This screen demonstrates authentication and authorization UX. It is not connected to Alexandra Hospital production identity systems.</span></div></div>
+      <div className="login-card">
+        <div><p className="eyebrow">CAREKAKI ACCESS</p><h2>Welcome back</h2><p>Use a demo profile below, then sign in.</p></div>
+        <form onSubmit={signIn} noValidate>
+          <label htmlFor="email">Email address<input id="email" name="email" type="email" autoComplete="username" inputMode="email" value={email} onChange={(event) => { setEmail(event.target.value); setError('') }} required /></label>
+          <label htmlFor="password">Password<span className="password-field"><input id="password" name="password" type={showPassword ? 'text' : 'password'} autoComplete="current-password" value={password} onChange={(event) => { setPassword(event.target.value); setError('') }} required /><button type="button" onClick={() => setShowPassword(!showPassword)} aria-pressed={showPassword}>{showPassword ? 'Hide' : 'Show'}</button></span></label>
+          {error && <p className="form-error" role="alert">{error}</p>}
+          <button className="button button-dark full" type="submit">Sign in securely <Arrow /></button>
+        </form>
+        <div className="demo-access"><span>Choose a demo profile</span>{demoAccounts.map((account, index) => <button type="button" key={account.role} onClick={() => chooseDemo(index)}><b>{account.label}</b><small>{account.role === 'caregiver' ? 'Private requests' : account.role === 'volunteer' ? 'Tasks and service receipts' : 'Triage and account oversight'}</small><em>Use details →</em></button>)}</div>
+        <p className="login-help">Need access? In a live pilot, an AH programme administrator would create or approve your account.</p>
+      </div>
+    </section>
+  </main>
+}
+
 export default function App() {
-  const [role, setRole] = useState<Role>('caregiver')
+  const [screen, setScreen] = useState<Screen>('home')
+  const [session, setSession] = useState<AuthSession | null>(null)
+  const [theme, setTheme] = useState<Theme>(() => resolveInitialTheme(
+    typeof window === 'undefined' ? null : window.localStorage.getItem('carekaki-theme'),
+    typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches,
+  ))
+  const role: Role = session?.role ?? 'caregiver'
   const [tasks, setTasks] = useState(initialTasks)
   const [isSilent, setIsSilent] = useState(true)
   const [category, setCategory] = useState<Category>('Errands')
@@ -99,6 +207,16 @@ export default function App() {
   const [adminNotice, setAdminNotice] = useState('')
   const [reflections, setReflections] = useState<Record<string, string>>({})
   const [accountState, setAccountState] = useState<Record<string, string>>({ 'MC-204': 'Active', 'VL-031': 'Active', 'VL-044': 'Training due' })
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme
+    document.documentElement.style.colorScheme = theme
+    window.localStorage.setItem('carekaki-theme', theme)
+  }, [theme])
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' })
+  }, [screen])
 
   const openCount = tasks.filter((task) => task.status === 'Open').length
   const reviewCount = tasks.filter((task) => task.status === 'Review' || ((task.urgent || task.category === 'Sensitive accompaniment') && !task.safetyCleared)).length
@@ -200,36 +318,28 @@ export default function App() {
     setAccountState({ ...accountState, [id]: accountState[id] === 'Active' ? 'Paused' : 'Active' })
   }
 
+  if (screen === 'home') {
+    return <PublicHome theme={theme} onThemeChange={setTheme} onOpenPortal={() => setScreen(session ? 'portal' : 'login')} />
+  }
+
+  if (screen === 'login' || !session) {
+    return <LoginPage theme={theme} onThemeChange={setTheme} onBack={() => setScreen('home')} onAuthenticated={(nextSession) => { setSession(nextSession); setScreen('portal') }} />
+  }
+
   return (
-    <main>
-      <nav className="nav-shell">
-        <a className="brand" href="#top"><Mark /><span>carekaki<span className="brand-light">bridge</span></span></a>
-        <div className="role-switch" aria-label="Choose interface">
-          {(Object.keys(roleCopy) as Role[]).map((item) => <button key={item} className={role === item ? 'active' : ''} onClick={() => setRole(item)}><span>{item === 'caregiver' ? '01' : item === 'volunteer' ? '02' : '03'}</span>{roleCopy[item].label}</button>)}
-        </div>
-        <div className="secure-chip"><span></span> AH-supervised demo</div>
+    <main className="portal-page">
+      <nav className="portal-nav" aria-label="Portal navigation">
+        <button className="brand brand-button" type="button" onClick={() => setScreen('home')}><Mark /><span>carekaki<span className="brand-light">bridge</span></span></button>
+        <div className="portal-context"><span className="secure-chip"><i></i> AH-supervised demo</span><span className="role-lock">{roleCopy[role].label} workspace</span></div>
+        <div className="portal-actions"><ThemeToggle theme={theme} onChange={setTheme} /><button className="button button-outline" type="button" onClick={() => setScreen('home')}>Public website</button><button className="button button-dark" type="button" onClick={() => { setSession(null); setScreen('login') }}>Sign out</button></div>
       </nav>
 
-      <section className="hero" id="top">
-        <div className="hero-copy">
-          <p className="eyebrow">ALEXANDRA HOSPITAL · CAREGIVER RESPITE PILOT</p>
-          <h1>Help, on your<br /><em>own terms.</em></h1>
-          <p className="lede">Male caregivers ask for one bounded, practical task. Trained students step in. Hospital admins keep every match safe and accountable.</p>
-          <div className="hero-actions"><button className="button button-dark" onClick={() => { setRole('caregiver'); document.getElementById('workspace')?.scrollIntoView() }}>Open caregiver view <Arrow /></button><button className="text-link button-link" onClick={() => { setRole('volunteer'); document.getElementById('workspace')?.scrollIntoView() }}>I want to volunteer <span>↓</span></button></div>
-          <div className="trust-row"><span><b>01</b> anonymous ask</span><i></i><span><b>02</b> trained match</span><i></i><span><b>03</b> admin receipt</span></div>
-        </div>
-        <div className="hero-visual">
-          <img src={heroImage} alt="A caregiver and youth volunteer reviewing a practical checklist together" />
-          <div className="image-wash"></div>
-          <div className="floating-card"><span className="soft-label">SILENT TASK</span><strong>“No name. No call.<br />Just one clear ask.”</strong><div><span className="mini-dot"></span> Identity protected from volunteers</div></div>
-          <div className="hero-stamp"><span>CAREKAKI</span><b>24</b><span>BRIDGE</span></div>
-        </div>
-      </section>
+      <section className="portal-account-bar" aria-label="Signed-in account"><div className="account-dot">{session.name.slice(0, 1)}</div><div><span>Signed in as</span><b>{session.name}</b></div><div className="account-assurance"><span>{session.id}</span><b>{session.assurance}</b></div></section>
 
       <section className="workspace" id="workspace">
         <header className="workspace-head">
           <div><p className="eyebrow">{roleCopy[role].eyebrow}</p><h2>{role === 'caregiver' ? 'My private request space' : role === 'volunteer' ? 'Tasks matched to my skills' : 'Hospital operations console'}</h2></div>
-          <div className="identity-card"><span>{role === 'caregiver' ? 'C-204' : role === 'volunteer' ? 'Maya T.' : 'AH-C3U Admin'}</span><b>{role === 'caregiver' ? 'Anonymous to volunteers' : role === 'volunteer' ? 'Identity + training verified' : 'Account administrator'}</b></div>
+          <div className="identity-card"><span>{session.id}</span><b>{session.assurance}</b></div>
         </header>
 
         {role === 'caregiver' && <div className="caregiver-grid">
@@ -285,16 +395,7 @@ export default function App() {
         </div>}
       </section>
 
-      <section className="principles">
-        <p className="eyebrow">ONE SERVICE · THREE CLEAR RESPONSIBILITIES</p>
-        <div className="principle-grid"><article><span className="number">01</span><h3>Caregiver controls the ask</h3><p>Choose a varied practical task, hide identity, minimise conversation and request task-specific support preferences.</p></article><article><span className="number">02</span><h3>Volunteer chooses the fit</h3><p>Offer help for unpaid OTOT tasks by skill, time and category; build private progress through verified contribution.</p></article><article><span className="number">03</span><h3>Hospital owns the risk</h3><p>Administer accounts, approve sensitive matches, protect identity, redirect unsafe requests and retain an accountable receipt.</p></article></div>
-      </section>
-
-      <section className="safety-section"><div><p className="eyebrow">THE CAREKAKI PROMISE</p><h2>Warmth needs<br /><em>clear edges.</em></h2></div><div className="safety-grid"><article><span>↳</span><h3>We do</h3><p>Errands, meals, reminder setup, wayfinding, basic forms, companionship and bounded accompaniment.</p></article><article><span>×</span><h3>We do not</h3><p>Medication, personal care, clinical advice, lifting or transfers, finances, diagnosis or emergency response.</p></article><article><span>!</span><h3>We escalate</h3><p>Urgent and sensitive requests go to a named AH admin for fit, scope, referral and no-show recovery.</p></article></div></section>
-
-      <section className="pilot-banner"><div><p className="eyebrow">THE JUDGE-VISIBLE LOOP</p><h2>Ask → offer →<br />approve → receipt.</h2></div><div className="pilot-metrics"><span><b>3</b> role-specific views</span><span><b>7</b> practical categories</span><span><b>0</b> identity fields shown to volunteers</span></div></section>
-
-      <footer><a className="brand" href="#top"><Mark /><span>carekaki<span className="brand-light">bridge</span></span></a><p>Silent help. Visible relief. Managed with care.</p><span>SparkX⁺Change · Alexandra Hospital · interactive concept demo</span></footer>
+      <footer className="portal-footer"><span>CareKaki Bridge · role-bound interactive demo</span><span>Operational data shown here is illustrative.</span></footer>
     </main>
   )
 }

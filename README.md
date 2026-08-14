@@ -12,11 +12,13 @@ CareKaki Bridge is not a generic gig app or substitute for clinical care. It is 
 
 ### Core experience
 
-1. **Caregiver interface:** post a bounded task across seven practical categories and optionally choose a task-specific comfort preference.
-2. **Silent Task:** a deterministic preflight blocks obvious direct identifiers in free text before posting; the volunteer then sees a request alias, approximate zone and minimum instructions, never the caregiver's structured name, photo, phone number or exact address.
-3. **Volunteer interface:** a deterministic readiness gate permits offers only when the active volunteer has the task's required training tag; see private progress and a service-time estimate before coordinator confirmation.
-4. **Hospital-admin interface:** administer accounts, triage urgent/sensitive requests, approve matches, protect identity and redirect anything outside scope. A deterministic scope gate keeps medication, personal care, clinical advice, lifting/transfers, money handling and emergencies off the volunteer surface.
-5. **Complete visibly:** a matched volunteer submits a private reflection; hours and points remain pending until AH verifies the completion receipt, after which the record can go to the partner school for its own VIA decision.
+1. **Public website:** explains the service, roles, lifecycle and safety boundaries without exposing operational forms, task queues or account controls.
+2. **Role-bound sign-in:** demo authentication maps each approved identity to exactly one caregiver, volunteer or AH-admin workspace; there is no post-login role switch.
+3. **Caregiver interface:** post a bounded task across seven practical categories and optionally choose a task-specific comfort preference.
+4. **Silent Task:** a deterministic preflight blocks obvious direct identifiers in free text before posting; the volunteer then sees a request alias, approximate zone and minimum instructions, never the caregiver's structured name, photo, phone number or exact address.
+5. **Volunteer interface:** a deterministic readiness gate permits offers only when the active volunteer has the task's required training tag; see private progress and a service-time estimate before coordinator confirmation.
+6. **Hospital-admin interface:** administer accounts, triage urgent/sensitive requests, approve matches, protect identity and redirect anything outside scope. A deterministic scope gate keeps medication, personal care, clinical advice, lifting/transfers, money handling and emergencies off the volunteer surface.
+7. **Complete visibly:** a matched volunteer submits a private reflection; hours and points remain pending until AH verifies the completion receipt, after which the record can go to the partner school for its own VIA decision.
 
 ## Product standards implemented
 
@@ -31,12 +33,16 @@ CareKaki Bridge is not a generic gig app or substitute for clinical care. It is 
 - **Executable service redirect:** excluded request text creates an AH-admin-only redirect receipt; it cannot enter the volunteer offer pool. Life-threatening wording also displays the official SCDF 995 direction without asking the caregiver to wait for admin review.
 - **Verified completion:** task completion creates a minimum-detail receipt rather than instant credit. AH review is the deterministic release gate for service time and private impact points; the product does not award VIA.
 - **Pilot accountability:** named operational / escalation owners, daily moderation, task receipts and outcome measurement.
+- **Information architecture:** descriptive content lives on the public website; authenticated operations live in a separate portal shell with persistent account identity, role assurance and sign-out.
+- **Authentication honesty:** the static prototype demonstrates sign-in and authorization UX but explicitly says it is not connected to AH production identity systems.
+- **Accessible themes:** light and dark modes use semantic colour tokens for every surface, field, status and control. Normal-text token pairs are checked against the WCAG 2.2 AA 4.5:1 contrast threshold, and keyboard focus uses a visible 3px outline.
 
 ## Interaction demo
 
 The front-end prototype supports:
 
-- switching among separate caregiver, volunteer and AH-admin interfaces;
+- entering through a descriptive public website, then signing in with one of three role-bound demo accounts;
+- returning to the public website without exposing operational controls, or signing out to change demo identity;
 - creating a private request, toggling **Silent Task**, and setting time-sensitive or task-specific comfort preferences;
 - seeing an ineligible task remain disabled, releasing a sensitive task through AH review, and offering only after both safety and readiness gates pass;
 - approving / redirecting a sensitive request and administering caregiver / volunteer account status;
@@ -50,6 +56,7 @@ All data is in-memory demo data; no personal or health data is collected.
 ```bash
 npm install
 npm run dev
+npm test
 npm run build
 npm run lint
 ```
