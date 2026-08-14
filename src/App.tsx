@@ -7,6 +7,7 @@ type TaskStatus = 'Open' | 'Review' | 'Matched' | 'Done'
 type Category = 'Errands' | 'Digital help' | 'Wayfinding' | 'Meals & home' | 'Admin & forms' | 'Companionship' | 'Sensitive accompaniment'
 type Difficulty = 'Light' | 'Skilled' | 'Weightier'
 type PrivacySignal = { label: string; guidance: string }
+type ScopeSignal = { label: string; guidance: string; emergency?: boolean }
 
 type Task = {
   id: string
@@ -24,13 +25,15 @@ type Task = {
   skill: string
   volunteer: string
   safetyCleared: boolean
+  referralOnly: boolean
+  scopeFlags: string[]
 }
 
 const initialTasks: Task[] = [
-  { id: 'CK-204', title: 'Collect discharge essentials from AH pharmacy counter', category: 'Errands', time: 'Today · 7:30 pm', zone: 'AH campus', silent: true, urgent: false, femalePreferred: false, status: 'Open', points: 40, viaHours: 1, difficulty: 'Light', skill: 'Errands ready', volunteer: '', safetyCleared: true },
-  { id: 'CK-205', title: 'Escort mum from clinic reception to booked taxi pickup', category: 'Sensitive accompaniment', time: 'Today · 5:45 pm', zone: 'AH campus', silent: true, urgent: true, femalePreferred: true, status: 'Open', points: 60, viaHours: 1.5, difficulty: 'Weightier', skill: 'Safeguarding + accompaniment', volunteer: '', safetyCleared: false },
-  { id: 'CK-206', title: 'Set gentle appointment reminders on my phone', category: 'Digital help', time: 'Tomorrow · 8:00 pm', zone: 'Remote', silent: false, urgent: false, femalePreferred: false, status: 'Matched', points: 35, viaHours: 0.5, difficulty: 'Skilled', skill: 'Digital help ready', volunteer: 'Arjun L.', safetyCleared: true },
-  { id: 'CK-207', title: 'Help complete a non-clinical transport form', category: 'Admin & forms', time: 'Fri · 4:15 pm', zone: 'Queenstown · 2 km band', silent: true, urgent: false, femalePreferred: false, status: 'Open', points: 50, viaHours: 1, difficulty: 'Skilled', skill: 'Forms briefing', volunteer: '', safetyCleared: true },
+  { id: 'CK-204', title: 'Collect discharge essentials from AH pharmacy counter', category: 'Errands', time: 'Today · 7:30 pm', zone: 'AH campus', silent: true, urgent: false, femalePreferred: false, status: 'Open', points: 40, viaHours: 1, difficulty: 'Light', skill: 'Errands ready', volunteer: '', safetyCleared: true, referralOnly: false, scopeFlags: [] },
+  { id: 'CK-205', title: 'Escort mum from clinic reception to booked taxi pickup', category: 'Sensitive accompaniment', time: 'Today · 5:45 pm', zone: 'AH campus', silent: true, urgent: true, femalePreferred: true, status: 'Open', points: 60, viaHours: 1.5, difficulty: 'Weightier', skill: 'Safeguarding + accompaniment', volunteer: '', safetyCleared: false, referralOnly: false, scopeFlags: [] },
+  { id: 'CK-206', title: 'Set gentle appointment reminders on my phone', category: 'Digital help', time: 'Tomorrow · 8:00 pm', zone: 'Remote', silent: false, urgent: false, femalePreferred: false, status: 'Matched', points: 35, viaHours: 0.5, difficulty: 'Skilled', skill: 'Digital help ready', volunteer: 'Arjun L.', safetyCleared: true, referralOnly: false, scopeFlags: [] },
+  { id: 'CK-207', title: 'Help complete a non-clinical transport form', category: 'Admin & forms', time: 'Fri · 4:15 pm', zone: 'Queenstown · 2 km band', silent: true, urgent: false, femalePreferred: false, status: 'Open', points: 50, viaHours: 1, difficulty: 'Skilled', skill: 'Forms briefing', volunteer: '', safetyCleared: true, referralOnly: false, scopeFlags: [] },
 ]
 
 const categories: Category[] = ['Errands', 'Digital help', 'Wayfinding', 'Meals & home', 'Admin & forms', 'Companionship', 'Sensitive accompaniment']
@@ -53,6 +56,18 @@ function findDirectIdentifiers(value: string): PrivacySignal[] {
   return checks.filter((check) => check.pattern.test(value)).map(({ label, guidance }) => ({ label, guidance }))
 }
 
+function findScopeExclusions(value: string): ScopeSignal[] {
+  const checks: Array<ScopeSignal & { pattern: RegExp }> = [
+    { label: 'Possible emergency', guidance: 'Do not wait for CareKaki. Call 995 now for a life-threatening emergency.', emergency: true, pattern: /\b(?:emergency|unconscious|not breathing|chest pain|stroke|severe bleeding|suicid(?:e|al)|collapsed)\b/i },
+    { label: 'Medication or clinical task', guidance: 'Medication, symptoms, wounds, diagnosis and clinical advice must go to qualified staff.', pattern: /\b(?:medicat(?:e|ion)|medicine|pills?|dosage|dose|insulin|injection|inject|wound|diagnos(?:e|is)|clinical advice|medical advice|take blood pressure)\b/i },
+    { label: 'Personal care', guidance: 'Bathing, toileting, dressing and other personal care are outside the student-volunteer role.', pattern: /\b(?:bath(?:e|ing)|shower(?:ing)?|toilet(?:ing)?|diaper|nappy|dress(?:ing)?|personal care|feed(?:ing)?)\b/i },
+    { label: 'Lifting or transfer', guidance: 'Lifting, carrying or transferring a person requires an appropriate formal care pathway.', pattern: /\b(?:lift|lifting|transfer(?:ring)?|carry)\s+(?:me|mum|mom|dad|father|mother|patient|him|her|my family member)\b/i },
+    { label: 'Money handling', guidance: 'Cash, banking, payment and financial transactions are outside volunteer scope.', pattern: /\b(?:cash|bank(?:ing)?|transfer money|pay(?:ment)?|withdraw|atm|credit card|debit card|pin number|financial transaction)\b/i },
+  ]
+
+  return checks.filter((check) => check.pattern.test(value)).map(({ label, guidance, emergency }) => ({ label, guidance, emergency }))
+}
+
 function Mark() {
   return <div className="mark" aria-label="CareKaki Bridge"><span></span><span></span><span></span></div>
 }
@@ -72,6 +87,7 @@ export default function App() {
   const [femalePreferred, setFemalePreferred] = useState(false)
   const [urgent, setUrgent] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [submittedForReferral, setSubmittedForReferral] = useState(false)
   const [privacyBlocked, setPrivacyBlocked] = useState(false)
   const [adminNotice, setAdminNotice] = useState('')
   const [accountState, setAccountState] = useState<Record<string, string>>({ 'MC-204': 'Active', 'VL-031': 'Active', 'VL-044': 'Training due' })
@@ -84,31 +100,36 @@ export default function App() {
   }, [category])
   const viaHours = category === 'Digital help' ? 0.5 : category === 'Sensitive accompaniment' ? 1.5 : 1
   const privacySignals = useMemo(() => isSilent ? findDirectIdentifiers(request) : [], [isSilent, request])
+  const scopeSignals = useMemo(() => findScopeExclusions(request), [request])
 
   function postTask() {
     if (privacySignals.length > 0) {
       setPrivacyBlocked(true)
       return
     }
+    const referralOnly = scopeSignals.length > 0
     const newTask: Task = {
       id: `CK-${208 + tasks.length}`,
       title: request,
       category,
-      time: urgent ? 'Today · urgent review' : 'Next available slot',
+      time: referralOnly ? 'AH service redirect' : urgent ? 'Today · urgent review' : 'Next available slot',
       zone: 'Queenstown · approximate zone',
       silent: isSilent,
       urgent,
       femalePreferred: femalePreferred && category === 'Sensitive accompaniment',
-      status: urgent || category === 'Sensitive accompaniment' ? 'Review' : 'Open',
-      points,
-      viaHours,
-      difficulty: urgent || category === 'Sensitive accompaniment' ? 'Weightier' : category === 'Digital help' ? 'Skilled' : 'Light',
-      skill: category === 'Sensitive accompaniment' ? 'Safeguarding + accompaniment' : `${category} ready`,
+      status: referralOnly || urgent || category === 'Sensitive accompaniment' ? 'Review' : 'Open',
+      points: referralOnly ? 0 : points,
+      viaHours: referralOnly ? 0 : viaHours,
+      difficulty: referralOnly || urgent || category === 'Sensitive accompaniment' ? 'Weightier' : category === 'Digital help' ? 'Skilled' : 'Light',
+      skill: referralOnly ? 'Formal AH service required' : category === 'Sensitive accompaniment' ? 'Safeguarding + accompaniment' : `${category} ready`,
       volunteer: '',
-      safetyCleared: !urgent && category !== 'Sensitive accompaniment',
+      safetyCleared: !referralOnly && !urgent && category !== 'Sensitive accompaniment',
+      referralOnly,
+      scopeFlags: scopeSignals.map((signal) => signal.label),
     }
     setTasks([newTask, ...tasks])
     setPrivacyBlocked(false)
+    setSubmittedForReferral(referralOnly)
     setSubmitted(true)
   }
 
@@ -131,6 +152,11 @@ export default function App() {
 
   function completeTask(id: string) {
     setTasks(tasks.map((task) => task.id === id ? { ...task, status: 'Done' } : task))
+  }
+
+  function confirmRedirect(id: string) {
+    setTasks(tasks.map((task) => task.id === id ? { ...task, status: 'Done' } : task))
+    setAdminNotice(`${id} closed with a formal-service redirect receipt; no volunteer details were released.`)
   }
 
   function toggleAccount(id: string) {
@@ -171,14 +197,15 @@ export default function App() {
 
         {role === 'caregiver' && <div className="caregiver-grid">
           <div className="request-card">
-            {submitted ? <div className="success-state"><span className="success-icon">✓</span><p className="eyebrow">REQUEST RECEIVED</p><h3>{urgent ? 'An AH admin is reviewing this now.' : 'That is one thing off your plate.'}</h3><p>{isSilent ? 'Volunteers see your task alias, approximate zone and the minimum instructions only. Your name, photo, phone number and care details stay hidden.' : 'Your request is in the moderated matching queue.'}</p><ol className="request-steps"><li><b>Scope check</b><span>Admin confirms the request is bounded and non-clinical.</span></li><li><b>Eligible offer</b><span>Only a trained volunteer with the required skill can offer to help.</span></li><li><b>Protected handoff</b><span>Task details unlock after approval; identity remains hidden in Silent mode.</span></li></ol><button onClick={() => setSubmitted(false)} className="button button-dark">Post another <Arrow /></button></div> : <>
+            {submitted ? <div className={`success-state ${submittedForReferral ? 'redirected' : ''}`}><span className="success-icon">{submittedForReferral ? '!' : '✓'}</span><p className="eyebrow">{submittedForReferral ? 'VOLUNTEER MATCHING BLOCKED' : 'REQUEST RECEIVED'}</p><h3>{submittedForReferral ? 'This needs the formal AH service lane.' : urgent ? 'An AH admin is reviewing this now.' : 'That is one thing off your plate.'}</h3>{submittedForReferral ? <><p>CareKaki did not publish this request to volunteers. AH admin receives a redirect receipt and can guide it to an appropriate professional or service.</p>{scopeSignals.some((signal) => signal.emergency) && <div className="emergency-callout"><b>Life-threatening emergency?</b><span>Do not wait for an admin response — call SCDF at 995 now.</span></div>}<ol className="request-steps"><li><b>Volunteer offer disabled</b><span>No student can view, offer for or be assigned this request.</span></li><li><b>AH service review</b><span>An administrator confirms the appropriate formal route.</span></li><li><b>Redirect receipt</b><span>The decision closes with an accountable no-volunteer record.</span></li></ol></> : <><p>{isSilent ? 'Volunteers see your task alias, approximate zone and the minimum instructions only. Your name, photo, phone number and care details stay hidden.' : 'Your request is in the moderated matching queue.'}</p><ol className="request-steps"><li><b>Scope check</b><span>Admin confirms the request is bounded and non-clinical.</span></li><li><b>Eligible offer</b><span>Only a trained volunteer with the required skill can offer to help.</span></li><li><b>Protected handoff</b><span>Task details unlock after approval; identity remains hidden in Silent mode.</span></li></ol></>}<button onClick={() => setSubmitted(false)} className="button button-dark">Post another <Arrow /></button></div> : <>
               <div className="form-top"><span>ONE SMALL ASK</span><span>about 30 seconds</span></div>
               <label>What would make today lighter?<textarea value={request} onChange={(event) => { setRequest(event.target.value); setPrivacyBlocked(false) }} /></label>
               <div className="form-row"><label>Task category<select value={category} onChange={(event) => { const next = event.target.value as Category; setCategory(next); if (next !== 'Sensitive accompaniment') setFemalePreferred(false) }}>{categories.map((item) => <option key={item}>{item}</option>)}</select></label><label>Volunteer recognition<div className="points-box">{points} <small>impact points · {viaHours}h service estimate</small></div></label></div>
               <button className={`silent-switch ${isSilent ? 'on' : ''}`} onClick={() => { setIsSilent(!isSilent); setPrivacyBlocked(false) }}><span className="switch-knob"></span><span><b>Silent Task</b><small>Volunteer cannot see your identity or contact details</small></span><em>{isSilent ? 'ON' : 'OFF'}</em></button>
               {isSilent && <div className={`privacy-preflight ${privacyBlocked ? 'blocked' : ''}`} aria-live="polite"><div><span>{privacyBlocked ? 'BLOCKED BEFORE POSTING' : 'SILENT TASK PRIVACY PREFLIGHT'}</span><b>{privacySignals.length ? `${privacySignals.length} direct identifier ${privacySignals.length === 1 ? 'type' : 'types'} detected` : 'No obvious direct identifiers detected'}</b></div>{privacySignals.length > 0 ? <ul>{privacySignals.map((signal) => <li key={signal.label}><b>{signal.label}</b><span>{signal.guidance}</span></li>)}</ul> : <p>We check the task text for obvious phone, email, identity-number, exact-location and stated-name patterns. AH still reviews the request before matching.</p>}</div>}
+              {scopeSignals.length > 0 && <div className="scope-preflight" aria-live="polite"><div><span>OUTSIDE VOLUNTEER SCOPE</span><b>Will route to AH, never to a volunteer</b></div><ul>{scopeSignals.map((signal) => <li key={signal.label}><b>{signal.label}</b><span>{signal.guidance}</span></li>)}</ul></div>}
               <div className="option-row"><label className="check-option"><input type="checkbox" checked={urgent} onChange={(event) => setUrgent(event.target.checked)} /><span><b>Time-sensitive today</b><small>Routes to AH admin triage, not a public urgency bounty.</small></span></label>{category === 'Sensitive accompaniment' && <label className="check-option"><input type="checkbox" checked={femalePreferred} onChange={(event) => setFemalePreferred(event.target.checked)} /><span><b>Female support requested</b><small>For task-specific privacy or comfort; admin checks suitability.</small></span></label>}</div>
-              <button className="button button-dark full" onClick={postTask}>Send private request <Arrow /></button>
+              <button className="button button-dark full" onClick={postTask}>{scopeSignals.length ? 'Create AH redirect receipt' : 'Send private request'} <Arrow /></button>
               <p className="form-foot">No medication, personal care, clinical advice, lifting, money handling or emergencies. Those go to the appropriate AH service.</p>
             </>}
           </div>
@@ -189,7 +216,7 @@ export default function App() {
           <div className="volunteer-strip"><article><span>PRIVATE PROGRESS</span><b>620</b><small>Level 3 · Steady Kaki</small></article><article><span>VERIFIED SERVICE</span><b>8.5h</b><small>VIA subject to partner approval</small></article><article><span>RELIABILITY</span><b>96%</b><small>11 of 12 tasks completed</small></article><article className="league-card"><span>OPT-IN TEAM GOAL</span><b>14/20</b><small>SMU Care Crew · completed tasks</small></article></div>
           <div className="section-split"><div><p className="eyebrow">ELIGIBLE FOR YOU</p><h3>Offer help where your training and time fit.</h3></div><div className="skill-pills"><Badge tone="green">✓ Errands ready</Badge><Badge tone="green">✓ Digital help ready</Badge><Badge tone="blue">✓ Safeguarding + accompaniment</Badge><Badge tone="plain">Forms briefing not completed</Badge></div></div>
           <div className="readiness-rule"><span>DETERMINISTIC READINESS GATE</span><p>Every offer checks active training tags first. Sensitive tasks also stay locked until AH clears the exact bounded scope; gender preference never substitutes for readiness.</p></div>
-          <div className="task-grid">{tasks.filter((task) => task.status !== 'Done').map((task) => {
+          <div className="task-grid">{tasks.filter((task) => task.status !== 'Done' && !task.referralOnly).map((task) => {
             const isEligible = volunteerReadiness.includes(task.skill)
             const awaitingSafetyReview = !task.safetyCleared && (task.urgent || task.category === 'Sensitive accompaniment')
             return <article className={`volunteer-task ${task.urgent ? 'urgent' : ''} ${!isEligible || awaitingSafetyReview ? 'locked' : ''}`} key={task.id}>
@@ -209,7 +236,7 @@ export default function App() {
           <div className="admin-metrics"><article><span>OPEN TASKS</span><b>{openCount}</b><small>across approved categories</small></article><article><span>NEEDS REVIEW</span><b>{reviewCount}</b><small>volunteer offers + sensitive tasks</small></article><article><span>ACTIVE VOLUNTEERS</span><b>18</b><small>5 skill groups</small></article><article><span>SAFETY INCIDENTS</span><b>0</b><small>illustrative pilot dashboard</small></article></div>
           <div className="admin-columns">
             <section className="admin-panel"><div className="panel-head"><div><p className="eyebrow">TRIAGE & MATCHING</p><h3>One accountable queue</h3></div><Badge tone="red">1 urgent</Badge></div>
-              <div className="admin-task-list">{tasks.filter((task) => task.status === 'Review' || ((task.urgent || task.category === 'Sensitive accompaniment') && !task.safetyCleared)).map((task) => <article key={task.id}><div className="admin-task-title"><span>{task.id}</span><div><b>{task.title}</b><small>{task.category} · {task.zone}</small></div></div><div className="admin-flags">{task.silent && <Badge tone="blue">Identity vaulted</Badge>}{task.urgent && <Badge tone="red">Time-sensitive</Badge>}{task.femalePreferred && <Badge tone="amber">Female support preference</Badge>}<Badge tone={task.safetyCleared ? 'green' : 'red'}>{task.safetyCleared ? 'Scope cleared' : 'Offer gate locked'}</Badge></div><p>{task.femalePreferred ? 'Confirm no personal care, lifting or clinical work. If bounded, release only to volunteers with Safeguarding + accompaniment readiness; otherwise redirect to formal care support.' : 'Confirm scope, volunteer eligibility and minimum-detail release.'}</p><div className="admin-actions">{task.status === 'Review' && task.volunteer ? <button className="button button-dark" onClick={() => approveTask(task.id)}>Approve match <Arrow /></button> : !task.safetyCleared ? <button className="button button-dark" onClick={() => releaseTask(task.id)}>Clear bounded scope <Arrow /></button> : <button className="button button-outline" onClick={() => setAdminNotice(`${task.id} routed for direct coordinator outreach.`)}>Find suitable volunteer</button>}<button className="text-action" onClick={() => setAdminNotice(`${task.id} escalated to the AH service lane; volunteer matching paused.`)}>Escalate / redirect</button></div></article>)}</div>
+              <div className="admin-task-list">{tasks.filter((task) => task.status === 'Review' || ((task.urgent || task.category === 'Sensitive accompaniment') && !task.safetyCleared)).map((task) => <article key={task.id}><div className="admin-task-title"><span>{task.id}</span><div><b>{task.title}</b><small>{task.category} · {task.zone}</small></div></div><div className="admin-flags">{task.silent && <Badge tone="blue">Identity vaulted</Badge>}{task.urgent && <Badge tone="red">Time-sensitive</Badge>}{task.femalePreferred && <Badge tone="amber">Female support preference</Badge>}{task.referralOnly && <Badge tone="red">Formal service only</Badge>}<Badge tone={task.safetyCleared ? 'green' : 'red'}>{task.safetyCleared ? 'Scope cleared' : 'Offer gate locked'}</Badge></div>{task.scopeFlags.length > 0 && <div className="scope-flags">Detected: {task.scopeFlags.join(' · ')}</div>}<p>{task.referralOnly ? 'Volunteer matching is structurally disabled. Confirm the appropriate professional, clinical or emergency route and close an accountable redirect receipt.' : task.femalePreferred ? 'Confirm no personal care, lifting or clinical work. If bounded, release only to volunteers with Safeguarding + accompaniment readiness; otherwise redirect to formal care support.' : 'Confirm scope, volunteer eligibility and minimum-detail release.'}</p><div className="admin-actions">{task.referralOnly ? <button className="button button-dark" onClick={() => confirmRedirect(task.id)}>Confirm formal redirect <Arrow /></button> : task.status === 'Review' && task.volunteer ? <button className="button button-dark" onClick={() => approveTask(task.id)}>Approve match <Arrow /></button> : !task.safetyCleared ? <button className="button button-dark" onClick={() => releaseTask(task.id)}>Clear bounded scope <Arrow /></button> : <button className="button button-outline" onClick={() => setAdminNotice(`${task.id} routed for direct coordinator outreach.`)}>Find suitable volunteer</button>}{!task.referralOnly && <button className="text-action" onClick={() => setAdminNotice(`${task.id} escalated to the AH service lane; volunteer matching paused.`)}>Escalate / redirect</button>}</div></article>)}</div>
             </section>
             <section className="admin-panel"><div className="panel-head"><div><p className="eyebrow">ACCOUNT ADMINISTRATION</p><h3>People, access, readiness</h3></div><Badge tone="green">Protected</Badge></div>
               <div className="account-list">{[{ id: 'MC-204', name: 'Male caregiver account', role: 'Caregiver · identity verified' }, { id: 'VL-031', name: 'Maya Tan', role: 'Volunteer · 4 skill badges' }, { id: 'VL-044', name: 'Arjun Lee', role: 'Volunteer · renewal due' }].map((account) => <article key={account.id}><div className="account-avatar">{account.id.slice(0, 2)}</div><div><b>{account.name}</b><small>{account.id} · {account.role}</small></div><Badge tone={accountState[account.id] === 'Active' ? 'green' : 'amber'}>{accountState[account.id]}</Badge><button onClick={() => toggleAccount(account.id)}>{accountState[account.id] === 'Active' ? 'Pause' : 'Activate'}</button></article>)}</div>

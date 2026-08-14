@@ -15,7 +15,7 @@ CareKaki Bridge is not a generic gig app or substitute for clinical care. It is 
 1. **Caregiver interface:** post a bounded task across seven practical categories and optionally choose a task-specific comfort preference.
 2. **Silent Task:** a deterministic preflight blocks obvious direct identifiers in free text before posting; the volunteer then sees a request alias, approximate zone and minimum instructions, never the caregiver's structured name, photo, phone number or exact address.
 3. **Volunteer interface:** a deterministic readiness gate permits offers only when the active volunteer has the task's required training tag; see private progress and a service-time estimate before coordinator confirmation.
-4. **Hospital-admin interface:** administer accounts, triage urgent/sensitive requests, approve matches, protect identity and redirect anything outside scope.
+4. **Hospital-admin interface:** administer accounts, triage urgent/sensitive requests, approve matches, protect identity and redirect anything outside scope. A deterministic scope gate keeps medication, personal care, clinical advice, lifting/transfers, money handling and emergencies off the volunteer surface.
 5. **Complete visibly:** create an accountable completion / escalation record and volunteer recognition receipt.
 
 ## Product standards implemented
@@ -28,6 +28,7 @@ CareKaki Bridge is not a generic gig app or substitute for clinical care. It is 
 - **Sensitive-task routing:** urgency is an admin-triage signal, not a bigger public bounty. A female-support preference is task-specific and never permits personal care, lifting or clinical work.
 - **Enforced readiness:** sensitive or urgent tasks start locked, AH must clear their bounded scope, and even then only a volunteer with the exact required readiness tag can offer. Missing training produces an explicit disabled state rather than a cosmetic badge.
 - **Clinical boundary:** volunteers provide non-clinical practical help only. Symptoms, medication, personal care, lifting, falls, mental-health crisis and medical interpretation are escalated.
+- **Executable service redirect:** excluded request text creates an AH-admin-only redirect receipt; it cannot enter the volunteer offer pool. Life-threatening wording also displays the official SCDF 995 direction without asking the caregiver to wait for admin review.
 - **Pilot accountability:** named operational / escalation owners, daily moderation, task receipts and outcome measurement.
 
 ## Interaction demo
