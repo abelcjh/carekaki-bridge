@@ -16,7 +16,7 @@ CareKaki Bridge is not a generic gig app or substitute for clinical care. It is 
 2. **Silent Task:** a deterministic preflight blocks obvious direct identifiers in free text before posting; the volunteer then sees a request alias, approximate zone and minimum instructions, never the caregiver's structured name, photo, phone number or exact address.
 3. **Volunteer interface:** a deterministic readiness gate permits offers only when the active volunteer has the task's required training tag; see private progress and a service-time estimate before coordinator confirmation.
 4. **Hospital-admin interface:** administer accounts, triage urgent/sensitive requests, approve matches, protect identity and redirect anything outside scope. A deterministic scope gate keeps medication, personal care, clinical advice, lifting/transfers, money handling and emergencies off the volunteer surface.
-5. **Complete visibly:** create an accountable completion / escalation record and volunteer recognition receipt.
+5. **Complete visibly:** a matched volunteer submits a private reflection; hours and points remain pending until AH verifies the completion receipt, after which the record can go to the partner school for its own VIA decision.
 
 ## Product standards implemented
 
@@ -29,6 +29,7 @@ CareKaki Bridge is not a generic gig app or substitute for clinical care. It is 
 - **Enforced readiness:** sensitive or urgent tasks start locked, AH must clear their bounded scope, and even then only a volunteer with the exact required readiness tag can offer. Missing training produces an explicit disabled state rather than a cosmetic badge.
 - **Clinical boundary:** volunteers provide non-clinical practical help only. Symptoms, medication, personal care, lifting, falls, mental-health crisis and medical interpretation are escalated.
 - **Executable service redirect:** excluded request text creates an AH-admin-only redirect receipt; it cannot enter the volunteer offer pool. Life-threatening wording also displays the official SCDF 995 direction without asking the caregiver to wait for admin review.
+- **Verified completion:** task completion creates a minimum-detail receipt rather than instant credit. AH review is the deterministic release gate for service time and private impact points; the product does not award VIA.
 - **Pilot accountability:** named operational / escalation owners, daily moderation, task receipts and outcome measurement.
 
 ## Interaction demo
@@ -39,6 +40,7 @@ The front-end prototype supports:
 - creating a private request, toggling **Silent Task**, and setting time-sensitive or task-specific comfort preferences;
 - seeing an ineligible task remain disabled, releasing a sensitive task through AH review, and offering only after both safety and readiness gates pass;
 - approving / redirecting a sensitive request and administering caregiver / volunteer account status;
+- submitting a completion reflection, seeing its time and points remain pending, and having AH verify the receipt before the private progress record updates;
 - seeing private progress, verified service time, reliability, an opt-in team goal and explicit safety boundaries.
 
 All data is in-memory demo data; no personal or health data is collected.
