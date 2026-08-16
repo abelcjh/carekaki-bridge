@@ -556,6 +556,50 @@ input:focus-visible {
 
 /* Authenticated operations */
 .portal-nav { min-height: 74px; }
+.portal-nav-left { display: flex; align-items: center; gap: 13px; }
+.portal-menu-trigger {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  padding: 0;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  display: grid;
+  place-content: center;
+  gap: 4px;
+  background: var(--surface);
+  color: var(--text);
+}
+.portal-menu-trigger:hover, .portal-menu-trigger[aria-expanded='true'] { border-color: var(--accent); background: var(--surface-soft); }
+.portal-menu-trigger span { width: 17px; height: 1.5px; display: block; border-radius: 999px; background: currentColor; }
+.portal-menu-layer { position: fixed; inset: 0; z-index: 80; }
+.portal-menu-scrim { position: absolute; inset: 0; border: 0; background: rgba(12, 21, 18, 0.56); backdrop-filter: blur(3px); }
+.portal-menu-drawer {
+  width: min(420px, calc(100vw - 24px));
+  height: 100%;
+  position: relative;
+  z-index: 1;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-raised);
+  box-shadow: 20px 0 70px var(--shadow);
+  animation: portal-drawer-in 180ms ease-out;
+}
+@keyframes portal-drawer-in { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+.portal-menu-head { padding-bottom: 23px; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
+.portal-menu-head span { color: var(--accent); font: 600 8px 'DM Mono', monospace; letter-spacing: 0.1em; }
+.portal-menu-head h2 { margin: 5px 0 0; color: var(--text); font: 500 38px/1 'Playfair Display', serif; }
+.portal-menu-head > button { width: 36px; height: 36px; border: 0; border-radius: 50%; background: var(--surface-soft); color: var(--text-muted); font-size: 24px; line-height: 1; }
+.portal-section-links { margin-top: 18px; display: grid; }
+.portal-section-links > button { width: 100%; padding: 16px 5px; border: 0; border-bottom: 1px solid var(--border); display: grid; grid-template-columns: 30px 1fr auto; align-items: center; gap: 12px; background: transparent; color: var(--text); text-align: left; }
+.portal-section-links > button:hover, .portal-section-links > button.active { padding-left: 12px; background: var(--surface-soft); }
+.portal-section-links > button > span { color: var(--accent); font: 500 8px 'DM Mono', monospace; }
+.portal-section-links b, .portal-section-links small { display: block; }
+.portal-section-links b { font-size: 13px; }
+.portal-section-links small { margin-top: 4px; color: var(--text-muted); font-size: 9px; line-height: 1.35; }
+.portal-section-links em { color: var(--accent); font-style: normal; }
+.portal-menu-foot { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border); color: var(--text-subtle); font-size: 9px; line-height: 1.5; }
 .portal-context { display: flex; align-items: center; gap: 10px; }
 .secure-chip, .role-lock { color: var(--text-muted); font: 500 9px 'DM Mono', monospace; }
 .secure-chip i { width: 7px; height: 7px; margin-right: 5px; display: inline-block; border-radius: 50%; background: #6db57c; }
@@ -617,6 +661,7 @@ input:focus-visible {
 }
 .workspace-head { padding: 33px 38px 28px; border-bottom: 1px solid var(--border); display: flex; align-items: end; justify-content: space-between; gap: 34px; }
 .workspace-head h2 { margin-bottom: 0; color: var(--text); font-size: clamp(32px, 4vw, 52px); line-height: 0.98; letter-spacing: -0.06em; }
+.portal-page-description { margin: 10px 0 0; color: var(--text-muted); font-size: 11px; }
 .identity-card { text-align: right; }
 .identity-card span, .identity-card b { display: block; }
 .identity-card span { color: var(--accent); font: 500 9px 'DM Mono', monospace; }
@@ -722,6 +767,21 @@ input:focus-visible {
 .ethics-note { margin: 22px 0 0; padding: 15px; border: 1px solid var(--border); color: var(--text-muted); background: var(--surface-soft); font-size: 9px; line-height: 1.5; }
 
 .admin-notice { margin-bottom: 14px; padding: 12px 15px; font-size: 11px; }
+.volunteer-recognition-page { border: 1px solid var(--border); background: var(--surface-soft); }
+.volunteer-recognition-page .map-recognition-head { padding: 22px; }
+.volunteer-recognition-page .map-recognition-head h3 { margin: 4px 0 0; color: var(--text); font: 500 29px/1.1 'Playfair Display', serif; }
+.volunteer-recognition-page .map-readiness { margin: 0; padding: 18px 22px; border-top: 1px solid var(--border); }
+.admin-overview-intro { padding: 28px; border: 1px solid var(--border); background: var(--surface-soft); }
+.admin-overview-intro h3 { max-width: 700px; margin: 7px 0 10px; color: var(--text); font: 500 clamp(28px, 4vw, 46px)/1.02 'Playfair Display', serif; }
+.admin-overview-intro > p:last-child { max-width: 760px; margin: 0; color: var(--text-muted); font-size: 10px; line-height: 1.6; }
+.admin-section-directory { margin-top: 18px; border: 1px solid var(--border); background: var(--surface); }
+.admin-directory-grid { padding: 14px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.admin-directory-grid button { min-height: 128px; padding: 18px; border: 1px solid var(--border); display: flex; flex-direction: column; align-items: flex-start; background: var(--surface-soft); color: var(--text); text-align: left; }
+.admin-directory-grid button:hover { border-color: var(--accent); transform: translateY(-2px); }
+.admin-directory-grid span, .admin-directory-grid small, .admin-directory-grid em { display: block; }
+.admin-directory-grid span { font: 500 20px/1.1 'Playfair Display', serif; }
+.admin-directory-grid small { margin-top: 7px; color: var(--text-muted); font-size: 9px; }
+.admin-directory-grid em { margin-top: auto; padding-top: 16px; color: var(--accent); font: 500 8px 'DM Mono', monospace; font-style: normal; }
 .admin-columns { margin-top: 15px; display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 15px; }
 .admin-panel { border: 1px solid var(--border); background: var(--surface); }
 .panel-head { padding: 22px; border-bottom: 1px solid var(--border); display: flex; align-items: start; justify-content: space-between; gap: 20px; }
@@ -746,6 +806,12 @@ input:focus-visible {
 .account-list button { border: 0; background: transparent; color: var(--accent); font-size: 9px; text-decoration: underline; }
 .vault-note { margin: 20px; }
 .completion-queue { margin-top: 15px; }
+.admin-completion-summary { padding: 14px; border-bottom: 1px solid var(--border); display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; background: var(--surface-soft); }
+.admin-completion-summary article { min-height: 112px; padding: 15px; border: 1px solid var(--border); display: flex; flex-direction: column; background: var(--surface); }
+.admin-completion-summary span, .admin-completion-summary b, .admin-completion-summary small { display: block; }
+.admin-completion-summary span { color: var(--text-subtle); font: 500 7px 'DM Mono', monospace; }
+.admin-completion-summary b { margin-top: 9px; color: var(--text); font: 500 28px/1 'Playfair Display', serif; }
+.admin-completion-summary small { margin-top: auto; padding-top: 10px; color: var(--text-muted); font-size: 8px; line-height: 1.35; }
 .completion-queue .panel-head h3 { font-size: 30px; }
 .receipt-reflection { margin: 12px 0 !important; padding: 12px; background: var(--surface-soft); color: var(--text-muted) !important; font-size: 11px !important; }
 .verification-summary { margin-bottom: 14px; display: flex; flex-wrap: wrap; gap: 8px; }
@@ -970,6 +1036,9 @@ input:focus-visible {
   .database-roadmap > .badge { grid-column: 2; justify-self: start; }
   .caregiver-grid { min-height: 0; }
   .request-card, .task-preview-panel, .volunteer-view, .admin-view { padding: 25px 20px; }
+  .portal-menu-drawer { padding: 22px; }
+  .admin-directory-grid { grid-template-columns: 1fr; }
+  .admin-completion-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .form-row, .option-row, .contact-fields, .schedule-row, .language-preference, .task-map-layout, .capacity-alert-list dl { grid-template-columns: 1fr; }
   .task-map-section { padding: 24px 20px 28px; }
   .task-map-head, .capacity-alert-head, .capacity-alert-title, .map-caption, .map-recognition-head { align-items: flex-start; flex-direction: column; }
