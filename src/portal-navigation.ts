@@ -10,8 +10,8 @@ export type PortalSection = {
 
 const portalSections: Record<Role, readonly PortalSection[]> = {
   caregiver: [
-    { id: 'tasks', label: 'My tasks', description: 'Map, status and AH updates' },
-    { id: 'create', label: 'Create a request', description: 'Publish a new practical task' },
+    { id: 'tasks', label: 'Task map', description: 'View your tasks, statuses and AH updates' },
+    { id: 'create', label: 'Create task', description: 'Publish a new practical support request' },
   ],
   volunteer: [
     { id: 'tasks', label: 'Find tasks', description: 'Map, filters and task offers' },
