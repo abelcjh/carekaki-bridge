@@ -1,0 +1,42 @@
+{
+  "expo": {
+    "name": "ReliefKaki",
+    "slug": "reliefkaki-judging",
+    "description": "Mobile judging preview for ReliefKaki, a caregiver-to-volunteer practical support platform.",
+    "version": "1.0.0",
+    "runtimeVersion": "exposdk:54.0.0",
+    "orientation": "portrait",
+    "scheme": "reliefkaki",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#F5F0E8",
+    "primaryColor": "#20463A",
+    "githubUrl": "https://github.com/abelcjh/reliefkaki",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.nyalalabs.reliefkaki"
+    },
+    "android": {
+      "package": "com.nyalalabs.reliefkaki",
+      "adaptiveIcon": {
+        "backgroundColor": "#F5F0E8",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": true
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "640b1e39-9017-489b-9397-15d9f1296931"
+      }
+    },
+    "owner": "abelchinjh",
+    "updates": {
+      "url": "https://u.expo.dev/640b1e39-9017-489b-9397-15d9f1296931"
+    }
+  }
+}
