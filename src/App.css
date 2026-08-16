@@ -1,4 +1,4 @@
-/* CareKaki visual system: every foreground/background pair is tokenised so light and dark modes remain legible. */
+/* ReliefKaki visual system: every foreground/background pair is tokenised so light and dark modes remain legible. */
 :root,
 :root[data-theme='light'] {
   --page: #f5f2ec;
@@ -838,7 +838,6 @@ footer .mark { width: 20px; height: 20px; }
   .login-context h1 { font-size: 42px; line-height: 1; }
   .demo-access button { grid-template-columns: 1fr; }
   .demo-access em { grid-column: 1; grid-row: auto; margin-top: 6px; }
-
   .workspace-head h2 { font-size: 32px; }
   .volunteer-strip b, .admin-metrics b { font-size: 23px; }
   .reward-row { gap: 5px; }

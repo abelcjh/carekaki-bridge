@@ -18,8 +18,8 @@ export const demoAccounts: DemoAccount[] = [
   {
     role: 'caregiver',
     label: 'Caregiver demo',
-    email: 'caregiver@carekaki.demo',
-    password: 'carekaki',
+    email: 'caregiver@reliefkaki.demo',
+    password: 'reliefkaki',
     name: 'Marcus Lim',
     id: 'C-204',
     assurance: 'Anonymous to volunteers',
@@ -27,8 +27,8 @@ export const demoAccounts: DemoAccount[] = [
   {
     role: 'volunteer',
     label: 'Volunteer demo',
-    email: 'maya@carekaki.demo',
-    password: 'carekaki',
+    email: 'maya@reliefkaki.demo',
+    password: 'reliefkaki',
     name: 'Maya Tan',
     id: 'VL-031',
     assurance: 'Identity and training verified',
@@ -36,8 +36,8 @@ export const demoAccounts: DemoAccount[] = [
   {
     role: 'admin',
     label: 'AH admin demo',
-    email: 'admin@carekaki.demo',
-    password: 'carekaki',
+    email: 'admin@reliefkaki.demo',
+    password: 'reliefkaki',
     name: 'AH-C3U Admin',
     id: 'AH-018',
     assurance: 'Account administrator',

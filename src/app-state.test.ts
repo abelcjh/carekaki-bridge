@@ -14,7 +14,7 @@ describe('role-bound demo authentication', () => {
   })
 
   it('rejects unknown credentials instead of granting a fallback role', () => {
-    expect(authenticateDemo('unknown@example.com', 'carekaki')).toBeNull()
+    expect(authenticateDemo('unknown@example.com', 'reliefkaki')).toBeNull()
     expect(authenticateDemo(demoAccounts[0].email, 'wrong-password')).toBeNull()
   })
 })

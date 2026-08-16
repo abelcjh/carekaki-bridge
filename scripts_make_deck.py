@@ -5,9 +5,9 @@ from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
 from pptx.enum.shapes import MSO_SHAPE
 from pptx.dml.color import RGBColor
 
-ROOT = Path('/home/abel/carekaki-bridge')
-OUT = ROOT / 'CareKaki_Bridge_pitch_deck_v2.pptx'
-PHOTO = ROOT / 'src/assets/carekaki-hero.png'
+ROOT = Path(__file__).resolve().parent
+OUT = ROOT / 'ReliefKaki_pitch_deck_v2.pptx'
+PHOTO = ROOT / 'src/assets/reliefkaki-hero.png'
 
 prs = Presentation()
 prs.slide_width = Inches(13.333)
@@ -63,7 +63,7 @@ def quote(slide, value, x, y, w, h, color=INK):
 
 def footer(slide, number_text):
     divider(slide, 7.02)
-    text(slide, 'CAREKAKI BRIDGE', .62, 7.15, 2, .16, 7.5, MUTED, True, MONO)
+    text(slide, 'RELIEFKAKI', .62, 7.15, 2, .16, 7.5, MUTED, True, MONO)
     text(slide, number_text, 12.1, 7.15, .6, .16, 7.5, MUTED, True, MONO, PP_ALIGN.RIGHT)
 
 # 01 / cover
@@ -71,7 +71,7 @@ slide = prs.slides.add_slide(prs.slide_layouts[6]); rect(slide, 0, 0, 13.333, 7.
 slide.shapes.add_picture(str(PHOTO), Inches(7.3), Inches(0), width=Inches(6.033), height=Inches(7.5))
 rect(slide, 7.3, 0, 2.8, 7.5, FOREST).fill.transparency = 32
 text(slide, 'SPARKX⁺CHANGE · ALEXANDRA HOSPITAL CAREGIVER RESPITE', .72, .62, 5.9, .25, 9, CLAY, True, MONO)
-text(slide, 'CareKaki\nBridge', .7, 1.34, 6.1, 1.75, 48, WHITE, True, SANS)
+text(slide, 'ReliefKaki\nBridge', .7, 1.34, 6.1, 1.75, 48, WHITE, True, SANS)
 quote(slide, 'Help, on your own terms.', .75, 3.42, 5.3, .52, WHITE)
 text(slide, 'A quiet, practical way for caregivers to offload one thing today — matched with trained youth volunteers, never clinical care.', .75, 4.42, 5.3, .68, 16, RGBColor(217, 228, 220))
 rect(slide, .75, 5.62, 3.35, .48, CLAY, True)
@@ -113,7 +113,7 @@ footer(slide, '03')
 # 04 / solution
 slide = prs.slides.add_slide(prs.slide_layouts[6]); rect(slide, 0, 0, 13.333, 7.5, PAPER)
 tag(slide, 'The response')
-text(slide, 'CareKaki Bridge', .62, 1.03, 6.6, .58, 38, INK, True)
+text(slide, 'ReliefKaki', .62, 1.03, 6.6, .58, 38, INK, True)
 quote(slide, 'A silent-help task layer between “formal services exist” and “I need help tonight.”', .65, 1.78, 8.45, .65, RUST)
 steps = [
     ('01', 'POST', 'One bounded non-clinical task.'),
@@ -235,7 +235,7 @@ rect(slide, .64, 3.1, 5.0, 1.42, SAGE)
 text(slide, 'POST A SILENT TASK', .95, 3.47, 2.7, .2, 10, RUST, True, MONO)
 text(slide, 'Then claim, complete and record the help.', .95, 3.85, 3.95, .25, 14, FOREST, True)
 text(slide, 'LIVE DEMO', 7.08, 1.64, 1.3, .18, 10, RUST, True, MONO)
-text(slide, 'abelcjh.github.io/\ncarekaki-bridge', 7.08, 2.1, 5.2, .7, 26, FOREST, True)
+text(slide, 'abelcjh.github.io/\nreliefkaki', 7.08, 2.1, 5.2, .7, 26, FOREST, True)
 divider(slide, 3.2, 7.08, 4.7)
 text(slide, 'BUILT INTO THE PROTOTYPE', 7.08, 3.56, 2.55, .16, 9, RUST, True, MONO)
 text(slide, 'Silent Task · moderated task board · safe scope · volunteer recognition · pilot scorecard', 7.08, 3.98, 4.72, .75, 14, MUTED)
@@ -251,7 +251,7 @@ for i, item in enumerate(['an AH pilot owner', 'a safe task list + escalation SO
     y=3.5+i*.48
     text(slide, f'0{i+1}', 7.22, y, .42, .16, 9, RUST, True, MONO)
     text(slide, item, 7.78, y-.03, 3.4, .22, 13, INK, True)
-text(slide, 'CAREKAKI BRIDGE', .65, 6.8, 2.5, .18, 9, FOREST, True, MONO)
+text(slide, 'RELIEFKAKI', .65, 6.8, 2.5, .18, 9, FOREST, True, MONO)
 text(slide, '12', 12.1, 6.8, .6, .18, 9, FOREST, True, MONO, PP_ALIGN.RIGHT)
 
 prs.save(OUT)

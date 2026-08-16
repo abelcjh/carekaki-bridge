@@ -1,14 +1,14 @@
-# CareKaki Bridge
+# ReliefKaki
 
 > **Help, on your own terms.** A high-trust, AH-linked caregiver-respite pilot for small, bounded non-clinical tasks.
 
-[Live prototype](https://abelcjh.github.io/carekaki-bridge/) · [Editable V2 deck](https://docs.google.com/presentation/d/1Be8o3WgWZ4HiMO0bN_4A_JVgpNycGeqs/edit) · [Research and standards](./RESEARCH.md)
+[Live prototype](https://abelcjh.github.io/reliefkaki/) · [Editable V2 deck](https://docs.google.com/presentation/d/1Be8o3WgWZ4HiMO0bN_4A_JVgpNycGeqs/edit) · [Research and standards](./RESEARCH.md)
 
-![CareKaki Bridge hero](./src/assets/carekaki-hero.png)
+![ReliefKaki hero](./src/assets/reliefkaki-hero.png)
 
 ## What this prototype demonstrates
 
-CareKaki Bridge is not a generic gig app or substitute for clinical care. It is an **activation layer** that makes it easier for caregivers — especially people uncomfortable asking for help — to turn one practical burden into a safely managed request.
+ReliefKaki is not a generic gig app or substitute for clinical care. It is an **activation layer** that makes it easier for caregivers — especially people uncomfortable asking for help — to turn one practical burden into a safely managed request.
 
 ### Core experience
 
@@ -70,7 +70,7 @@ npm run lint
 
 ## Deck
 
-`scripts_make_deck.py` generates `CareKaki_Bridge_pitch_deck_v2.pptx`. The deck is a 12-slide editable PPTX and uses the same visual system as the web experience.
+`scripts_make_deck.py` generates `ReliefKaki_pitch_deck_v2.pptx`. The deck is a 12-slide editable PPTX and uses the same visual system as the web experience.
 
 ```bash
 python3 -m venv .venv

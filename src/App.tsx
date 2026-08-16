@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
-import heroImage from './assets/carekaki-hero.png'
+import heroImage from './assets/reliefkaki-hero.png'
 import { authenticateDemo, demoAccounts, resolveInitialTheme, type AuthSession, type Role, type Screen, type Theme } from './app-state'
 import { taskContactForVolunteer, validateTaskContact } from './task-privacy'
 import { filterTaskMap, taskDisplayLabel, type Coordinates, type TaskMapFilters } from './task-filters'
@@ -128,7 +128,7 @@ const volunteerLanguages = ['English', 'Mandarin']
 function findDirectIdentifiers(value: string): PrivacySignal[] {
   const checks: Array<PrivacySignal & { pattern: RegExp }> = [
     { label: 'Phone number', guidance: 'Remove phone numbers; AH keeps contact details in the protected account.', pattern: /(?:\+?65[\s-]?)?(?:[689]\d{3}[\s-]?\d{4})\b/i },
-    { label: 'Email address', guidance: 'Remove email addresses; volunteers should not contact you outside CareKaki.', pattern: /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i },
+    { label: 'Email address', guidance: 'Remove email addresses; volunteers should not contact you outside ReliefKaki.', pattern: /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i },
     { label: 'NRIC or FIN', guidance: 'Remove identity numbers. They are never needed in a volunteer task.', pattern: /\b[STFGM]\d{7}[A-Z]\b/i },
     { label: 'Postal code or exact block', guidance: 'Use an approximate zone only; AH releases a meeting point after approval if needed.', pattern: /\b(?:singapore\s*)?\d{6}\b|\b(?:blk|block)\s*\d+[A-Z]?\b/i },
     { label: 'Stated personal name', guidance: 'Remove your or your care recipient’s name; use “me”, “mum”, “dad” or “my family member”.', pattern: /\b(?:my name is|i am|i'm|ask for|contact)\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+)?\b/ },
@@ -139,7 +139,7 @@ function findDirectIdentifiers(value: string): PrivacySignal[] {
 
 function findScopeExclusions(value: string): ScopeSignal[] {
   const checks: Array<ScopeSignal & { pattern: RegExp }> = [
-    { label: 'Possible emergency', guidance: 'Do not wait for CareKaki. Call 995 now for a life-threatening emergency.', emergency: true, pattern: /\b(?:emergency|unconscious|not breathing|chest pain|stroke|severe bleeding|suicid(?:e|al)|collapsed)\b/i },
+    { label: 'Possible emergency', guidance: 'Do not wait for ReliefKaki. Call 995 now for a life-threatening emergency.', emergency: true, pattern: /\b(?:emergency|unconscious|not breathing|chest pain|stroke|severe bleeding|suicid(?:e|al)|collapsed)\b/i },
     { label: 'Medication or clinical task', guidance: 'Medication, symptoms, wounds, diagnosis and clinical advice must go to qualified staff.', pattern: /\b(?:medicat(?:e|ion)|medicine|pills?|dosage|dose|insulin|injection|inject|wound|diagnos(?:e|is)|clinical advice|medical advice|take blood pressure)\b/i },
     { label: 'Personal care', guidance: 'Bathing, toileting, dressing and other personal care are outside the student-volunteer role.', pattern: /\b(?:bath(?:e|ing)|shower(?:ing)?|toilet(?:ing)?|diaper|nappy|dress(?:ing)?|personal care|feed(?:ing)?)\b/i },
     { label: 'Lifting or transfer', guidance: 'Lifting, carrying or transferring a person requires an appropriate formal care pathway.', pattern: /\b(?:lift|lifting|transfer(?:ring)?|carry)\s+(?:me|mum|mom|dad|father|mother|patient|him|her|my family member)\b/i },
@@ -150,7 +150,7 @@ function findScopeExclusions(value: string): ScopeSignal[] {
 }
 
 function Mark() {
-  return <div className="mark" aria-label="CareKaki Bridge"><span></span><span></span><span></span></div>
+  return <div className="mark" aria-label="ReliefKaki"><span></span><span></span><span></span></div>
 }
 
 function Arrow() { return <span className="arrow">↗</span> }
@@ -285,7 +285,7 @@ function TaskMap({ tasks, role, now, ownLocation, trackingStatus, onCreateTask }
 function PublicHome({ theme, onThemeChange, onOpenPortal }: { theme: Theme; onThemeChange: (theme: Theme) => void; onOpenPortal: () => void }) {
   return <main className="public-page">
     <nav className="public-nav" aria-label="Primary navigation">
-      <a className="brand" href="#top"><Mark /><span>carekaki<span className="brand-light">bridge</span></span></a>
+      <a className="brand" href="#top"><Mark /><span>relief<span className="brand-light">kaki</span></span></a>
       <div className="public-links"><a href="#how-it-works">How it works</a><a href="#safety">Safety</a><a href="#roles">Who it is for</a></div>
       <div className="nav-actions"><ThemeToggle theme={theme} onChange={onThemeChange} /><button className="button button-dark" type="button" onClick={onOpenPortal}>Access portal <Arrow /></button></div>
     </nav>
@@ -294,15 +294,15 @@ function PublicHome({ theme, onThemeChange, onOpenPortal }: { theme: Theme; onTh
       <div className="hero-copy">
         <p className="eyebrow">ALEXANDRA HOSPITAL · CAREGIVER RESPITE PILOT</p>
         <h1>One small ask.<br /><em>One lighter day.</em></h1>
-        <p className="lede">CareKaki turns a practical burden into a bounded, privacy-preserving task. Trained student volunteers can offer support while hospital administrators retain oversight.</p>
-        <div className="hero-actions"><button className="button button-dark" type="button" onClick={onOpenPortal}>Sign in to CareKaki <Arrow /></button><a className="button-link" href="#how-it-works">See how it works <span>↓</span></a></div>
+        <p className="lede">ReliefKaki turns a practical burden into a bounded, privacy-preserving task. Trained student volunteers can offer support while hospital administrators retain oversight.</p>
+        <div className="hero-actions"><button className="button button-dark" type="button" onClick={onOpenPortal}>Sign in to ReliefKaki <Arrow /></button><a className="button-link" href="#how-it-works">See how it works <span>↓</span></a></div>
         <div className="trust-row"><span><b>01</b> private request</span><i></i><span><b>02</b> eligible offer</span><i></i><span><b>03</b> verified receipt</span></div>
       </div>
       <div className="hero-visual">
         <img src={heroImage} alt="A caregiver and student volunteer reviewing a practical checklist together" />
         <div className="image-wash"></div>
         <div className="floating-card"><span className="soft-label">SILENT TASK</span><strong>“No public profile.<br />Just one clear ask.”</strong><div><span className="mini-dot"></span> Identity stays protected from volunteers</div></div>
-        <div className="hero-stamp"><span>CAREKAKI</span><b>24</b><span>BRIDGE</span></div>
+        <div className="hero-stamp"><span>RELIEF</span><b>24</b><span>KAKI</span></div>
       </div>
     </section>
 
@@ -324,11 +324,11 @@ function PublicHome({ theme, onThemeChange, onOpenPortal }: { theme: Theme; onTh
       </div>
     </section>
 
-    <section className="safety-section" id="safety"><div><p className="eyebrow">THE CAREKAKI PROMISE</p><h2>Warmth needs<br /><em>clear edges.</em></h2></div><div className="safety-grid"><article><span>↳</span><h3>We do</h3><p>Errands, meals, reminder setup, wayfinding, basic forms, companionship and bounded accompaniment.</p></article><article><span>×</span><h3>We do not</h3><p>Medication, personal care, clinical advice, lifting or transfers, finances, diagnosis or emergency response.</p></article><article><span>!</span><h3>We escalate</h3><p>Urgent and sensitive requests go to a named AH administrator for review, referral and recovery.</p></article></div></section>
+    <section className="safety-section" id="safety"><div><p className="eyebrow">THE RELIEFKAKI PROMISE</p><h2>Warmth needs<br /><em>clear edges.</em></h2></div><div className="safety-grid"><article><span>↳</span><h3>We do</h3><p>Errands, meals, reminder setup, wayfinding, basic forms, companionship and bounded accompaniment.</p></article><article><span>×</span><h3>We do not</h3><p>Medication, personal care, clinical advice, lifting or transfers, finances, diagnosis or emergency response.</p></article><article><span>!</span><h3>We escalate</h3><p>Urgent and sensitive requests go to a named AH administrator for review, referral and recovery.</p></article></div></section>
 
     <section className="access-banner"><div><p className="eyebrow">AUTHENTICATED OPERATIONS</p><h2>Ready to enter your workspace?</h2><p>Caregiver, volunteer and AH-admin tools stay behind a role-bound sign-in.</p></div><button className="button button-dark" type="button" onClick={onOpenPortal}>Access the demo portal <Arrow /></button></section>
 
-    <footer><a className="brand" href="#top"><Mark /><span>carekaki<span className="brand-light">bridge</span></span></a><p>Silent help. Visible relief. Managed with care.</p><span>SparkX⁺Change · Alexandra Hospital · interactive concept demo</span></footer>
+    <footer><a className="brand" href="#top"><Mark /><span>relief<span className="brand-light">kaki</span></span></a><p>Silent help. Visible relief. Managed with care.</p><span>SparkX⁺Change · Alexandra Hospital · interactive concept demo</span></footer>
   </main>
 }
 
@@ -359,13 +359,13 @@ function LoginPage({ theme, onThemeChange, onBack, onAuthenticated }: { theme: T
 
   return <main className="login-page">
     <nav className="public-nav login-nav" aria-label="Sign-in navigation">
-      <button className="brand brand-button" type="button" onClick={onBack}><Mark /><span>carekaki<span className="brand-light">bridge</span></span></button>
+      <button className="brand brand-button" type="button" onClick={onBack}><Mark /><span>relief<span className="brand-light">kaki</span></span></button>
       <div className="nav-actions"><ThemeToggle theme={theme} onChange={onThemeChange} /><button className="button button-outline" type="button" onClick={onBack}>Back to website</button></div>
     </nav>
     <section className="login-layout">
-      <div className="login-context"><p className="eyebrow">PROTECTED WORKSPACES</p><h1>Sign in to the role you have been approved for.</h1><p>CareKaki uses role-bound access: caregivers manage private requests, volunteers see eligible tasks, and AH administrators oversee safety and completion.</p><ul><li><span>✓</span> No role switching after sign-in</li><li><span>✓</span> Minimum necessary information by role</li><li><span>✓</span> Clear sign-out and account identity at all times</li></ul><div className="prototype-note"><b>Interactive prototype</b><span>This screen demonstrates authentication and authorization UX. It is not connected to Alexandra Hospital production identity systems.</span></div></div>
+      <div className="login-context"><p className="eyebrow">PROTECTED WORKSPACES</p><h1>Sign in to the role you have been approved for.</h1><p>ReliefKaki uses role-bound access: caregivers manage private requests, volunteers see eligible tasks, and AH administrators oversee safety and completion.</p><ul><li><span>✓</span> No role switching after sign-in</li><li><span>✓</span> Minimum necessary information by role</li><li><span>✓</span> Clear sign-out and account identity at all times</li></ul><div className="prototype-note"><b>Interactive prototype</b><span>This screen demonstrates authentication and authorization UX. It is not connected to Alexandra Hospital production identity systems.</span></div></div>
       <div className="login-card">
-        <div><p className="eyebrow">CAREKAKI ACCESS</p><h2>Welcome back</h2><p>Use a demo profile below, then sign in.</p></div>
+        <div><p className="eyebrow">RELIEFKAKI ACCESS</p><h2>Welcome back</h2><p>Use a demo profile below, then sign in.</p></div>
         <form onSubmit={signIn} noValidate>
           <label htmlFor="email">Email address<input id="email" name="email" type="email" autoComplete="username" inputMode="email" value={email} onChange={(event) => { setEmail(event.target.value); setError('') }} required /></label>
           <label htmlFor="password">Password<span className="password-field"><input id="password" name="password" type={showPassword ? 'text' : 'password'} autoComplete="current-password" value={password} onChange={(event) => { setPassword(event.target.value); setError('') }} required /><button type="button" onClick={() => setShowPassword(!showPassword)} aria-pressed={showPassword}>{showPassword ? 'Hide' : 'Show'}</button></span></label>
@@ -383,7 +383,7 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>('home')
   const [session, setSession] = useState<AuthSession | null>(null)
   const [theme, setTheme] = useState<Theme>(() => resolveInitialTheme(
-    typeof window === 'undefined' ? null : window.localStorage.getItem('carekaki-theme'),
+    typeof window === 'undefined' ? null : window.localStorage.getItem('reliefkaki-theme'),
     typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches,
   ))
   const role: Role = session?.role ?? 'caregiver'
@@ -415,7 +415,7 @@ export default function App() {
   useEffect(() => {
     document.documentElement.dataset.theme = theme
     document.documentElement.style.colorScheme = theme
-    window.localStorage.setItem('carekaki-theme', theme)
+    window.localStorage.setItem('reliefkaki-theme', theme)
   }, [theme])
 
   useEffect(() => {
@@ -634,7 +634,7 @@ export default function App() {
   return (
     <main className="portal-page">
       <nav className="portal-nav" aria-label="Portal navigation">
-        <button className="brand brand-button" type="button" onClick={() => setScreen('home')}><Mark /><span>carekaki<span className="brand-light">bridge</span></span></button>
+        <button className="brand brand-button" type="button" onClick={() => setScreen('home')}><Mark /><span>relief<span className="brand-light">kaki</span></span></button>
         <div className="portal-context"><span className="secure-chip"><i></i> AH-supervised demo</span><span className="role-lock">{roleCopy[role].label} workspace</span></div>
         <div className="portal-actions"><ThemeToggle theme={theme} onChange={setTheme} /><AccountSettings session={session} role={role} trackOwnLocation={trackOwnLocation} trackingStatus={trackingStatus} onTrackOwnLocationChange={setTrackOwnLocation} onHome={() => setScreen('home')} onSignOut={() => { setSession(null); setScreen('login') }} /></div>
       </nav>
@@ -652,7 +652,7 @@ export default function App() {
 
         {role === 'caregiver' && caregiverPanel === 'create' && <><button type="button" className="back-to-task-map" onClick={() => setCaregiverPanel('map')}>← Back to your task map</button><div className="caregiver-grid">
           <div className="request-card">
-            {submitted ? <div className={`success-state ${submittedForReferral ? 'redirected' : ''}`}><span className="success-icon">{submittedForReferral ? '!' : '✓'}</span><p className="eyebrow">{submittedForReferral ? 'VOLUNTEER MATCHING BLOCKED' : 'REQUEST RECEIVED'}</p><h3>{submittedForReferral ? 'This needs the formal AH service lane.' : urgent ? 'An AH admin is reviewing this now.' : 'That is one thing off your plate.'}</h3>{submittedForReferral ? <><p>CareKaki did not publish this request to volunteers. AH admin receives a redirect receipt and can guide it to an appropriate professional or service.</p>{scopeSignals.some((signal) => signal.emergency) && <div className="emergency-callout"><b>Life-threatening emergency?</b><span>Do not wait for an admin response — call SCDF at 995 now.</span></div>}<ol className="request-steps"><li><b>Volunteer offer disabled</b><span>No student can view, offer for or be assigned this request.</span></li><li><b>AH service review</b><span>An administrator confirms the appropriate formal route.</span></li><li><b>Redirect receipt</b><span>The decision closes with an accountable no-volunteer record.</span></li></ol></> : <><p>{isSilent ? 'Volunteers see your task alias, approximate zone and the minimum instructions only. Your name, photo, phone number and care details stay hidden.' : 'Your request is in the moderated matching queue.'}</p><ol className="request-steps"><li><b>Scope check</b><span>Admin confirms the request is bounded and non-clinical.</span></li><li><b>Eligible offer</b><span>Only a trained volunteer who also fits any task-language need can offer to help.</span></li><li><b>Protected handoff</b><span>Task details unlock after approval; identity remains hidden in Silent mode.</span></li></ol></>}<button onClick={() => setSubmitted(false)} className="button button-dark">Post another <Arrow /></button></div> : <>
+            {submitted ? <div className={`success-state ${submittedForReferral ? 'redirected' : ''}`}><span className="success-icon">{submittedForReferral ? '!' : '✓'}</span><p className="eyebrow">{submittedForReferral ? 'VOLUNTEER MATCHING BLOCKED' : 'REQUEST RECEIVED'}</p><h3>{submittedForReferral ? 'This needs the formal AH service lane.' : urgent ? 'An AH admin is reviewing this now.' : 'That is one thing off your plate.'}</h3>{submittedForReferral ? <><p>ReliefKaki did not publish this request to volunteers. AH admin receives a redirect receipt and can guide it to an appropriate professional or service.</p>{scopeSignals.some((signal) => signal.emergency) && <div className="emergency-callout"><b>Life-threatening emergency?</b><span>Do not wait for an admin response — call SCDF at 995 now.</span></div>}<ol className="request-steps"><li><b>Volunteer offer disabled</b><span>No student can view, offer for or be assigned this request.</span></li><li><b>AH service review</b><span>An administrator confirms the appropriate formal route.</span></li><li><b>Redirect receipt</b><span>The decision closes with an accountable no-volunteer record.</span></li></ol></> : <><p>{isSilent ? 'Volunteers see your task alias, approximate zone and the minimum instructions only. Your name, photo, phone number and care details stay hidden.' : 'Your request is in the moderated matching queue.'}</p><ol className="request-steps"><li><b>Scope check</b><span>Admin confirms the request is bounded and non-clinical.</span></li><li><b>Eligible offer</b><span>Only a trained volunteer who also fits any task-language need can offer to help.</span></li><li><b>Protected handoff</b><span>Task details unlock after approval; identity remains hidden in Silent mode.</span></li></ol></>}<button onClick={() => setSubmitted(false)} className="button button-dark">Post another <Arrow /></button></div> : <>
               <div className="form-top"><span>ONE SMALL ASK</span><span>about 30 seconds</span></div>
               <label>What would make today lighter?<textarea value={request} onChange={(event) => { setRequest(event.target.value); setPrivacyBlocked(false) }} /></label>
               <div className="form-row"><label>Task category<select value={category} onChange={(event) => { const next = event.target.value as Category; setCategory(next); if (next !== 'Sensitive accompaniment') setFemalePreferred(false) }}>{categories.map((item) => <option key={item}>{item}</option>)}</select></label><label>Volunteer recognition<div className="points-box">{points} <small>impact points · {viaHours}h service estimate</small></div></label></div>
@@ -715,7 +715,7 @@ export default function App() {
         </div>}
       </section>
 
-      <footer className="portal-footer"><span>CareKaki Bridge · role-bound interactive demo</span><span>Operational data shown here is illustrative.</span></footer>
+      <footer className="portal-footer"><span>ReliefKaki · role-bound interactive demo</span><span>Operational data shown here is illustrative.</span></footer>
     </main>
   )
 }

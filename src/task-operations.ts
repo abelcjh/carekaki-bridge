@@ -144,7 +144,7 @@ export function closeTaskForCapacity<T extends CapacityTask>(task: T, now: strin
     capacityState: 'Closed · capacity unavailable',
     closedAt: now,
     adminNotification: `${taskDisplayLabel(task.id)} closed after coordinator sourcing did not secure enough suitable volunteers.`,
-    caregiverNotice: `We are sorry. CareKaki and the AH coordinator could not find enough suitable volunteers for ${taskDisplayLabel(task.id)}, so this task has been closed. Please contact the AH care team if you still need support.`,
+    caregiverNotice: `We are sorry. ReliefKaki and the AH coordinator could not find enough suitable volunteers for ${taskDisplayLabel(task.id)}, so this task has been closed. Please contact the AH care team if you still need support.`,
   }
 }
 
