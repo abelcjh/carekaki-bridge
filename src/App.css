@@ -389,22 +389,48 @@ footer .mark { width: 20px; height: 20px; }
 .secure-chip, .role-lock { color: var(--text-muted); font: 500 9px 'DM Mono', monospace; }
 .secure-chip i { width: 7px; height: 7px; margin-right: 5px; display: inline-block; border-radius: 50%; background: #6db57c; }
 .role-lock { padding: 8px 10px; border: 1px solid var(--border); border-radius: 999px; color: var(--text); }
-.portal-account-bar {
-  width: min(1380px, calc(100% - 48px));
-  min-height: 68px;
-  margin: 0 auto 14px;
-  padding: 11px 16px;
-  border: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  background: var(--surface-soft);
+.portal-nav { position: relative; z-index: 20; }
+.account-settings { position: relative; }
+.settings-trigger {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--surface);
+  color: var(--text);
 }
-.account-dot { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--primary); color: var(--on-primary); font: 600 13px 'DM Mono', monospace; }
-.portal-account-bar span, .portal-account-bar b { display: block; }
-.portal-account-bar span { color: var(--text-subtle); font-size: 8px; }
-.portal-account-bar b { margin-top: 2px; color: var(--text); font-size: 11px; }
-.account-assurance { margin-left: auto; text-align: right; }
+.settings-trigger:hover, .settings-trigger[aria-expanded='true'] { border-color: var(--accent); background: var(--surface-soft); }
+.settings-trigger svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.65; stroke-linecap: round; stroke-linejoin: round; }
+.settings-popover {
+  width: min(360px, calc(100vw - 24px));
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 30;
+  border: 1px solid var(--border-strong);
+  border-radius: 18px;
+  padding: 20px;
+  background: var(--surface-raised);
+  box-shadow: 0 24px 60px var(--shadow);
+}
+.settings-popover-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
+.settings-popover-head span { color: var(--accent); font: 600 8px 'DM Mono', monospace; letter-spacing: 0.09em; }
+.settings-popover-head h2 { margin: 4px 0 0; color: var(--text); font-size: 22px; letter-spacing: -0.04em; }
+.settings-popover-head > button { width: 32px; height: 32px; border: 0; border-radius: 50%; background: var(--surface-soft); color: var(--text-muted); font-size: 21px; line-height: 1; }
+.settings-popover-head > button:hover { color: var(--text); background: var(--border); }
+.profile-summary { margin: 20px 0 17px; padding: 17px; display: flex; align-items: center; gap: 13px; background: var(--surface-soft); }
+.profile-avatar { width: 44px; height: 44px; flex: none; border-radius: 50%; display: grid; place-items: center; background: var(--primary); color: var(--on-primary); font: 600 15px 'DM Mono', monospace; }
+.profile-summary b, .profile-summary span { display: block; overflow-wrap: anywhere; }
+.profile-summary b { color: var(--text); font-size: 13px; }
+.profile-summary span { margin-top: 4px; color: var(--text-muted); font-size: 10px; }
+.profile-details { margin: 0; }
+.profile-details > div { padding: 11px 1px; border-top: 1px solid var(--border); display: grid; grid-template-columns: 88px 1fr; gap: 12px; }
+.profile-details dt { color: var(--text-subtle); font: 500 8px 'DM Mono', monospace; text-transform: uppercase; }
+.profile-details dd { margin: 0; color: var(--text); font-size: 10px; font-weight: 650; text-align: right; }
+.profile-actions { margin-top: 17px; display: grid; gap: 8px; }
+.profile-actions .button { width: 100%; }
 .workspace {
   width: min(1380px, calc(100% - 48px));
   margin: 0 auto 36px;
@@ -719,7 +745,6 @@ footer .mark { width: 20px; height: 20px; }
   .theme-toggle { padding: 7px 9px; }
   .theme-toggle b { display: none; }
   .login-nav .button-outline { min-height: 40px; padding: 9px 12px; }
-  .portal-actions .button-outline { display: none; }
   .portal-actions .button { min-height: 40px; padding: 9px 13px; }
   .hero { width: min(100% - 24px, 1380px); margin-bottom: 65px; grid-template-columns: 1fr; }
   .hero-copy { min-height: 535px; padding: 55px 25px; }
@@ -740,11 +765,10 @@ footer .mark { width: 20px; height: 20px; }
   .login-context { padding-top: 20px; }
   .login-context h1 { font-size: clamp(40px, 12vw, 58px); }
   .login-card { padding: 24px 20px; }
-  .portal-account-bar, .realtime-ops-bar, .workspace { width: min(100% - 24px, 1380px); }
-  .portal-account-bar { margin-top: 7px; }
+  .realtime-ops-bar, .workspace { width: min(100% - 24px, 1380px); }
   .realtime-ops-bar { align-items: flex-start; flex-direction: column; gap: 9px; }
   .realtime-ops-bar > div:last-child { width: 100%; justify-content: space-between; }
-  .account-assurance { display: none; }
+
   .workspace-head { padding: 25px 20px; align-items: start; }
   .workspace-head h2 { font-size: 36px; line-height: 1.02; }
   .identity-card { display: none; }
@@ -784,7 +808,7 @@ footer .mark { width: 20px; height: 20px; }
   .login-context h1 { font-size: 42px; line-height: 1; }
   .demo-access button { grid-template-columns: 1fr; }
   .demo-access em { grid-column: 1; grid-row: auto; margin-top: 6px; }
-  .portal-account-bar { padding: 9px 11px; }
+
   .workspace-head h2 { font-size: 32px; }
   .volunteer-strip b, .admin-metrics b { font-size: 23px; }
   .reward-row { gap: 5px; }

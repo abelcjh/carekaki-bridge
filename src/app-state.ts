@@ -12,7 +12,7 @@ export type DemoAccount = {
   assurance: string
 }
 
-export type AuthSession = Pick<DemoAccount, 'role' | 'name' | 'id' | 'assurance'>
+export type AuthSession = Pick<DemoAccount, 'role' | 'email' | 'name' | 'id' | 'assurance'>
 
 export const demoAccounts: DemoAccount[] = [
   {
@@ -20,7 +20,7 @@ export const demoAccounts: DemoAccount[] = [
     label: 'Caregiver demo',
     email: 'caregiver@carekaki.demo',
     password: 'carekaki',
-    name: 'Care request C-204',
+    name: 'Marcus Lim',
     id: 'C-204',
     assurance: 'Anonymous to volunteers',
   },
@@ -48,8 +48,8 @@ export function authenticateDemo(email: string, password: string): AuthSession |
   const normalizedEmail = email.trim().toLowerCase()
   const account = demoAccounts.find((candidate) => candidate.email === normalizedEmail && candidate.password === password)
   if (!account) return null
-  const { role, name, id, assurance } = account
-  return { role, name, id, assurance }
+  const { role, email: accountEmail, name, id, assurance } = account
+  return { role, email: accountEmail, name, id, assurance }
 }
 
 export function resolveInitialTheme(savedTheme: string | null, systemPrefersDark: boolean): Theme {

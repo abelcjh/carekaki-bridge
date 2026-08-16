@@ -6,6 +6,7 @@ describe('role-bound demo authentication', () => {
     for (const account of demoAccounts) {
       expect(authenticateDemo(account.email.toUpperCase(), account.password)).toMatchObject({
         role: account.role,
+        email: account.email,
         name: account.name,
         id: account.id,
       })

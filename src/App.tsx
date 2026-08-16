@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import heroImage from './assets/carekaki-hero.png'
 import { authenticateDemo, demoAccounts, resolveInitialTheme, type AuthSession, type Role, type Screen, type Theme } from './app-state'
 import { taskContactForVolunteer, validateTaskContact } from './task-privacy'
@@ -133,6 +133,48 @@ function ThemeToggle({ theme, onChange }: { theme: Theme; onChange: (theme: Them
 
 function SingaporeClock({ now }: { now: Date }) {
   return <div className="singapore-clock" aria-label="Current Singapore time"><span><i></i> LIVE · SINGAPORE</span><time dateTime={now.toISOString()}>{formatSingaporeClock(now)}</time></div>
+}
+
+function SettingsIcon() {
+  return <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 15.25A3.25 3.25 0 1 0 12 8.75a3.25 3.25 0 0 0 0 6.5Z" /><path d="M19.1 13.7c.05-.55.05-1.05 0-1.6l2-1.55-2-3.45-2.5 1a8.3 8.3 0 0 0-1.4-.8L14.85 4h-4l-.4 3.3c-.5.2-.95.5-1.4.8l-2.5-1-2 3.45 2.05 1.55c-.05.55-.05 1.05 0 1.6l-2.05 1.55 2 3.45 2.5-1c.45.35.9.6 1.4.8l.4 3.3h4l.35-3.3c.5-.2.95-.45 1.4-.8l2.5 1 2-3.45-2-1.55Z" /></svg>
+}
+
+function AccountSettings({ session, role, onHome, onSignOut }: { session: AuthSession; role: Role; onHome: () => void; onSignOut: () => void }) {
+  const [open, setOpen] = useState(false)
+  const rootRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    const closeOutside = (event: PointerEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) setOpen(false)
+    }
+    const closeWithEscape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+      setOpen(false)
+      triggerRef.current?.focus()
+    }
+    document.addEventListener('pointerdown', closeOutside)
+    document.addEventListener('keydown', closeWithEscape)
+    return () => {
+      document.removeEventListener('pointerdown', closeOutside)
+      document.removeEventListener('keydown', closeWithEscape)
+    }
+  }, [open])
+
+  return <div className="account-settings" ref={rootRef}>
+    <button ref={triggerRef} className="settings-trigger" type="button" aria-label="Open profile and settings" aria-haspopup="dialog" aria-expanded={open} aria-controls="profile-settings-panel" onClick={() => setOpen((current) => !current)}><SettingsIcon /></button>
+    {open && <section className="settings-popover" id="profile-settings-panel" role="dialog" aria-labelledby="profile-settings-title">
+      <div className="settings-popover-head"><div><span>ACCOUNT</span><h2 id="profile-settings-title">Profile & settings</h2></div><button type="button" aria-label="Close profile and settings" onClick={() => setOpen(false)}>×</button></div>
+      <div className="profile-summary"><div className="profile-avatar">{session.name.slice(0, 1)}</div><div><b>{session.name}</b><span>{session.email}</span></div></div>
+      <dl className="profile-details">
+        <div><dt>Account ID</dt><dd>{session.id}</dd></div>
+        <div><dt>Workspace</dt><dd>{roleCopy[role].label}</dd></div>
+        <div><dt>Privacy</dt><dd>{session.assurance}</dd></div>
+      </dl>
+      <div className="profile-actions"><button className="button button-dark" type="button" onClick={onHome}>Back to homepage <Arrow /></button><button className="button button-outline" type="button" onClick={onSignOut}>Sign out</button></div>
+    </section>}
+  </div>
 }
 
 function TaskMap({ tasks, role, now }: { tasks: Task[]; role: Role; now: Date }) {
@@ -493,10 +535,9 @@ export default function App() {
       <nav className="portal-nav" aria-label="Portal navigation">
         <button className="brand brand-button" type="button" onClick={() => setScreen('home')}><Mark /><span>carekaki<span className="brand-light">bridge</span></span></button>
         <div className="portal-context"><span className="secure-chip"><i></i> AH-supervised demo</span><span className="role-lock">{roleCopy[role].label} workspace</span></div>
-        <div className="portal-actions"><ThemeToggle theme={theme} onChange={setTheme} /><button className="button button-outline" type="button" onClick={() => setScreen('home')}>Public website</button><button className="button button-dark" type="button" onClick={() => { setSession(null); setScreen('login') }}>Sign out</button></div>
+        <div className="portal-actions"><ThemeToggle theme={theme} onChange={setTheme} /><AccountSettings session={session} role={role} onHome={() => setScreen('home')} onSignOut={() => { setSession(null); setScreen('login') }} /></div>
       </nav>
 
-      <section className="portal-account-bar" aria-label="Signed-in account"><div className="account-dot">{session.name.slice(0, 1)}</div><div><span>Signed in as</span><b>{session.name}</b></div><div className="account-assurance"><span>{session.id}</span><b>{session.assurance}</b></div></section>
       <section className="realtime-ops-bar" aria-label="Live Singapore task operations"><SingaporeClock now={now} /><div><span>OPEN NOW <b>{openCount}</b></span><span>7-DAY ALERTS <b>{capacityAlerts.length}</b></span></div></section>
 
       <section className="workspace" id="workspace">
