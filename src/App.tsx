@@ -1,6 +1,8 @@
-import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import heroImage from './assets/reliefkaki-hero.png'
 import { authenticateDemo, demoAccounts, resolveInitialTheme, type AuthSession, type Role, type Screen, type Theme } from './app-state'
+import { JudgeExpoGuide } from './judge-guide'
+import { judgeGuideStorageKey, shouldShowJudgeGuide } from './judge-guide-state'
 import { taskContactForVolunteer, validateTaskContact } from './task-contact'
 import { filterTaskMap, openVolunteerTasks, taskDisplayLabel, type Coordinates, type TaskMapFilters } from './task-filters'
 import { taskLanguages, volunteerMatchGaps, volunteerTaskAction, type TaskLanguage } from './volunteer-matching'
@@ -396,6 +398,23 @@ function TaskMap({ tasks, role, now, ownLocation, trackingStatus, onCreateTask, 
 }
 
 function PublicHome({ theme, onThemeChange, onOpenPortal }: { theme: Theme; onThemeChange: (theme: Theme) => void; onOpenPortal: () => void }) {
+  const [judgeGuideOpen, setJudgeGuideOpen] = useState(() => {
+    if (typeof window === 'undefined') return true
+    try {
+      return shouldShowJudgeGuide(window.localStorage.getItem(judgeGuideStorageKey))
+    } catch {
+      return true
+    }
+  })
+  const dismissJudgeGuide = useCallback(() => {
+    try {
+      window.localStorage.setItem(judgeGuideStorageKey, '1')
+    } catch {
+      // The guide still closes when browser storage is unavailable.
+    }
+    setJudgeGuideOpen(false)
+  }, [])
+
   return <main className="public-page">
     <nav className="public-nav" aria-label="Primary navigation">
       <a className="brand" href="#top"><Mark /><span>relief<span className="brand-light">kaki</span></span></a>
@@ -442,6 +461,7 @@ function PublicHome({ theme, onThemeChange, onOpenPortal }: { theme: Theme; onTh
     <section className="access-banner"><div><p className="eyebrow">AUTHENTICATED OPERATIONS</p><h2>Ready to enter your workspace?</h2><p>Caregiver, volunteer and AH-admin tools stay behind a role-bound sign-in.</p></div><button className="button button-dark" type="button" onClick={onOpenPortal}>Access the demo portal <Arrow /></button></section>
 
     <SiteFooter />
+    <JudgeExpoGuide open={judgeGuideOpen} onOpen={() => setJudgeGuideOpen(true)} onDismiss={dismissJudgeGuide} />
   </main>
 }
 
