@@ -8,14 +8,11 @@ import { taskContactForVolunteer, validateTaskContact } from './task-contact'
 import { filterTaskMap, openVolunteerTasks, taskDisplayLabel, type Coordinates, type TaskMapFilters } from './task-filters'
 import { taskLanguages, volunteerMatchGaps, volunteerTaskAction, type TaskLanguage } from './volunteer-matching'
 import {
-  autoEscalateTasks,
-  closeTaskForCapacity,
+  confirmVolunteerDirectly,
   formatSingaporeClock,
   formatSingaporeDateTime,
-  recordSourcedVolunteer,
   singaporeInputFromDate,
   singaporeInputToIso,
-  startCoordinatorSourcing,
   taskLocationForRole,
   taskWaitLabel,
   type CapacityTask,
@@ -28,8 +25,6 @@ type ScopeSignal = { label: string; guidance: string; emergency?: boolean }
 type CompletionReceipt = {
   submittedAt: string
   reflection: string
-  verification: 'Pending AH verification' | 'Verified by AH'
-  verifiedAt?: string
 }
 
 type Task = CapacityTask & {
@@ -48,9 +43,6 @@ type Task = CapacityTask & {
   difficulty: Difficulty
   skill: string
   volunteer: string
-  safetyCleared: boolean
-  referralOnly: boolean
-  scopeFlags: string[]
   completion: CompletionReceipt | null
 }
 
@@ -103,25 +95,24 @@ const initialisedAt = Date.now()
 const hoursFromInitialisation = (hours: number) => new Date(initialisedAt + hours * 60 * 60 * 1000).toISOString()
 
 const initialTasks: Task[] = [
-  { id: 'CK-204', title: 'Collect discharge essentials from AH pharmacy counter', category: 'Errands', language: 'English', scheduledAt: hoursFromInitialisation(3), createdAt: hoursFromInitialisation(-2), location: locationCatalog.ah, ownerId: 'C-204', caregiverName: 'Marcus Lim', caregiverPhone: '+65 9123 4567', urgent: false, femalePreferred: false, status: 'Open', points: 40, viaHours: 1, difficulty: 'Light', skill: 'Errands ready', volunteer: '', safetyCleared: true, referralOnly: false, scopeFlags: [], completion: null, volunteersNeeded: 1, confirmedVolunteers: [], capacityState: 'Recruiting' },
-  { id: 'CK-205', title: 'Escort mum from clinic reception to booked taxi pickup', category: 'Sensitive accompaniment', language: 'Mandarin', scheduledAt: hoursFromInitialisation(1.25), createdAt: hoursFromInitialisation(-5), location: locationCatalog.ah, ownerId: 'C-204', caregiverName: 'Marcus Lim', caregiverPhone: '+65 9123 4567', urgent: true, femalePreferred: true, status: 'Open', points: 60, viaHours: 1.5, difficulty: 'Weightier', skill: 'Safeguarding + accompaniment', volunteer: '', safetyCleared: false, referralOnly: false, scopeFlags: [], completion: null, volunteersNeeded: 2, confirmedVolunteers: [], capacityState: 'Recruiting' },
-  { id: 'CK-206', title: 'Set gentle appointment reminders on my phone', category: 'Digital help', language: 'No preference', scheduledAt: hoursFromInitialisation(-26), createdAt: hoursFromInitialisation(-32), location: locationCatalog.remote, ownerId: 'C-204', caregiverName: 'Marcus Lim', caregiverPhone: '+65 9123 4567', urgent: false, femalePreferred: false, status: 'Done', points: 35, viaHours: 0.5, difficulty: 'Skilled', skill: 'Digital help ready', volunteer: 'Arjun L.', safetyCleared: true, referralOnly: false, scopeFlags: [], completion: { submittedAt: '15 Aug 2026 · 3:45 pm SGT', reflection: 'We set three clear reminders and tested each alert together.', verification: 'Verified by AH', verifiedAt: '15 Aug 2026 · 4:20 pm SGT' }, volunteersNeeded: 1, confirmedVolunteers: ['Arjun L.'], capacityState: 'Covered' },
-  { id: 'CK-207', title: 'Help complete a non-clinical transport form', category: 'Admin & forms', language: 'Malay', scheduledAt: hoursFromInitialisation(6), createdAt: hoursFromInitialisation(-8 * 24), location: locationCatalog.home, ownerId: 'C-204', caregiverName: 'Marcus Lim', caregiverPhone: '+65 9123 4567', urgent: false, femalePreferred: false, status: 'Open', points: 50, viaHours: 1, difficulty: 'Skilled', skill: 'Forms briefing', volunteer: '', safetyCleared: true, referralOnly: false, scopeFlags: [], completion: null, volunteersNeeded: 2, confirmedVolunteers: [], capacityState: 'Recruiting' },
-  { id: 'CK-208', title: 'Pick up soft-food groceries for the weekend', category: 'Meals & home', language: 'English', scheduledAt: hoursFromInitialisation(28), createdAt: hoursFromInitialisation(-30), location: locationCatalog.tiongBahru, ownerId: 'C-205', caregiverName: 'Siti Noor', caregiverPhone: '+65 9000 0205', urgent: false, femalePreferred: false, status: 'Open', points: 45, viaHours: 1, difficulty: 'Light', skill: 'Meals & home ready', volunteer: '', safetyCleared: true, referralOnly: false, scopeFlags: [], completion: null, volunteersNeeded: 1, confirmedVolunteers: [], capacityState: 'Recruiting' },
-  { id: 'CK-209', title: 'Show me how to join a telehealth call', category: 'Digital help', language: 'English', scheduledAt: hoursFromInitialisation(50), createdAt: hoursFromInitialisation(-48), location: locationCatalog.commonwealth, ownerId: 'C-206', caregiverName: 'Daniel Tan', caregiverPhone: '+65 9000 0206', urgent: false, femalePreferred: false, status: 'Open', points: 35, viaHours: 0.5, difficulty: 'Skilled', skill: 'Digital help ready', volunteer: '', safetyCleared: true, referralOnly: false, scopeFlags: [], completion: null, volunteersNeeded: 1, confirmedVolunteers: [], capacityState: 'Recruiting' },
-  { id: 'CK-210', title: 'Collect printed caregiver programme information', category: 'Errands', language: 'No preference', scheduledAt: hoursFromInitialisation(72), createdAt: hoursFromInitialisation(-54), location: locationCatalog.bukitMerah, ownerId: 'C-207', caregiverName: 'Priya Nair', caregiverPhone: '+65 9000 0207', urgent: false, femalePreferred: false, status: 'Open', points: 40, viaHours: 1, difficulty: 'Light', skill: 'Errands ready', volunteer: '', safetyCleared: true, referralOnly: false, scopeFlags: [], completion: null, volunteersNeeded: 1, confirmedVolunteers: [], capacityState: 'Recruiting' },
-  { id: 'CK-211', title: 'Buy simple breakfast items from the market', category: 'Meals & home', language: 'Mandarin', scheduledAt: hoursFromInitialisation(-5), createdAt: hoursFromInitialisation(-30), location: locationCatalog.ghimMoh, ownerId: 'C-204', caregiverName: 'Marcus Lim', caregiverPhone: '+65 9123 4567', urgent: false, femalePreferred: false, status: 'Done', points: 45, viaHours: 1, difficulty: 'Light', skill: 'Meals & home ready', volunteer: 'Maya T.', safetyCleared: true, referralOnly: false, scopeFlags: [], completion: { submittedAt: '16 Aug 2026 · 11:10 am SGT', reflection: 'I followed the written list and confirmed the handoff at the agreed meeting point.', verification: 'Pending AH verification' }, volunteersNeeded: 1, confirmedVolunteers: ['Maya T.'], capacityState: 'Covered' },
-  { id: 'CK-212', title: 'Meet me at the station and guide me to the shuttle', category: 'Wayfinding', language: 'English', scheduledAt: hoursFromInitialisation(32), createdAt: hoursFromInitialisation(-96), location: locationCatalog.telokBlangah, ownerId: 'C-204', caregiverName: 'Marcus Lim', caregiverPhone: '+65 9123 4567', urgent: false, femalePreferred: false, status: 'Open', points: 45, viaHours: 1, difficulty: 'Light', skill: 'Wayfinding ready', volunteer: '', safetyCleared: true, referralOnly: false, scopeFlags: [], completion: null, volunteersNeeded: 1, confirmedVolunteers: [], capacityState: 'Recruiting' },
-  { id: 'CK-213', title: 'Help scan and organise two appointment letters', category: 'Admin & forms', language: 'English', scheduledAt: hoursFromInitialisation(44), createdAt: hoursFromInitialisation(-120), location: locationCatalog.queenstownLibrary, ownerId: 'C-207', caregiverName: 'Priya Nair', caregiverPhone: '+65 9000 0207', urgent: false, femalePreferred: false, status: 'Open', points: 50, viaHours: 1, difficulty: 'Skilled', skill: 'Forms briefing', volunteer: '', safetyCleared: true, referralOnly: false, scopeFlags: [], completion: null, volunteersNeeded: 1, confirmedVolunteers: [], capacityState: 'Recruiting' },
-  { id: 'CK-214', title: 'Sit with dad while I make two essential calls nearby', category: 'Companionship', language: 'Mandarin', scheduledAt: hoursFromInitialisation(30), createdAt: hoursFromInitialisation(-144), location: locationCatalog.home, ownerId: 'C-204', caregiverName: 'Marcus Lim', caregiverPhone: '+65 9123 4567', urgent: false, femalePreferred: false, status: 'Open', points: 55, viaHours: 1, difficulty: 'Weightier', skill: 'Safeguarding + accompaniment', volunteer: '', safetyCleared: true, referralOnly: false, scopeFlags: [], completion: null, volunteersNeeded: 2, confirmedVolunteers: ['Nur A.'], capacityState: 'Recruiting' },
-  { id: 'CK-215', title: 'Return a borrowed mobility aid to the hospital desk', category: 'Errands', language: 'No preference', scheduledAt: hoursFromInitialisation(78), createdAt: hoursFromInitialisation(-168), location: locationCatalog.ah, ownerId: 'C-204', caregiverName: 'Marcus Lim', caregiverPhone: '+65 9123 4567', urgent: false, femalePreferred: false, status: 'Open', points: 40, viaHours: 1, difficulty: 'Light', skill: 'Errands ready', volunteer: '', safetyCleared: true, referralOnly: false, scopeFlags: [], completion: null, volunteersNeeded: 1, confirmedVolunteers: [], capacityState: 'Recruiting' },
+  { id: 'CK-204', title: 'Collect discharge essentials from AH pharmacy counter', category: 'Errands', language: 'English', scheduledAt: hoursFromInitialisation(3), createdAt: hoursFromInitialisation(-2), location: locationCatalog.ah, ownerId: 'C-204', caregiverName: 'Marcus Lim', caregiverPhone: '+65 9123 4567', urgent: false, femalePreferred: false, status: 'Open', points: 40, viaHours: 1, difficulty: 'Light', skill: 'Errands ready', volunteer: '', completion: null, volunteersNeeded: 1, confirmedVolunteers: [], capacityState: 'Recruiting' },
+  { id: 'CK-205', title: 'Escort mum from clinic reception to booked taxi pickup', category: 'Sensitive accompaniment', language: 'Mandarin', scheduledAt: hoursFromInitialisation(1.25), createdAt: hoursFromInitialisation(-5), location: locationCatalog.ah, ownerId: 'C-204', caregiverName: 'Marcus Lim', caregiverPhone: '+65 9123 4567', urgent: true, femalePreferred: true, status: 'Open', points: 60, viaHours: 1.5, difficulty: 'Weightier', skill: 'Safeguarding + accompaniment', volunteer: '', completion: null, volunteersNeeded: 2, confirmedVolunteers: [], capacityState: 'Recruiting' },
+  { id: 'CK-206', title: 'Set gentle appointment reminders on my phone', category: 'Digital help', language: 'No preference', scheduledAt: hoursFromInitialisation(-26), createdAt: hoursFromInitialisation(-32), location: locationCatalog.remote, ownerId: 'C-204', caregiverName: 'Marcus Lim', caregiverPhone: '+65 9123 4567', urgent: false, femalePreferred: false, status: 'Done', points: 35, viaHours: 0.5, difficulty: 'Skilled', skill: 'Digital help ready', volunteer: 'Arjun L.', completion: { submittedAt: '15 Aug 2026 · 3:45 pm SGT', reflection: 'We set three clear reminders and tested each alert together.' }, volunteersNeeded: 1, confirmedVolunteers: ['Arjun L.'], capacityState: 'Covered' },
+  { id: 'CK-207', title: 'Help complete a non-clinical transport form', category: 'Admin & forms', language: 'Malay', scheduledAt: hoursFromInitialisation(6), createdAt: hoursFromInitialisation(-8 * 24), location: locationCatalog.home, ownerId: 'C-204', caregiverName: 'Marcus Lim', caregiverPhone: '+65 9123 4567', urgent: false, femalePreferred: false, status: 'Open', points: 50, viaHours: 1, difficulty: 'Skilled', skill: 'Forms briefing', volunteer: '', completion: null, volunteersNeeded: 2, confirmedVolunteers: [], capacityState: 'Recruiting' },
+  { id: 'CK-208', title: 'Pick up soft-food groceries for the weekend', category: 'Meals & home', language: 'English', scheduledAt: hoursFromInitialisation(28), createdAt: hoursFromInitialisation(-30), location: locationCatalog.tiongBahru, ownerId: 'C-205', caregiverName: 'Siti Noor', caregiverPhone: '+65 9000 0205', urgent: false, femalePreferred: false, status: 'Open', points: 45, viaHours: 1, difficulty: 'Light', skill: 'Meals & home ready', volunteer: '', completion: null, volunteersNeeded: 1, confirmedVolunteers: [], capacityState: 'Recruiting' },
+  { id: 'CK-209', title: 'Show me how to join a telehealth call', category: 'Digital help', language: 'English', scheduledAt: hoursFromInitialisation(50), createdAt: hoursFromInitialisation(-48), location: locationCatalog.commonwealth, ownerId: 'C-206', caregiverName: 'Daniel Tan', caregiverPhone: '+65 9000 0206', urgent: false, femalePreferred: false, status: 'Open', points: 35, viaHours: 0.5, difficulty: 'Skilled', skill: 'Digital help ready', volunteer: '', completion: null, volunteersNeeded: 1, confirmedVolunteers: [], capacityState: 'Recruiting' },
+  { id: 'CK-210', title: 'Collect printed caregiver programme information', category: 'Errands', language: 'No preference', scheduledAt: hoursFromInitialisation(72), createdAt: hoursFromInitialisation(-54), location: locationCatalog.bukitMerah, ownerId: 'C-207', caregiverName: 'Priya Nair', caregiverPhone: '+65 9000 0207', urgent: false, femalePreferred: false, status: 'Open', points: 40, viaHours: 1, difficulty: 'Light', skill: 'Errands ready', volunteer: '', completion: null, volunteersNeeded: 1, confirmedVolunteers: [], capacityState: 'Recruiting' },
+  { id: 'CK-211', title: 'Buy simple breakfast items from the market', category: 'Meals & home', language: 'Mandarin', scheduledAt: hoursFromInitialisation(-5), createdAt: hoursFromInitialisation(-30), location: locationCatalog.ghimMoh, ownerId: 'C-204', caregiverName: 'Marcus Lim', caregiverPhone: '+65 9123 4567', urgent: false, femalePreferred: false, status: 'Done', points: 45, viaHours: 1, difficulty: 'Light', skill: 'Meals & home ready', volunteer: 'Maya T.', completion: { submittedAt: '16 Aug 2026 · 11:10 am SGT', reflection: 'I followed the written list and confirmed the handoff at the agreed meeting point.' }, volunteersNeeded: 1, confirmedVolunteers: ['Maya T.'], capacityState: 'Covered' },
+  { id: 'CK-212', title: 'Meet me at the station and guide me to the shuttle', category: 'Wayfinding', language: 'English', scheduledAt: hoursFromInitialisation(32), createdAt: hoursFromInitialisation(-96), location: locationCatalog.telokBlangah, ownerId: 'C-204', caregiverName: 'Marcus Lim', caregiverPhone: '+65 9123 4567', urgent: false, femalePreferred: false, status: 'Open', points: 45, viaHours: 1, difficulty: 'Light', skill: 'Wayfinding ready', volunteer: '', completion: null, volunteersNeeded: 1, confirmedVolunteers: [], capacityState: 'Recruiting' },
+  { id: 'CK-213', title: 'Help scan and organise two appointment letters', category: 'Admin & forms', language: 'English', scheduledAt: hoursFromInitialisation(44), createdAt: hoursFromInitialisation(-120), location: locationCatalog.queenstownLibrary, ownerId: 'C-207', caregiverName: 'Priya Nair', caregiverPhone: '+65 9000 0207', urgent: false, femalePreferred: false, status: 'Open', points: 50, viaHours: 1, difficulty: 'Skilled', skill: 'Forms briefing', volunteer: '', completion: null, volunteersNeeded: 1, confirmedVolunteers: [], capacityState: 'Recruiting' },
+  { id: 'CK-214', title: 'Sit with dad while I make two essential calls nearby', category: 'Companionship', language: 'Mandarin', scheduledAt: hoursFromInitialisation(30), createdAt: hoursFromInitialisation(-144), location: locationCatalog.home, ownerId: 'C-204', caregiverName: 'Marcus Lim', caregiverPhone: '+65 9123 4567', urgent: false, femalePreferred: false, status: 'Open', points: 55, viaHours: 1, difficulty: 'Weightier', skill: 'Safeguarding + accompaniment', volunteer: '', completion: null, volunteersNeeded: 2, confirmedVolunteers: ['Nur A.'], capacityState: 'Recruiting' },
+  { id: 'CK-215', title: 'Return a borrowed mobility aid to the hospital desk', category: 'Errands', language: 'No preference', scheduledAt: hoursFromInitialisation(78), createdAt: hoursFromInitialisation(-168), location: locationCatalog.ah, ownerId: 'C-204', caregiverName: 'Marcus Lim', caregiverPhone: '+65 9123 4567', urgent: false, femalePreferred: false, status: 'Open', points: 40, viaHours: 1, difficulty: 'Light', skill: 'Errands ready', volunteer: '', completion: null, volunteersNeeded: 1, confirmedVolunteers: [], capacityState: 'Recruiting' },
 ]
 
 const categories: Category[] = ['Errands', 'Digital help', 'Wayfinding', 'Meals & home', 'Admin & forms', 'Companionship', 'Sensitive accompaniment']
 const roleCopy: Record<Role, { label: string; eyebrow: string }> = {
   caregiver: { label: 'Caregiver', eyebrow: '' },
   volunteer: { label: 'Volunteer', eyebrow: 'CHOOSE A TASK THAT FITS' },
-  admin: { label: 'AH admin', eyebrow: 'OVERSEE SAFETY & FULFILMENT' },
 }
 const volunteerReadiness = ['Errands ready', 'Digital help ready', 'Safeguarding + accompaniment']
 const volunteerLanguages = ['English', 'Mandarin']
@@ -319,8 +310,6 @@ function AccountSettings({ session, role, onHome, onSignOut, trackOwnLocation, t
 }
 
 type VolunteerMapTools = {
-  verifiedPoints: number
-  verifiedHours: number
   reflections: Record<string, string>
   onAcceptTask: (id: string) => void
   onReflectionChange: (id: string, value: string) => void
@@ -330,7 +319,7 @@ type VolunteerMapTools = {
 function DatabaseRoadmapNotice({ role }: { role: 'caregiver' | 'volunteer' }) {
   return <aside className={`database-roadmap ${role}`} aria-label="Planned shared task database">
     <span className="database-roadmap-icon" aria-hidden="true">▤</span>
-    <div><p>NEXT IMPLEMENTATION · SHARED TASK DATABASE</p><b>{role === 'caregiver' ? 'Every caregiver request will feed one live volunteer task pool.' : 'This map will read every approved caregiver request from one live source.'}</b><small>{role === 'caregiver' ? 'For production, we will securely store requests from all caregiver accounts in a shared database, then synchronise approved, open tasks to the volunteer dashboard in real time.' : 'For production, a secure shared database will keep caregiver-created tasks, volunteer offers and status updates synchronised in real time. This prototype currently demonstrates that flow with representative in-browser data.'}</small></div>
+    <div><p>NEXT IMPLEMENTATION · SHARED TASK DATABASE</p><b>{role === 'caregiver' ? 'Every caregiver request will feed one live volunteer task pool.' : 'This map will read every in-scope caregiver request from one live source.'}</b><small>{role === 'caregiver' ? 'For production, we will securely store in-scope requests from all caregiver accounts and publish them to the volunteer dashboard in real time.' : 'For production, a secure shared database will keep caregiver-created tasks, direct volunteer confirmations and status updates synchronised in real time. This prototype currently demonstrates that flow with representative in-browser data.'}</small></div>
     <Badge tone="blue">Planned data layer</Badge>
   </aside>
 }
@@ -338,7 +327,7 @@ function DatabaseRoadmapNotice({ role }: { role: 'caregiver' | 'volunteer' }) {
 function TaskMap({ tasks, role, now, ownLocation, trackingStatus, onCreateTask, volunteerTools }: { tasks: Task[]; role: Role; now: Date; ownLocation: Coordinates | null; trackingStatus: LocationTrackingStatus; onCreateTask?: () => void; volunteerTools?: VolunteerMapTools }) {
   const [selectedId, setSelectedId] = useState('')
   const [filters, setFilters] = useState<TaskMapFilters>({ category: 'All', status: 'All', openedFrom: '', openedTo: '', locationMode: 'All', specificLocation: '', radiusKm: 'All' })
-  const availableTasks = tasks.filter((task) => !task.referralOnly)
+  const availableTasks = tasks
   const visibleTasks = availableTasks.map((task) => ({ task, location: taskLocationForRole(task.location, role) }))
   const categoryOptions = Array.from(new Set(visibleTasks.map(({ task }) => task.category)))
   const statusOptions = Array.from(new Set(visibleTasks.map(({ task }) => task.status)))
@@ -364,7 +353,6 @@ function TaskMap({ tasks, role, now, ownLocation, trackingStatus, onCreateTask, 
   ) : []
   const selectedAction = selectedTask && role === 'volunteer' ? volunteerTaskAction({
     status: selectedTask.status,
-    safetyCleared: selectedTask.safetyCleared,
     matchGaps: selectedMatchGaps,
     volunteer: selectedTask.volunteer,
     confirmedByCurrent: selectedTask.confirmedVolunteers.includes('Maya T.'),
@@ -372,7 +360,7 @@ function TaskMap({ tasks, role, now, ownLocation, trackingStatus, onCreateTask, 
   const selectedContact = selectedTask && role === 'volunteer' ? taskContactForVolunteer({ caregiverName: selectedTask.caregiverName, caregiverPhone: selectedTask.caregiverPhone }) : null
 
   return <section className="task-map-section" aria-labelledby="task-map-title">
-    <div className="task-map-head"><div><h3 id="task-map-title">{role === 'volunteer' ? 'Volunteer task map' : role === 'admin' ? 'Operations task map' : 'Your task map'}</h3><p>{role === 'caregiver' ? 'Filter your tasks, select one from the scrollable list, and see its exact service location.' : role === 'volunteer' ? 'Your single place to browse every unexpired caregiver task, check fit and offer to help.' : 'Filter tasks and review each accountable operational location.'}</p></div><div className="task-map-head-actions"><Badge tone="green">{mapTasks.length} of {availableTasks.length} tasks</Badge>{onCreateTask && <button className="button button-outline compact-button" type="button" onClick={onCreateTask}>Create a task</button>}</div></div>
+    <div className="task-map-head"><div><h3 id="task-map-title">{role === 'volunteer' ? 'Volunteer task map' : 'Your task map'}</h3><p>{role === 'caregiver' ? 'Filter your tasks, select one from the scrollable list, and see its exact service location.' : 'Browse every unexpired caregiver task and confirm one directly when your readiness fits.'}</p></div><div className="task-map-head-actions"><Badge tone="green">{mapTasks.length} of {availableTasks.length} tasks</Badge>{onCreateTask && <button className="button button-outline compact-button" type="button" onClick={onCreateTask}>Create a task</button>}</div></div>
     <div className="task-map-filters" aria-label="Task filters">
       <label>Category<select value={filters.category} onChange={(event) => updateFilter('category', event.target.value)}><option>All</option>{categoryOptions.map((category) => <option key={category}>{category}</option>)}</select></label>
       <label>Status<select value={filters.status} onChange={(event) => updateFilter('status', event.target.value)}><option>All</option>{statusOptions.map((status) => <option key={status}>{status}</option>)}</select></label>
@@ -405,18 +393,18 @@ function TaskMap({ tasks, role, now, ownLocation, trackingStatus, onCreateTask, 
     </div> : <div className="task-map-empty"><b>No tasks match these filters.</b><span>Try widening the date or distance, or choose All.</span></div>}
     {role === 'volunteer' && selectedTask && selectedLocation && selectedAction && selectedContact && volunteerTools && <article className="volunteer-map-detail" aria-live="polite">
       <div className="volunteer-map-detail-copy">
-        <div className="task-card-top"><div>{selectedTask.urgent && <Badge tone="red">Admin triage</Badge>}{selectedTask.femalePreferred && <Badge tone="amber">Female support requested</Badge>}<Badge tone={selectedAction.state === 'offer' ? 'green' : selectedAction.state === 'locked' ? 'amber' : 'blue'}>{selectedAction.state === 'offer' ? 'Eligible to offer' : selectedAction.label}</Badge></div><span>{taskDisplayLabel(selectedTask.id)} · {selectedTask.status}</span></div>
+        <div className="task-card-top"><div>{selectedTask.urgent && <Badge tone="red">Time-sensitive today</Badge>}{selectedTask.femalePreferred && <Badge tone="amber">Female support requested</Badge>}<Badge tone={selectedAction.state === 'offer' ? 'green' : selectedAction.state === 'locked' ? 'amber' : 'blue'}>{selectedAction.state === 'offer' ? 'Eligible to accept' : selectedAction.label}</Badge></div><span>{taskDisplayLabel(selectedTask.id)} · {selectedTask.status}</span></div>
         <p className="task-category">{selectedTask.category} · {selectedTask.difficulty}</p>
         <h4>{selectedTask.title}</h4>
         <div className="selected-task-facts"><span>◷ {formatSingaporeDateTime(selectedTask.scheduledAt)}</span><span>⌖ {selectedLocation.label}</span><span>◉ {selectedTask.language === 'No preference' ? 'Any conversation language' : `${selectedTask.language} conversation`}</span><span>✓ {selectedTask.skill}</span></div>
         <div className="task-contact map-task-contact"><span>CAREGIVER CONTACT</span><b>{selectedContact.displayName}</b><a href={`tel:${selectedContact.contactNumber.replace(/\s/g, '')}`}>{selectedContact.contactNumber}</a><small>Complete contact details are shown here for task coordination.</small></div>
-        {selectedTask.femalePreferred && <p className="boundary-callout">No personal care or lifting. AH confirms that this is a bounded accompaniment task before releasing offers.</p>}
+        {selectedTask.femalePreferred && <p className="boundary-callout">No personal care, lifting or clinical work. This request is limited to bounded accompaniment.</p>}
       </div>
       <div className="volunteer-map-decision">
         <p className="eyebrow">TASK VALUE & ACTION</p>
-        <div className="map-reward-row"><div><b>{selectedTask.points}</b><small>impact points after AH verification</small></div><div><b>{selectedTask.viaHours}h</b><small>estimated service time</small></div><div><b>{selectedTask.confirmedVolunteers.length}/{selectedTask.volunteersNeeded}</b><small>volunteers confirmed</small></div></div>
+        <div className="map-reward-row"><div><b>{selectedTask.points}</b><small>impact points after completion</small></div><div><b>{selectedTask.viaHours}h</b><small>estimated service time</small></div><div><b>{selectedTask.confirmedVolunteers.length}/{selectedTask.volunteersNeeded}</b><small>volunteers confirmed</small></div></div>
         <div className={`map-eligibility ${selectedAction.state}`}><b>{selectedAction.state === 'offer' ? 'Ready to help' : selectedAction.label}</b><span>{selectedAction.detail}</span></div>
-        {selectedAction.state === 'offer' ? <button className="button button-dark full map-offer-button" type="button" onClick={() => volunteerTools.onAcceptTask(selectedTask.id)}>Offer to help <Arrow /></button> : selectedAction.state === 'complete' ? <div className="completion-form map-completion-form"><label>Private completion reflection<textarea aria-label={`Reflection for ${taskDisplayLabel(selectedTask.id)}`} placeholder="What was completed, and was any follow-up needed?" value={volunteerTools.reflections[selectedTask.id] || ''} onChange={(event) => volunteerTools.onReflectionChange(selectedTask.id, event.target.value)} /></label><button className="button button-dark full" type="button" disabled={!(volunteerTools.reflections[selectedTask.id] || '').trim()} onClick={() => volunteerTools.onCompleteTask(selectedTask.id)}>Submit completion receipt <Arrow /></button><small>Hours and points stay pending until AH verifies this record.</small></div> : <button className="button button-muted full" type="button" disabled>{selectedAction.label}</button>}
+        {selectedAction.state === 'offer' ? <button className="button button-dark full map-offer-button" type="button" onClick={() => volunteerTools.onAcceptTask(selectedTask.id)}>Accept task <Arrow /></button> : selectedAction.state === 'complete' ? <div className="completion-form map-completion-form"><label>Private completion reflection<textarea aria-label={`Reflection for ${taskDisplayLabel(selectedTask.id)}`} placeholder="What was completed, and was any follow-up needed?" value={volunteerTools.reflections[selectedTask.id] || ''} onChange={(event) => volunteerTools.onReflectionChange(selectedTask.id, event.target.value)} /></label><button className="button button-dark full" type="button" disabled={!(volunteerTools.reflections[selectedTask.id] || '').trim()} onClick={() => volunteerTools.onCompleteTask(selectedTask.id)}>Submit completion receipt <Arrow /></button><small>Your service record is added as soon as you submit.</small></div> : <button className="button button-muted full" type="button" disabled>{selectedAction.label}</button>}
       </div>
     </article>}
   </section>
@@ -452,9 +440,9 @@ function PublicHome({ theme, onThemeChange, onOpenPortal }: { theme: Theme; onTh
       <div className="hero-copy">
         <p className="eyebrow">ALEXANDRA HOSPITAL · CAREGIVER RESPITE PILOT</p>
         <h1>One small ask.<br /><em>One lighter day.</em></h1>
-        <p className="lede">ReliefKaki turns a practical burden into a bounded task with clear instructions, contact details and location. Eligible student volunteers choose directly from one shared open task board.</p>
+        <p className="lede">ReliefKaki turns a practical burden into a bounded task with clear instructions, contact details and location. Eligible student volunteers can accept suitable tasks directly from one shared open task board.</p>
         <div className="hero-actions"><button className="button button-dark" type="button" onClick={onOpenPortal}>Sign in to ReliefKaki <Arrow /></button><a className="button-link" href="#how-it-works">See how it works <span>↓</span></a></div>
-        <div className="trust-row"><span><b>01</b> complete request</span><i></i><span><b>02</b> eligible offer</span><i></i><span><b>03</b> verified receipt</span></div>
+        <div className="trust-row"><span><b>01</b> complete request</span><i></i><span><b>02</b> direct confirmation</span><i></i><span><b>03</b> completion receipt</span></div>
       </div>
       <div className="hero-visual">
         <img src={heroImage} alt="A caregiver and student volunteer going through a practical checklist together" />
@@ -465,26 +453,25 @@ function PublicHome({ theme, onThemeChange, onOpenPortal }: { theme: Theme; onTh
     </section>
 
     <section className="public-section process-section" id="how-it-works">
-      <div className="section-intro"><p className="eyebrow">HOW THE SERVICE WORKS</p><h2>A clear handoff from caregiver to volunteer.</h2><p>Caregivers publish complete tasks to one shared board. Eligible volunteers choose and offer directly, without waiting for hospital staff to approve routine matches.</p></div>
+      <div className="section-intro"><p className="eyebrow">HOW THE SERVICE WORKS</p><h2>A direct handoff with clear boundaries.</h2><p>In-scope requests publish immediately. Eligible volunteers can see the complete details and confirm a suitable task directly.</p></div>
       <ol className="process-grid">
         <li><span>01</span><h3>Ask clearly</h3><p>A caregiver posts the complete instructions, contact details, timing and exact service location.</p></li>
-        <li><span>02</span><h3>Choose directly</h3><p>Eligible volunteers filter the open board, check the full details and offer on a task that fits.</p></li>
-        <li><span>03</span><h3>Complete safely</h3><p>The caregiver and volunteer coordinate the handoff, then close the task with a private reflection and completion receipt.</p></li>
+        <li><span>02</span><h3>Confirm fit</h3><p>Readiness, conversation language and task boundaries determine whether a volunteer can accept directly.</p></li>
+        <li><span>03</span><h3>Complete safely</h3><p>The task closes with a private reflection and an immediate service receipt.</p></li>
       </ol>
     </section>
 
     <section className="role-explainer" id="roles">
-      <div className="section-intro compact"><p className="eyebrow">THREE RESPONSIBILITIES</p><h2>One service, three protected workspaces.</h2></div>
+      <div className="section-intro compact"><p className="eyebrow">TWO PARTICIPANTS</p><h2>One service, two focused workspaces.</h2></div>
       <div className="role-cards">
         <article><span className="role-icon">C</span><p className="eyebrow">CAREGIVER</p><h3>Control the ask</h3><p>Post one bounded practical task with the full instructions, contact details and location, then follow its status.</p></article>
         <article><span className="role-icon">V</span><p className="eyebrow">VOLUNTEER</p><h3>Choose a safe fit</h3><p>Filter and map every unexpired open task from all caregivers, then offer where your readiness fits.</p></article>
-        <article><span className="role-icon">AH</span><p className="eyebrow">HOSPITAL ADMIN</p><h3>Keep the service safe</h3><p>Manage access, training, escalations and programme visibility without approving routine tasks.</p></article>
       </div>
     </section>
 
-    <section className="safety-section" id="safety"><div><p className="eyebrow">THE RELIEFKAKI PROMISE</p><h2>Warmth needs<br /><em>clear edges.</em></h2></div><div className="safety-grid"><article><span>↳</span><h3>We do</h3><p>Errands, meals, reminder setup, wayfinding, basic forms, companionship and bounded accompaniment.</p></article><article><span>×</span><h3>We do not</h3><p>Medication, personal care, clinical advice, lifting or transfers, finances, diagnosis or emergency response.</p></article><article><span>!</span><h3>We redirect</h3><p>Urgent, sensitive or out-of-scope requests leave the volunteer board and follow the appropriate hospital or emergency support path.</p></article></div></section>
+    <section className="safety-section" id="safety"><div><p className="eyebrow">THE RELIEFKAKI PROMISE</p><h2>Warmth needs<br /><em>clear edges.</em></h2></div><div className="safety-grid"><article><span>↳</span><h3>We do</h3><p>Errands, meals, reminder setup, wayfinding, basic forms, companionship and bounded accompaniment.</p></article><article><span>×</span><h3>We do not</h3><p>Medication, personal care, clinical advice, lifting or transfers, finances, diagnosis or emergency response.</p></article><article><span>!</span><h3>We block unsafe requests</h3><p>Automatic scope checks stop excluded work before publication and show emergency or professional-support guidance.</p></article></div></section>
 
-    <section className="access-banner"><div><p className="eyebrow">AUTHENTICATED OPERATIONS</p><h2>Ready to enter your workspace?</h2><p>Caregiver, volunteer and AH-admin tools stay behind a role-bound sign-in. Routine task matching happens directly between eligible users.</p></div><button className="button button-dark" type="button" onClick={onOpenPortal}>Access the demo portal <Arrow /></button></section>
+    <section className="access-banner"><div><p className="eyebrow">AUTHENTICATED WORKSPACES</p><h2>Ready to enter your workspace?</h2><p>Caregiver and volunteer tools stay behind a role-bound sign-in.</p></div><button className="button button-dark" type="button" onClick={onOpenPortal}>Access the demo portal <Arrow /></button></section>
 
     <SiteFooter footerRef={footerRef} />
     <JudgeExpoGuide footerRef={footerRef} open={judgeGuideOpen} onOpen={() => setJudgeGuideOpen(true)} onDismiss={dismissJudgeGuide} />
@@ -522,7 +509,7 @@ function LoginPage({ theme, onThemeChange, onBack, onAuthenticated }: { theme: T
       <div className="nav-actions"><ThemeToggle theme={theme} onChange={onThemeChange} /><button className="button button-outline" type="button" onClick={onBack}>Back to website</button></div>
     </nav>
     <section className="login-layout">
-      <div className="login-context"><p className="eyebrow">PROTECTED WORKSPACES</p><h1>Sign in to the role you have been approved for.</h1><p>ReliefKaki uses role-bound access: caregivers create task requests, volunteers browse every open task, and AH administrators oversee safety and completion.</p><ul><li><span>✓</span> No role switching after sign-in</li><li><span>✓</span> Complete task details for volunteers</li><li><span>✓</span> Clear sign-out and account identity at all times</li></ul><div className="prototype-note"><b>Interactive prototype</b><span>This screen demonstrates authentication and authorization UX. It is not connected to Alexandra Hospital production identity systems.</span></div></div>
+      <div className="login-context"><p className="eyebrow">PROTECTED WORKSPACES</p><h1>Sign in to your ReliefKaki workspace.</h1><p>Caregivers publish bounded requests and volunteers confirm suitable open tasks directly.</p><ul><li><span>✓</span> No role switching after sign-in</li><li><span>✓</span> Complete task details for volunteers</li><li><span>✓</span> Clear sign-out and account identity at all times</li></ul><div className="prototype-note"><b>Interactive prototype</b><span>This screen demonstrates authentication and authorization UX. It is not connected to Alexandra Hospital production identity systems.</span></div></div>
       <div className="login-card">
         <div><p className="eyebrow">RELIEFKAKI ACCESS</p><h2>Welcome back</h2><p>Use a demo profile below, then sign in.</p></div>
         <form onSubmit={signIn} noValidate>
@@ -531,8 +518,8 @@ function LoginPage({ theme, onThemeChange, onBack, onAuthenticated }: { theme: T
           {error && <p className="form-error" role="alert">{error}</p>}
           <button className="button button-dark full" type="submit">Sign in securely <Arrow /></button>
         </form>
-        <div className="demo-access"><span>Choose a demo profile</span>{demoAccounts.map((account, index) => <button type="button" key={account.role} onClick={() => chooseDemo(index)}><b>{account.label}</b><small>{account.role === 'caregiver' ? 'Create and track requests' : account.role === 'volunteer' ? 'Open tasks and recognition' : 'Triage and account oversight'}</small><em>Use details →</em></button>)}</div>
-        <p className="login-help">Need access? In a live pilot, an AH programme administrator would create or approve your account.</p>
+        <div className="demo-access"><span>Choose a demo profile</span>{demoAccounts.map((account, index) => <button type="button" key={account.role} onClick={() => chooseDemo(index)}><b>{account.label}</b><small>{account.role === 'caregiver' ? 'Create and track requests' : 'Open tasks and recognition'}</small><em>Use details →</em></button>)}</div>
+        <p className="login-help">Use either fictional profile to explore the direct caregiver-to-volunteer flow.</p>
       </div>
     </section>
     <SiteFooter />
@@ -551,7 +538,7 @@ export default function App() {
   const activePortalSection = resolvePortalSection(role, portalSection)
   const currentPortalPage = portalSectionsForRole(role).find((section) => section.id === activePortalSection) ?? portalSectionsForRole(role)[0]
   const [now, setNow] = useState(() => new Date())
-  const [tasks, setTasks] = useState<Task[]>(() => autoEscalateTasks(initialTasks, new Date().toISOString()))
+  const [tasks, setTasks] = useState<Task[]>(initialTasks)
   const [trackOwnLocation, setTrackOwnLocation] = useState(false)
   const [trackingStatus, setTrackingStatus] = useState<LocationTrackingStatus>('off')
   const [ownLocation, setOwnLocation] = useState<Coordinates | null>(null)
@@ -567,10 +554,8 @@ export default function App() {
   const [femalePreferred, setFemalePreferred] = useState(false)
   const [urgent, setUrgent] = useState(false)
   const [submitted, setSubmitted] = useState(false)
-  const [submittedForReferral, setSubmittedForReferral] = useState(false)
-  const [adminNotice, setAdminNotice] = useState('')
+  const [submissionBlocked, setSubmissionBlocked] = useState(false)
   const [reflections, setReflections] = useState<Record<string, string>>({})
-  const [accountState, setAccountState] = useState<Record<string, string>>({ 'MC-204': 'Active', 'VL-031': 'Active', 'VL-044': 'Training due' })
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
@@ -584,18 +569,6 @@ export default function App() {
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 1000)
-    return () => window.clearInterval(timer)
-  }, [])
-
-  useEffect(() => {
-    const reconcile = () => {
-      const timestamp = new Date().toISOString()
-      setTasks((current) => {
-        const next = autoEscalateTasks(current, timestamp)
-        return next.some((task, index) => task !== current[index]) ? next : current
-      })
-    }
-    const timer = window.setInterval(reconcile, 60_000)
     return () => window.clearInterval(timer)
   }, [])
 
@@ -624,22 +597,16 @@ export default function App() {
     return () => navigator.geolocation.clearWatch(watchId)
   }, [trackOwnLocation])
 
-  const capacityAlerts = tasks.filter((task) => task.status === 'Escalated')
-  const closedCapacityTasks = tasks.filter((task) => task.status === 'Closed' && task.caregiverNotice && task.ownerId === (session?.id ?? 'C-204'))
-  const openCount = tasks.filter((task) => task.status === 'Open' || task.status === 'Escalated').length
+  const openCount = tasks.filter((task) => task.status === 'Open').length
   const volunteerMarketplaceTasks = openVolunteerTasks(tasks, now.toISOString())
   const volunteerDashboardTasks = tasks.filter((task) =>
     volunteerMarketplaceTasks.some((openTask) => openTask.id === task.id)
-    || (task.volunteer === 'Maya T.' && (task.status === 'Review' || task.status === 'Matched')),
+    || (task.volunteer === 'Maya T.' && task.status === 'Matched'),
   )
   const completionReceipts = tasks.filter((task) => task.completion)
-  const pendingCompletions = completionReceipts.filter((task) => task.completion?.verification === 'Pending AH verification').length
-  const verifiedCompletions = completionReceipts.filter((task) => task.completion?.verification === 'Verified by AH')
-  const verifiedServiceHours = verifiedCompletions.reduce((total, task) => total + task.viaHours, 0)
-  const verifiedRecognitionPoints = verifiedCompletions.reduce((total, task) => total + task.points, 0)
-  const verifiedForMaya = tasks.filter((task) => task.volunteer === 'Maya T.' && task.completion?.verification === 'Verified by AH')
-  const verifiedPoints = 620 + verifiedForMaya.reduce((total, task) => total + task.points, 0)
-  const verifiedHours = 8.5 + verifiedForMaya.reduce((total, task) => total + task.viaHours, 0)
+  const completedForMaya = tasks.filter((task) => task.volunteer === 'Maya T.' && task.completion)
+  const recordedPoints = 620 + completedForMaya.reduce((total, task) => total + task.points, 0)
+  const recordedHours = 8.5 + completedForMaya.reduce((total, task) => total + task.viaHours, 0)
   const points = useMemo(() => {
     const base: Record<Category, number> = { Errands: 40, 'Digital help': 35, Wayfinding: 45, 'Meals & home': 45, 'Admin & forms': 50, Companionship: 55, 'Sensitive accompaniment': 60 }
     return base[category]
@@ -671,7 +638,11 @@ export default function App() {
       setContactError(nextContactError)
       return
     }
-    const referralOnly = scopeSignals.length > 0
+    if (scopeSignals.length > 0) {
+      setSubmissionBlocked(true)
+      setSubmitted(true)
+      return
+    }
     const newTask: Task = {
       id: nextTaskId,
       title: request,
@@ -685,15 +656,12 @@ export default function App() {
       caregiverPhone: caregiverPhone.trim(),
       urgent,
       femalePreferred: femalePreferred && category === 'Sensitive accompaniment',
-      status: referralOnly || urgent || category === 'Sensitive accompaniment' ? 'Review' : 'Open',
-      points: referralOnly ? 0 : points,
-      viaHours: referralOnly ? 0 : viaHours,
-      difficulty: referralOnly || urgent || category === 'Sensitive accompaniment' ? 'Weightier' : category === 'Digital help' ? 'Skilled' : 'Light',
-      skill: referralOnly ? 'Formal AH service required' : category === 'Sensitive accompaniment' ? 'Safeguarding + accompaniment' : `${category} ready`,
+      status: 'Open',
+      points,
+      viaHours,
+      difficulty: urgent || category === 'Sensitive accompaniment' ? 'Weightier' : category === 'Digital help' ? 'Skilled' : 'Light',
+      skill: category === 'Sensitive accompaniment' ? 'Safeguarding + accompaniment' : `${category} ready`,
       volunteer: '',
-      safetyCleared: !referralOnly && !urgent && category !== 'Sensitive accompaniment',
-      referralOnly,
-      scopeFlags: scopeSignals.map((signal) => signal.label),
       completion: null,
       volunteersNeeded: category === 'Sensitive accompaniment' ? 2 : 1,
       confirmedVolunteers: [],
@@ -701,50 +669,19 @@ export default function App() {
     }
     setTasks([newTask, ...tasks])
     setContactError('')
-    setSubmittedForReferral(referralOnly)
+    setSubmissionBlocked(false)
     setSubmitted(true)
   }
 
   function acceptTask(id: string) {
-    setTasks(tasks.map((task) => {
+    setTasks((current) => current.map((task) => {
       const matchGaps = volunteerMatchGaps(
         { requiredSkill: task.skill, taskLanguage: task.language },
         { readiness: volunteerReadiness, languages: volunteerLanguages },
       )
-      if (task.id !== id || !['Open', 'Escalated'].includes(task.status) || !task.safetyCleared || matchGaps.length > 0 || task.confirmedVolunteers.includes('Maya T.')) return task
-      return { ...task, status: task.status === 'Escalated' ? 'Escalated' : 'Review', volunteer: 'Maya T.' }
+      if (task.id !== id || matchGaps.length > 0) return task
+      return confirmVolunteerDirectly(task, 'Maya T.')
     }))
-  }
-
-  function releaseTask(id: string) {
-    setTasks(tasks.map((task) => task.id === id ? { ...task, status: 'Open', safetyCleared: true } : task))
-    setAdminNotice(`${taskDisplayLabel(id)} scope cleared: released only to volunteers with the required readiness.`)
-  }
-
-  function approveTask(id: string) {
-    setTasks(tasks.map((task) => {
-      if (task.id !== id) return task
-      const volunteer = task.volunteer || 'Maya T.'
-      const confirmedVolunteers = task.confirmedVolunteers.includes(volunteer) ? task.confirmedVolunteers : [...task.confirmedVolunteers, volunteer]
-      const covered = confirmedVolunteers.length >= task.volunteersNeeded
-      return { ...task, status: covered ? 'Matched' : 'Open', volunteer, confirmedVolunteers, capacityState: covered ? 'Covered' : 'Recruiting' }
-    }))
-    setAdminNotice(`${taskDisplayLabel(id)} approved: confirmed capacity was updated and minimum task details released.`)
-  }
-
-  function startCapacitySourcing(id: string) {
-    setTasks((current) => current.map((task) => task.id === id ? startCoordinatorSourcing(task, new Date().toISOString()) : task))
-    setAdminNotice(`${taskDisplayLabel(id)}: AH coordinator sourcing started. The task stays open while suitable volunteers are contacted.`)
-  }
-
-  function addSourcedVolunteer(id: string) {
-    setTasks((current) => current.map((task) => task.id === id ? recordSourcedVolunteer(task, `AH sourced · volunteer ${task.confirmedVolunteers.length + 1}`) : task))
-    setAdminNotice(`${taskDisplayLabel(id)}: one suitable volunteer was confirmed by AH; the capacity count has been updated.`)
-  }
-
-  function closeCapacityTask(id: string) {
-    setTasks((current) => current.map((task) => task.id === id ? closeTaskForCapacity(task, new Date().toISOString()) : task))
-    setAdminNotice(`${taskDisplayLabel(id)} closed because enough suitable volunteers could not be found. The caregiver has been notified.`)
   }
 
   function completeTask(id: string) {
@@ -754,34 +691,13 @@ export default function App() {
       ...task,
       status: 'Done',
       completion: {
-        submittedAt: '14 Aug 2026 · 4:42 pm',
+        submittedAt: formatSingaporeDateTime(new Date()),
         reflection,
-        verification: 'Pending AH verification',
       },
     } : task))
     setReflections({ ...reflections, [id]: '' })
   }
 
-  function verifyCompletion(id: string) {
-    setTasks(tasks.map((task) => task.id === id && task.completion ? {
-      ...task,
-      completion: {
-        ...task.completion,
-        verification: 'Verified by AH',
-        verifiedAt: '14 Aug 2026 · 4:55 pm',
-      },
-    } : task))
-    setAdminNotice(`${taskDisplayLabel(id)} completion verified: service time and points added to the private record; VIA remains a partner-school decision.`)
-  }
-
-  function confirmRedirect(id: string) {
-    setTasks(tasks.map((task) => task.id === id ? { ...task, status: 'Done' } : task))
-    setAdminNotice(`${taskDisplayLabel(id)} closed with a formal-service redirect receipt; no volunteer details were released.`)
-  }
-
-  function toggleAccount(id: string) {
-    setAccountState({ ...accountState, [id]: accountState[id] === 'Active' ? 'Paused' : 'Active' })
-  }
 
   if (screen === 'home') {
     return <PublicHome theme={theme} onThemeChange={setTheme} onOpenPortal={() => setScreen(session ? 'portal' : 'login')} />
@@ -795,11 +711,11 @@ export default function App() {
     <main className="portal-page">
       <nav className="portal-nav" aria-label="Portal navigation">
         <div className="portal-nav-left"><PortalMenu role={role} activeSection={activePortalSection} onSelect={setPortalSection} /><button className="brand brand-button" type="button" onClick={() => setScreen('home')}><Mark /><span>relief<span className="brand-light">kaki</span></span></button></div>
-        <div className="portal-context"><span className="secure-chip"><i></i> AH-supervised demo</span><span className="role-lock">{roleCopy[role].label} workspace</span></div>
+        <div className="portal-context"><span className="secure-chip"><i></i> Direct matching demo</span><span className="role-lock">{roleCopy[role].label} workspace</span></div>
         <div className="portal-actions"><ThemeToggle theme={theme} onChange={setTheme} /><AccountSettings session={session} role={role} trackOwnLocation={trackOwnLocation} trackingStatus={trackingStatus} onTrackOwnLocationChange={setTrackOwnLocation} onHome={() => setScreen('home')} onSignOut={() => { setSession(null); setScreen('login') }} /></div>
       </nav>
 
-      {role !== 'caregiver' && <section className="realtime-ops-bar" aria-label="Live Singapore task operations"><SingaporeClock now={now} /><div><span>OPEN NOW <b>{openCount}</b></span><span>7-DAY ALERTS <b>{capacityAlerts.length}</b></span></div></section>}
+      {role === 'volunteer' && <section className="realtime-ops-bar" aria-label="Live Singapore tasks"><SingaporeClock now={now} /><div><span>OPEN NOW <b>{openCount}</b></span></div></section>}
 
       <section className="workspace" id="workspace">
         <header className={`workspace-head ${role === 'caregiver' ? 'caregiver-workspace-head' : ''}`}>
@@ -808,15 +724,13 @@ export default function App() {
         </header>
         {((role === 'caregiver' || role === 'volunteer') && activePortalSection === 'tasks') && <DatabaseRoadmapNotice role={role} />}
         {((role === 'caregiver' && activePortalSection === 'tasks') || (role === 'volunteer' && activePortalSection === 'tasks')) && <TaskMap
-          tasks={role === 'caregiver' ? tasks.filter((task) => task.ownerId === session.id) : role === 'volunteer' ? volunteerDashboardTasks : tasks}
+          tasks={role === 'caregiver' ? tasks.filter((task) => task.ownerId === session.id) : volunteerDashboardTasks}
           role={role}
           now={now}
           ownLocation={ownLocation}
           trackingStatus={trackingStatus}
           onCreateTask={role === 'caregiver' ? () => setPortalSection('create') : undefined}
           volunteerTools={role === 'volunteer' ? {
-            verifiedPoints,
-            verifiedHours,
             reflections,
             onAcceptTask: acceptTask,
             onReflectionChange: (id, value) => setReflections((current) => ({ ...current, [id]: value })),
@@ -824,23 +738,21 @@ export default function App() {
           } : undefined}
         />}
 
-        {role === 'caregiver' && activePortalSection === 'create' && closedCapacityTasks.length > 0 && <section className="caregiver-alerts" aria-live="polite"><div><span>AH CAPACITY UPDATE</span><b>{closedCapacityTasks.length} task {closedCapacityTasks.length === 1 ? 'was' : 'were'} closed</b></div>{closedCapacityTasks.map((task) => <article key={task.id}><Badge tone="red">{taskDisplayLabel(task.id)} · Closed</Badge><p>{task.caregiverNotice}</p><small>Closed {task.closedAt ? formatSingaporeDateTime(task.closedAt) : 'by AH'} · your original task remains in your private record</small></article>)}</section>}
-
         {role === 'caregiver' && activePortalSection === 'create' && <><button type="button" className="back-to-task-map" onClick={() => setPortalSection('tasks')}>← Back to your task map</button><div className="caregiver-grid">
           <div className="request-card">
-            {submitted ? <div className={`success-state ${submittedForReferral ? 'redirected' : ''}`}>
-              <span className="success-icon">{submittedForReferral ? '!' : '✓'}</span>
-              <p className="eyebrow">{submittedForReferral ? 'VOLUNTEER MATCHING BLOCKED' : 'REQUEST RECEIVED'}</p>
-              <h3>{submittedForReferral ? 'This needs the formal AH service lane.' : urgent ? 'An AH admin is reviewing this now.' : 'That is one thing off your plate.'}</h3>
-              {submittedForReferral ? <>
-                <p>ReliefKaki did not publish this request to volunteers. AH admin receives a redirect receipt and can guide it to an appropriate professional or service.</p>
-                {scopeSignals.some((signal) => signal.emergency) && <div className="emergency-callout"><b>Life-threatening emergency?</b><span>Do not wait for an admin response, call SCDF at 995 now.</span></div>}
-                <ol className="request-steps"><li><b>Volunteer offer disabled</b><span>No student can view, offer for or be assigned this request.</span></li><li><b>AH service review</b><span>An administrator confirms the appropriate formal route.</span></li><li><b>Redirect receipt</b><span>The decision closes with an accountable no-volunteer record.</span></li></ol>
+            {submitted ? <div className={`success-state ${submissionBlocked ? 'redirected' : ''}`}>
+              <span className="success-icon">{submissionBlocked ? '!' : '✓'}</span>
+              <p className="eyebrow">{submissionBlocked ? 'NOT PUBLISHED' : 'TASK PUBLISHED'}</p>
+              <h3>{submissionBlocked ? 'This request is outside ReliefKaki’s volunteer scope.' : 'Your task is live for eligible volunteers.'}</h3>
+              {submissionBlocked ? <>
+                <p>ReliefKaki did not add this request to the volunteer task board. Please use an appropriate qualified service instead.</p>
+                {scopeSignals.some((signal) => signal.emergency) && <div className="emergency-callout"><b>Life-threatening emergency?</b><span>Call SCDF at 995 now.</span></div>}
+                <ol className="request-steps"><li><b>Publication stopped</b><span>No volunteer can view or accept this request.</span></li><li><b>Use qualified support</b><span>Follow the guidance shown for the detected scope issue.</span></li><li><b>Try another bounded task</b><span>You can return to the form and enter a non-clinical practical request.</span></li></ol>
               </> : <>
-                <p>Volunteers can now review the complete request, your contact details and the exact task location.</p>
-                <ol className="request-steps"><li><b>Scope check</b><span>Admin confirms the request is bounded and non-clinical.</span></li><li><b>Open task board</b><span>Every active volunteer can see the request while it remains open and unexpired.</span></li><li><b>Moderated handoff</b><span>Admin confirms a suitable volunteer before the task is assigned.</span></li></ol>
+                <p>Volunteers can now see the complete request, your contact details and the exact task location.</p>
+                <ol className="request-steps"><li><b>Automatic scope check</b><span>Excluded work is blocked before publication.</span></li><li><b>Open task board</b><span>Eligible volunteers can see the request while it remains open and unexpired.</span></li><li><b>Direct confirmation</b><span>A suitable volunteer can accept the task directly.</span></li></ol>
               </>}
-              <button onClick={() => setSubmitted(false)} className="button button-dark">Post another <Arrow /></button>
+              <button onClick={() => setSubmitted(false)} className="button button-dark">{submissionBlocked ? 'Change request' : 'Post another'} <Arrow /></button>
             </div> : <>
               <div className="form-top"><span>ONE SMALL ASK</span><span>about 30 seconds</span></div>
               <label>What would make today lighter?<textarea value={request} onChange={(event) => setRequest(event.target.value)} /></label>
@@ -850,16 +762,16 @@ export default function App() {
               {scheduleError && <p className="form-error schedule-error" role="alert">{scheduleError}</p>}
               <div className="contact-fields"><label>Caregiver name<input value={caregiverName} onChange={(event) => { setCaregiverName(event.target.value); setContactError('') }} placeholder="Name shown to every volunteer" /></label><label>Contact number<input type="tel" inputMode="tel" value={caregiverPhone} onChange={(event) => { setCaregiverPhone(event.target.value); setContactError('') }} placeholder="Number shown to every volunteer" /></label></div>
               {contactError && <p className="form-error contact-error" role="alert">{contactError}</p>}
-              {scopeSignals.length > 0 && <div className="scope-preflight" aria-live="polite"><div><span>OUTSIDE VOLUNTEER SCOPE</span><b>Will route to AH, never to a volunteer</b></div><ul>{scopeSignals.map((signal) => <li key={signal.label}><b>{signal.label}</b><span>{signal.guidance}</span></li>)}</ul></div>}
-              <div className="option-row"><label className="check-option"><input type="checkbox" checked={urgent} onChange={(event) => setUrgent(event.target.checked)} /><span><b>Time-sensitive today</b><small>Routes to AH admin triage, not a public urgency bounty.</small></span></label>{category === 'Sensitive accompaniment' && <label className="check-option"><input type="checkbox" checked={femalePreferred} onChange={(event) => setFemalePreferred(event.target.checked)} /><span><b>Female support requested</b><small>For task-specific privacy or comfort; admin checks suitability.</small></span></label>}</div>
-              <button className="button button-dark full" onClick={postTask}>{scopeSignals.length ? 'Create AH redirect receipt' : 'Publish complete task'} <Arrow /></button>
-              <p className="form-foot">No medication, personal care, clinical advice, lifting, money handling or emergencies. Those go to the appropriate AH service.</p>
+              {scopeSignals.length > 0 && <div className="scope-preflight" aria-live="polite"><div><span>OUTSIDE VOLUNTEER SCOPE</span><b>Cannot be published to volunteers</b></div><ul>{scopeSignals.map((signal) => <li key={signal.label}><b>{signal.label}</b><span>{signal.guidance}</span></li>)}</ul></div>}
+              <div className="option-row"><label className="check-option"><input type="checkbox" checked={urgent} onChange={(event) => setUrgent(event.target.checked)} /><span><b>Time-sensitive today</b><small>Shown clearly to volunteers without changing the task’s points.</small></span></label>{category === 'Sensitive accompaniment' && <label className="check-option"><input type="checkbox" checked={femalePreferred} onChange={(event) => setFemalePreferred(event.target.checked)} /><span><b>Female support requested</b><small>For task-specific privacy or comfort; readiness rules still apply.</small></span></label>}</div>
+              <button className="button button-dark full" onClick={postTask}>{scopeSignals.length ? 'Check request guidance' : 'Publish complete task'} <Arrow /></button>
+              <p className="form-foot">Medication, personal care, clinical advice, lifting, money handling and emergencies cannot be published. Use an appropriate qualified service instead.</p>
             </>}
           </div>
           <aside className="task-preview-panel">
             <p className="eyebrow">LIVE VOLUNTEER TASK CARD</p>
             <div className="caregiver-profile"><span>{(caregiverName.trim().slice(0, 1) || 'C').toUpperCase()}</span><div><b>{draftContact.displayName || 'Caregiver name'}</b><small>Contact details shown with the task</small></div></div>
-            <div className="live-task-preview"><span>{category} · {urgent ? 'Admin triage' : draftScheduleLabel}</span><h3>{request.trim() || 'Your task request will appear here'}</h3><small>⌖ {draftVolunteerLocation.label}</small></div>
+            <div className="live-task-preview"><span>{category} · {urgent ? `Time-sensitive · ${draftScheduleLabel}` : draftScheduleLabel}</span><h3>{request.trim() || 'Your task request will appear here'}</h3><small>⌖ {draftVolunteerLocation.label}</small></div>
             <dl><div><dt>Name</dt><dd>{caregiverName.trim() || 'Required'}</dd></div><div><dt>Contact number</dt><dd>{draftContact.contactNumber || 'Required'}</dd></div><div><dt>Location</dt><dd>{draftVolunteerLocation.label}</dd></div><div><dt>Task language</dt><dd>{language === 'No preference' ? 'Any language' : language}</dd></div></dl>
             <div className="task-sharing-note"><span>✓</span><p><b>Complete details are shared with volunteers.</b> Every active volunteer can review the instructions, caregiver contact and exact task location while this task is open and unexpired.</p></div>
           </aside>
@@ -867,28 +779,14 @@ export default function App() {
 
         {role === 'volunteer' && activePortalSection === 'recognition' && <div className="volunteer-view volunteer-receipts-view">
           <section className="volunteer-recognition-page" aria-label="Volunteer recognition summary">
-            <div className="map-recognition-head"><div><p className="eyebrow">MY VOLUNTEER RECORD</p><h3>Verified service and readiness.</h3></div><Badge tone="blue">Volunteer only</Badge></div>
-            <div className="volunteer-strip"><article><span>VERIFIED IMPACT</span><b>{verifiedPoints}</b><small>Points after AH verification</small></article><article><span>VERIFIED SERVICE</span><b>{verifiedHours}h</b><small>VIA subject to partner approval</small></article><article><span>RELIABILITY</span><b>96%</b><small>11 of 12 tasks completed</small></article><article className="league-card"><span>OPT-IN TEAM GOAL</span><b>14/20</b><small>SMU Care Crew · completed tasks</small></article></div>
+            <div className="map-recognition-head"><div><p className="eyebrow">MY VOLUNTEER RECORD</p><h3>Completed service and readiness.</h3></div><Badge tone="blue">Volunteer only</Badge></div>
+            <div className="volunteer-strip"><article><span>RECORDED IMPACT</span><b>{recordedPoints}</b><small>Points recorded after completion</small></article><article><span>RECORDED SERVICE</span><b>{recordedHours}h</b><small>VIA subject to partner-school policy</small></article><article><span>RELIABILITY</span><b>96%</b><small>11 of 12 tasks completed</small></article><article className="league-card"><span>OPT-IN TEAM GOAL</span><b>14/20</b><small>SMU Care Crew · completed tasks</small></article></div>
             <div className="map-readiness"><span>YOUR ACTIVE FIT</span><div className="skill-pills"><Badge tone="green">✓ Errands ready</Badge><Badge tone="green">✓ Digital help ready</Badge><Badge tone="blue">✓ Safeguarding + accompaniment</Badge><Badge tone="plain">Forms briefing not completed</Badge><Badge tone="green">English</Badge><Badge tone="green">Mandarin</Badge></div></div>
           </section>
-          {completionReceipts.filter((task) => task.volunteer === 'Maya T.').length > 0 && <section className="receipt-shelf"><div className="receipt-shelf-head"><div><p className="eyebrow">MY SERVICE RECEIPTS</p><h3>Completion is recorded before recognition.</h3></div><Badge tone={pendingCompletions ? 'amber' : 'green'}>{pendingCompletions ? `${pendingCompletions} awaiting AH` : 'All verified'}</Badge></div>{completionReceipts.filter((task) => task.volunteer === 'Maya T.').map((task) => <article className="service-receipt" key={task.id}><div><span>{taskDisplayLabel(task.id)} · {task.completion?.submittedAt}</span><b>{task.title}</b><p>“{task.completion?.reflection}”</p></div><div className="receipt-verdict"><Badge tone={task.completion?.verification === 'Verified by AH' ? 'green' : 'amber'}>{task.completion?.verification}</Badge><small>{task.completion?.verification === 'Verified by AH' ? `${task.viaHours}h verified · ${task.points} points recorded` : `${task.viaHours}h and ${task.points} points pending`}</small><em>Partner school decides VIA recognition.</em></div></article>)}</section>}
-          <p className="ethics-note">Service time is verified after completion and reflection; partner schools decide whether it qualifies for VIA. Impact points recognise approved effort, reliability and contribution, never urgency, caregiver distress or risk. Progress stays private and team goals reveal no caregiver data.</p>
+          {completionReceipts.filter((task) => task.volunteer === 'Maya T.').length > 0 && <section className="receipt-shelf"><div className="receipt-shelf-head"><div><p className="eyebrow">MY SERVICE RECEIPTS</p><h3>Your completed tasks and reflections.</h3></div><Badge tone="green">Recorded</Badge></div>{completionReceipts.filter((task) => task.volunteer === 'Maya T.').map((task) => <article className="service-receipt" key={task.id}><div><span>{taskDisplayLabel(task.id)} · {task.completion?.submittedAt}</span><b>{task.title}</b><p>“{task.completion?.reflection}”</p></div><div className="receipt-verdict"><Badge tone="green">Completed</Badge><small>{task.viaHours}h service · {task.points} points recorded</small><em>Partner school decides VIA recognition.</em></div></article>)}</section>}
+          <p className="ethics-note">Service time and impact points are recorded after completion and reflection; partner schools decide whether service qualifies for VIA. Recognition never increases with urgency, caregiver distress or risk. Progress stays private and team goals reveal no caregiver data.</p>
         </div>}
 
-        {role === 'admin' && <div className="admin-view">
-          {adminNotice && <div className="admin-notice">✓ {adminNotice}</div>}
-          {activePortalSection === 'capacity' && <section className="capacity-alert-panel" aria-label="Seven-day capacity notifications"><div className="capacity-alert-head"><div><p className="eyebrow">AUTOMATIC 7-DAY REFERRALS</p><h3>AH capacity notifications</h3><p>Tasks still below the confirmed headcount after seven days are referred here automatically. AH can source suitable people or close the request with a caregiver notice.</p></div><Badge tone={capacityAlerts.length ? 'red' : 'green'}>{capacityAlerts.length ? `${capacityAlerts.length} action required` : 'Queue clear'}</Badge></div>{capacityAlerts.length > 0 ? <div className="capacity-alert-list">{capacityAlerts.map((task) => { const place = taskLocationForRole(task.location, 'admin'); return <article key={task.id}><div className="capacity-alert-title"><div><span>{taskDisplayLabel(task.id)} · {taskWaitLabel(task.createdAt, now)}</span><b>{task.title}</b></div><Badge tone="red">{task.confirmedVolunteers.length}/{task.volunteersNeeded} confirmed</Badge></div><p>{task.adminNotification}</p><dl><div><dt>Task time</dt><dd>{formatSingaporeDateTime(task.scheduledAt)}</dd></div><div><dt>Protected location</dt><dd>{place.label}</dd></div><div><dt>AH action</dt><dd>{task.capacityState}</dd></div></dl><div className="admin-actions">{task.capacityState === 'AH help required' && <button className="button button-dark" onClick={() => startCapacitySourcing(task.id)}>Start AH sourcing <Arrow /></button>}{task.capacityState === 'Coordinator sourcing' && <><button className="button button-dark" onClick={() => addSourcedVolunteer(task.id)}>Record sourced volunteer <Arrow /></button><button className="button button-outline danger" onClick={() => closeCapacityTask(task.id)}>Close · capacity unavailable</button></>}{task.volunteer && <button className="button button-outline" onClick={() => approveTask(task.id)}>Approve pending offer</button>}</div></article>})}</div> : <div className="empty-queue"><b>No overdue capacity gaps.</b><span>New seven-day referrals appear here with the task age, schedule, exact operational location and confirmed headcount.</span></div>}</section>}
-          {activePortalSection === 'overview' && <><section className="admin-overview-intro"><p className="eyebrow">AH ADMINISTRATION</p><h3>Focused workspaces for programme operations.</h3><p>Use the three-line menu or the page links below to move between capacity referrals, completion and recognition records, and account administration. Each area opens as its own page.</p></section>
-          <section className="admin-section-directory" aria-label="Administration sections"><div className="panel-head"><div><p className="eyebrow">ADMINISTRATION MENU</p><h3>Choose one focused work queue</h3></div><Badge tone="blue">3 sections</Badge></div><div className="admin-directory-grid">{portalSectionsForRole('admin').filter((section) => section.id !== 'overview').map((section) => <button type="button" key={section.id} onClick={() => setPortalSection(section.id)}><span>{section.label}</span><small>{section.description}</small><em>Open page →</em></button>)}</div></section></>}
-          {false && <section className="admin-panel"><div className="panel-head"><div><p className="eyebrow">TRIAGE & MATCHING</p><h3>One accountable queue</h3></div><Badge tone="red">1 urgent</Badge></div>
-              <div className="admin-task-list">{tasks.filter((task) => task.status === 'Review' || ((task.urgent || task.category === 'Sensitive accompaniment') && !task.safetyCleared)).map((task) => <article key={task.id}><div className="admin-task-title"><span>{taskDisplayLabel(task.id)}</span><div><b>{task.title}</b><small>{task.category} · {task.language === 'No preference' ? 'Any language' : task.language} · {taskLocationForRole(task.location, 'admin').label}</small></div></div><div className="admin-flags">{task.urgent && <Badge tone="red">Time-sensitive</Badge>}{task.femalePreferred && <Badge tone="amber">Female support preference</Badge>}{task.referralOnly && <Badge tone="red">Formal service only</Badge>}<Badge tone={task.safetyCleared ? 'green' : 'red'}>{task.safetyCleared ? 'Scope cleared' : 'Offer gate locked'}</Badge></div>{task.scopeFlags.length > 0 && <div className="scope-flags">Detected: {task.scopeFlags.join(' · ')}</div>}<p>{task.referralOnly ? 'Volunteer matching is structurally disabled. Confirm the appropriate professional, clinical or emergency route and close an accountable redirect receipt.' : task.femalePreferred ? 'Confirm no personal care, lifting or clinical work. If bounded, release only to volunteers with Safeguarding + accompaniment readiness; otherwise redirect to formal care support.' : 'Confirm scope, volunteer eligibility and complete task details.'}</p><div className="admin-actions">{task.referralOnly ? <button className="button button-dark" onClick={() => confirmRedirect(task.id)}>Confirm formal redirect <Arrow /></button> : task.status === 'Review' && task.volunteer ? <button className="button button-dark" onClick={() => approveTask(task.id)}>Approve match <Arrow /></button> : !task.safetyCleared ? <button className="button button-dark" onClick={() => releaseTask(task.id)}>Clear bounded scope <Arrow /></button> : <button className="button button-outline" onClick={() => setAdminNotice(`${taskDisplayLabel(task.id)} routed for direct coordinator outreach.`)}>Find suitable volunteer</button>}{!task.referralOnly && <button className="text-action" onClick={() => setAdminNotice(`${taskDisplayLabel(task.id)} escalated to the AH service lane; volunteer matching paused.`)}>Escalate / redirect</button>}</div></article>)}</div>
-          </section>}
-          {activePortalSection === 'accounts' && <section className="admin-panel account-administration-page"><div className="panel-head"><div><p className="eyebrow">ACCOUNT ADMINISTRATION</p><h3>People, access, readiness</h3></div><Badge tone="green">Protected</Badge></div>
-              <div className="account-list">{[{ id: 'MC-204', name: 'Male caregiver account', role: 'Caregiver · identity verified' }, { id: 'VL-031', name: 'Maya Tan', role: 'Volunteer · 4 skill badges' }, { id: 'VL-044', name: 'Arjun Lee', role: 'Volunteer · renewal due' }].map((account) => <article key={account.id}><div className="account-avatar">{account.id.slice(0, 2)}</div><div><b>{account.name}</b><small>{account.id} · {account.role}</small></div><Badge tone={accountState[account.id] === 'Active' ? 'green' : 'amber'}>{accountState[account.id]}</Badge><button onClick={() => toggleAccount(account.id)}>{accountState[account.id] === 'Active' ? 'Pause' : 'Activate'}</button></article>)}</div>
-              <div className="vault-note"><span>▣</span><p><b>Verified task contacts</b><br />Caregiver names, contact numbers and exact task locations are included in every open volunteer task. Admin access and match decisions remain logged for programme operations and safety follow-up.</p></div>
-          </section>}
-          {activePortalSection === 'completions' && <section className="admin-panel completion-queue"><div className="admin-completion-summary"><article><span>SUBMITTED RECORDS</span><b>{completionReceipts.length}</b><small>completion receipts in this demo</small></article><article><span>VERIFIED BY AH</span><b>{verifiedCompletions.length}</b><small>approved service records</small></article><article><span>AWAITING REVIEW</span><b>{pendingCompletions}</b><small>before recognition is released</small></article><article><span>VERIFIED SERVICE</span><b>{verifiedServiceHours.toFixed(1)}h</b><small>subject to partner-school review</small></article><article><span>IMPACT RECORDED</span><b>{verifiedRecognitionPoints}</b><small>verified recognition points</small></article></div><div className="panel-head"><div><p className="eyebrow">COMPLETION & RECOGNITION</p><h3>Verify the work, then release the record</h3></div><Badge tone={pendingCompletions ? 'amber' : 'green'}>{pendingCompletions ? `${pendingCompletions} pending` : 'Queue clear'}</Badge></div>{completionReceipts.length ? <div className="admin-task-list">{completionReceipts.map((task) => <article key={task.id}><div className="admin-task-title"><span>{taskDisplayLabel(task.id)}</span><div><b>{task.title}</b><small>{task.volunteer} · submitted {task.completion?.submittedAt}</small></div></div><div className="admin-flags"><Badge tone="blue">No caregiver identity in receipt</Badge><Badge tone={task.completion?.verification === 'Verified by AH' ? 'green' : 'amber'}>{task.completion?.verification}</Badge></div><p className="receipt-reflection">Volunteer reflection: “{task.completion?.reflection}”</p><div className="verification-summary"><span><b>{task.viaHours}h</b> service time</span><span><b>{task.points}</b> impact points</span><span><b>Partner review</b> for VIA</span></div>{task.completion?.verification === 'Pending AH verification' ? <button className="button button-dark" onClick={() => verifyCompletion(task.id)}>Verify completion <Arrow /></button> : <p className="verified-line">✓ Verified {task.completion?.verifiedAt}; private record released for partner-school review.</p>}</article>)}</div> : <div className="empty-queue"><b>No completion receipts yet.</b><span>Completed tasks appear here for AH review before time or points are recorded.</span></div>}</section>}
-        </div>}
       </section>
 
       <SiteFooter portal />

@@ -1,8 +1,7 @@
 import type { Role } from './app-state'
-import { taskDisplayLabel } from './task-filters'
 
-export type OperationalTaskStatus = 'Open' | 'Review' | 'Matched' | 'Done' | 'Escalated' | 'Closed'
-export type CapacityState = 'Recruiting' | 'AH help required' | 'Coordinator sourcing' | 'Covered' | 'Closed · capacity unavailable'
+export type OperationalTaskStatus = 'Open' | 'Matched' | 'Done'
+export type CapacityState = 'Recruiting' | 'Covered'
 
 export type CapacityTask = {
   id: string
@@ -11,11 +10,6 @@ export type CapacityTask = {
   volunteersNeeded: number
   confirmedVolunteers: string[]
   capacityState: CapacityState
-  escalatedAt?: string
-  sourcingStartedAt?: string
-  closedAt?: string
-  adminNotification?: string
-  caregiverNotice?: string
 }
 
 export type TaskLocation = {
@@ -95,64 +89,24 @@ export function taskWaitLabel(createdAt: string, now: string | number | Date): s
   return `${hours} ${hours === 1 ? 'hour' : 'hours'} waiting`
 }
 
-export function autoEscalateTasks<T extends CapacityTask>(tasks: T[], now: string): T[] {
-  return tasks.map((task) => {
-    const hasCapacity = task.confirmedVolunteers.length >= task.volunteersNeeded
-    const isFinal = task.status === 'Done' || task.status === 'Closed'
-    if (hasCapacity || isFinal || task.status === 'Escalated' || taskAgeDays(task.createdAt, now) < 7) return task
-    return {
-      ...task,
-      status: 'Escalated',
-      capacityState: 'AH help required',
-      escalatedAt: now,
-      adminNotification: `${taskDisplayLabel(task.id)} has waited 7 days with ${task.confirmedVolunteers.length} of ${task.volunteersNeeded} volunteers confirmed. Coordinator action is required.`,
-    }
-  })
-}
-
-export function startCoordinatorSourcing<T extends CapacityTask>(task: T, now: string): T {
-  if (task.status !== 'Escalated' || task.confirmedVolunteers.length >= task.volunteersNeeded) return task
-  return {
-    ...task,
-    capacityState: 'Coordinator sourcing',
-    sourcingStartedAt: now,
-    adminNotification: `${taskDisplayLabel(task.id)}: AH coordinator outreach is active for the remaining ${task.volunteersNeeded - task.confirmedVolunteers.length} volunteer place(s).`,
-  }
-}
-
-export function recordSourcedVolunteer<T extends CapacityTask>(task: T, volunteerName: string): T {
-  if (task.status !== 'Escalated' || task.capacityState !== 'Coordinator sourcing') return task
-  if (task.confirmedVolunteers.length >= task.volunteersNeeded || task.confirmedVolunteers.includes(volunteerName)) return task
+export function confirmVolunteerDirectly<T extends CapacityTask & { volunteer: string }>(task: T, volunteerName: string): T {
+  if (task.status !== 'Open' || task.confirmedVolunteers.includes(volunteerName) || task.confirmedVolunteers.length >= task.volunteersNeeded) return task
   const confirmedVolunteers = [...task.confirmedVolunteers, volunteerName]
   const covered = confirmedVolunteers.length >= task.volunteersNeeded
   return {
     ...task,
-    status: covered ? 'Matched' : 'Escalated',
+    status: covered ? 'Matched' : 'Open',
+    volunteer: task.volunteer || volunteerName,
     confirmedVolunteers,
-    capacityState: covered ? 'Covered' : 'Coordinator sourcing',
-    adminNotification: covered
-      ? `${taskDisplayLabel(task.id)}: ${confirmedVolunteers.length} of ${task.volunteersNeeded} volunteers confirmed. Capacity alert resolved.`
-      : `${taskDisplayLabel(task.id)}: ${confirmedVolunteers.length} of ${task.volunteersNeeded} volunteers confirmed; AH sourcing continues.`,
+    capacityState: covered ? 'Covered' : 'Recruiting',
   }
 }
 
-export function closeTaskForCapacity<T extends CapacityTask>(task: T, now: string): T {
-  if (task.status !== 'Escalated' || task.capacityState !== 'Coordinator sourcing' || task.confirmedVolunteers.length >= task.volunteersNeeded) return task
-  return {
-    ...task,
-    status: 'Closed',
-    capacityState: 'Closed · capacity unavailable',
-    closedAt: now,
-    adminNotification: `${taskDisplayLabel(task.id)} closed after coordinator sourcing did not secure enough suitable volunteers.`,
-    caregiverNotice: `We are sorry. ReliefKaki and the AH coordinator could not find enough suitable volunteers for ${taskDisplayLabel(task.id)}, so this task has been closed. Please contact the AH care team if you still need support.`,
-  }
-}
-
-export function taskLocationForRole(location: TaskLocation, role: Role): VisibleTaskLocation {
+export function taskLocationForRole(location: TaskLocation, _role: Role): VisibleTaskLocation {
   return {
     label: location.exactLabel,
     lat: location.exactLat,
     lng: location.exactLng,
-    precision: location.kind === 'home' ? (role === 'admin' ? 'Protected exact location' : 'Exact task location') : 'Exact service point',
+    precision: location.kind === 'home' ? 'Exact task location' : 'Exact service point',
   }
 }

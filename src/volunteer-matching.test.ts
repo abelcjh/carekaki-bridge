@@ -23,60 +23,36 @@ describe('task language and readiness matching', () => {
   })
 })
 
-describe('volunteer task-map actions', () => {
+describe('direct volunteer task actions', () => {
   it('offers an eligible open task directly from the map detail', () => {
-    expect(volunteerTaskAction({ status: 'Open', safetyCleared: true, matchGaps: [], volunteer: '' })).toEqual({
+    expect(volunteerTaskAction({ status: 'Open', matchGaps: [], volunteer: '' })).toEqual({
       state: 'offer',
-      label: 'Offer to help',
-      detail: 'Active readiness and conversation language fit this task.',
-    })
-  })
-
-  it('keeps an uncleared task locked for AH safety review', () => {
-    expect(volunteerTaskAction({ status: 'Open', safetyCleared: false, matchGaps: [], volunteer: '' })).toEqual({
-      state: 'locked',
-      label: 'Locked · AH review first',
-      detail: 'Scope must be cleared before any volunteer can offer.',
+      label: 'Accept task',
+      detail: 'Your readiness and conversation language fit this task.',
     })
   })
 
   it('explains the first readiness gap instead of offering', () => {
-    expect(volunteerTaskAction({ status: 'Open', safetyCleared: true, matchGaps: ['Complete Forms briefing'], volunteer: '' })).toEqual({
+    expect(volunteerTaskAction({ status: 'Open', matchGaps: ['Complete Forms briefing'], volunteer: '' })).toEqual({
       state: 'locked',
       label: 'Locked · Complete Forms briefing',
       detail: 'Complete Forms briefing',
     })
   })
 
-  it('keeps the signed-in volunteer pending offer on the map', () => {
-    expect(volunteerTaskAction({ status: 'Review', safetyCleared: true, matchGaps: [], volunteer: 'Maya T.' })).toEqual({
-      state: 'pending',
-      label: 'Offered · awaiting admin',
-      detail: 'AH confirmation is needed before assignment.',
-    })
-  })
-
-  it('does not offer an escalated task twice after this volunteer has offered', () => {
-    expect(volunteerTaskAction({ status: 'Escalated', safetyCleared: true, matchGaps: [], volunteer: 'Maya T.' })).toEqual({
-      state: 'pending',
-      label: 'Offered · awaiting admin',
-      detail: 'AH confirmation is needed before assignment.',
-    })
-  })
-
-  it('shows a partially staffed task as confirmed instead of offering again', () => {
-    expect(volunteerTaskAction({ status: 'Open', safetyCleared: true, matchGaps: [], volunteer: 'Maya T.', confirmedByCurrent: true })).toEqual({
+  it('shows a partially staffed task as confirmed instead of offering twice', () => {
+    expect(volunteerTaskAction({ status: 'Open', matchGaps: [], volunteer: 'Maya T.', confirmedByCurrent: true })).toEqual({
       state: 'pending',
       label: 'You are confirmed',
       detail: 'This task is still open because more volunteers are needed.',
     })
   })
 
-  it('opens completion for the signed-in volunteer after matching', () => {
-    expect(volunteerTaskAction({ status: 'Matched', safetyCleared: true, matchGaps: [], volunteer: 'Maya T.' })).toEqual({
+  it('opens completion immediately once the required capacity is filled', () => {
+    expect(volunteerTaskAction({ status: 'Matched', matchGaps: [], volunteer: 'Maya T.', confirmedByCurrent: true })).toEqual({
       state: 'complete',
       label: 'Submit completion receipt',
-      detail: 'Hours and points remain pending until AH verifies the record.',
+      detail: 'Your reflection will add this task to your private service record.',
     })
   })
 })

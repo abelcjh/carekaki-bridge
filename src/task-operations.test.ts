@@ -1,12 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import {
-  autoEscalateTasks,
-  closeTaskForCapacity,
+  confirmVolunteerDirectly,
   formatSingaporeClock,
   formatSingaporeDateTime,
   singaporeInputToIso,
-  startCoordinatorSourcing,
-  recordSourcedVolunteer,
   taskAgeDays,
   taskLocationForRole,
   type CapacityTask,
@@ -18,19 +15,20 @@ const exactHome: TaskLocation = {
   publicLabel: 'Queenstown · 2 km privacy zone',
   publicLat: 1.2942,
   publicLng: 103.7861,
-  exactLabel: 'Caregiver home · protected demo point',
+  exactLabel: 'Caregiver home · exact demo point',
   exactLat: 1.2921,
   exactLng: 103.7993,
   privacyRadiusM: 2000,
 }
 
-const waitingTask: CapacityTask = {
+const waitingTask: CapacityTask & { volunteer: string } = {
   id: 'CK-207',
   status: 'Open',
   createdAt: '2026-08-07T08:00:00.000Z',
-  volunteersNeeded: 2,
+  volunteersNeeded: 1,
   confirmedVolunteers: [],
   capacityState: 'Recruiting',
+  volunteer: '',
 }
 
 describe('Singapore task time', () => {
@@ -47,58 +45,35 @@ describe('Singapore task time', () => {
   })
 })
 
-describe('unmet task capacity lifecycle', () => {
-  it('calculates whole waiting days without escalating early', () => {
-    expect(taskAgeDays(waitingTask.createdAt, '2026-08-14T07:59:59.000Z')).toBe(6)
-    expect(autoEscalateTasks([waitingTask], '2026-08-14T07:59:59.000Z')[0].status).toBe('Open')
+describe('direct task confirmation', () => {
+  it('confirms an eligible volunteer directly', () => {
+    const matched = confirmVolunteerDirectly(waitingTask, 'Maya T.')
+    expect(matched.status).toBe('Matched')
+    expect(matched.volunteer).toBe('Maya T.')
+    expect(matched.confirmedVolunteers).toEqual(['Maya T.'])
+    expect(matched.capacityState).toBe('Covered')
   })
 
-  it('automatically escalates at seven days when confirmed capacity is short', () => {
-    const [task] = autoEscalateTasks([waitingTask], '2026-08-14T08:00:00.000Z')
-    expect(task.status).toBe('Escalated')
-    expect(task.capacityState).toBe('AH help required')
-    expect(task.escalatedAt).toBe('2026-08-14T08:00:00.000Z')
-    expect(task.adminNotification).toContain('0 of 2 volunteers confirmed')
-    expect(task.adminNotification).toContain('Task 207')
-    expect(task.adminNotification).not.toContain('CK-')
+  it('keeps a multi-volunteer task open while recording the direct confirmation', () => {
+    const task = { ...waitingTask, volunteersNeeded: 2 }
+    const partlyCovered = confirmVolunteerDirectly(task, 'Maya T.')
+    expect(partlyCovered.status).toBe('Open')
+    expect(partlyCovered.confirmedVolunteers).toEqual(['Maya T.'])
+    expect(partlyCovered.capacityState).toBe('Recruiting')
   })
 
-  it('does not escalate a task that already has enough confirmed volunteers', () => {
-    const covered = { ...waitingTask, confirmedVolunteers: ['Maya T.', 'Arjun L.'] }
-    expect(autoEscalateTasks([covered], '2026-08-15T08:00:00.000Z')[0].status).toBe('Open')
-  })
-
-  it('records AH-sourced volunteers and resolves the alert when capacity is reached', () => {
-    const escalated = autoEscalateTasks([waitingTask], '2026-08-14T08:00:00.000Z')[0]
-    const sourcing = startCoordinatorSourcing(escalated, '2026-08-14T08:05:00.000Z')
-    const partlyCovered = recordSourcedVolunteer(sourcing, 'AH sourced · Nur A.')
-    expect(partlyCovered.status).toBe('Escalated')
-    expect(partlyCovered.confirmedVolunteers).toEqual(['AH sourced · Nur A.'])
-
-    const covered = recordSourcedVolunteer(partlyCovered, 'AH sourced · Joel T.')
-    expect(covered.status).toBe('Matched')
-    expect(covered.capacityState).toBe('Covered')
-    expect(covered.adminNotification).toContain('2 of 2 volunteers confirmed')
-  })
-
-  it('lets AH start sourcing and then close an unmet task with a caregiver notice', () => {
-    const escalated = autoEscalateTasks([waitingTask], '2026-08-14T08:00:00.000Z')[0]
-    expect(closeTaskForCapacity(escalated, '2026-08-14T09:00:00.000Z')).toBe(escalated)
-
-    const sourcing = startCoordinatorSourcing(escalated, '2026-08-14T08:05:00.000Z')
-    expect(sourcing.capacityState).toBe('Coordinator sourcing')
-    expect(sourcing.sourcingStartedAt).toBe('2026-08-14T08:05:00.000Z')
-
-    const closed = closeTaskForCapacity(sourcing, '2026-08-14T09:00:00.000Z')
-    expect(closed.status).toBe('Closed')
-    expect(closed.capacityState).toBe('Closed · capacity unavailable')
-    expect(closed.caregiverNotice).toContain('could not find enough suitable volunteers')
-    expect(closed.caregiverNotice).toContain('Task 207')
-    expect(closed.caregiverNotice).not.toContain('CK-')
+  it('does not confirm the same volunteer twice', () => {
+    const matched = confirmVolunteerDirectly(waitingTask, 'Maya T.')
+    expect(confirmVolunteerDirectly(matched, 'Maya T.')).toBe(matched)
   })
 })
 
-describe('task geography', () => {
+describe('task age and geography', () => {
+  it('calculates whole waiting days', () => {
+    expect(taskAgeDays(waitingTask.createdAt, '2026-08-14T07:59:59.000Z')).toBe(6)
+    expect(taskAgeDays(waitingTask.createdAt, '2026-08-14T08:00:00.000Z')).toBe(7)
+  })
+
   it('shows volunteers the exact task location needed to complete the request', () => {
     expect(taskLocationForRole(exactHome, 'volunteer')).toEqual({
       label: exactHome.exactLabel,
@@ -108,21 +83,12 @@ describe('task geography', () => {
     })
   })
 
-  it('shows the caregiver their exact task location without a privacy warning', () => {
+  it('shows the caregiver their exact task location', () => {
     expect(taskLocationForRole(exactHome, 'caregiver')).toEqual({
       label: exactHome.exactLabel,
       lat: exactHome.exactLat,
       lng: exactHome.exactLng,
       precision: 'Exact task location',
-    })
-  })
-
-  it('shows the accountable AH administrator the protected operational point', () => {
-    expect(taskLocationForRole(exactHome, 'admin')).toEqual({
-      label: exactHome.exactLabel,
-      lat: exactHome.exactLat,
-      lng: exactHome.exactLng,
-      precision: 'Protected exact location',
     })
   })
 })

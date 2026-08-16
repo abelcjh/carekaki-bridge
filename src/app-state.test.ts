@@ -2,6 +2,10 @@ import { describe, expect, it } from 'vitest'
 import { authenticateDemo, demoAccounts, resolveInitialTheme } from './app-state'
 
 describe('role-bound demo authentication', () => {
+  it('publishes only caregiver and volunteer workspaces', () => {
+    expect(demoAccounts.map((account) => account.role)).toEqual(['caregiver', 'volunteer'])
+  })
+
   it('authenticates each published demo account into only its assigned role', () => {
     for (const account of demoAccounts) {
       expect(authenticateDemo(account.email.toUpperCase(), account.password)).toMatchObject({

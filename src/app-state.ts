@@ -1,4 +1,4 @@
-export type Role = 'caregiver' | 'volunteer' | 'admin'
+export type Role = 'caregiver' | 'volunteer'
 export type Theme = 'light' | 'dark'
 export type Screen = 'home' | 'login' | 'portal'
 
@@ -31,16 +31,7 @@ export const demoAccounts: DemoAccount[] = [
     password: 'reliefkaki',
     name: 'Maya Tan',
     id: 'VL-031',
-    assurance: 'Identity and training verified',
-  },
-  {
-    role: 'admin',
-    label: 'AH admin demo',
-    email: 'admin@reliefkaki.demo',
-    password: 'reliefkaki',
-    name: 'AH-C3U Admin',
-    id: 'AH-018',
-    assurance: 'Account administrator',
+    assurance: 'Identity and training complete',
   },
 ]
 

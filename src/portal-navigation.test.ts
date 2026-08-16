@@ -14,21 +14,9 @@ describe('role portal navigation', () => {
     expect(portalSectionsForRole('volunteer').map((section) => section.id)).toEqual(['tasks', 'recognition'])
   })
 
-  it('gives AH administrators separate operational pages including account administration', () => {
-    expect(portalSectionsForRole('admin').map((section) => section.id)).toEqual([
-      'overview',
-      'capacity',
-      'completions',
-      'accounts',
-    ])
-    expect(portalSectionsForRole('admin').find((section) => section.id === 'accounts')?.label).toBe('Account administration')
-  })
-
   it('falls back to the role homepage when a section belongs to another role', () => {
     expect(defaultPortalSection('caregiver')).toBe('tasks')
     expect(defaultPortalSection('volunteer')).toBe('tasks')
-    expect(defaultPortalSection('admin')).toBe('overview')
-    expect(resolvePortalSection('admin', 'create')).toBe('overview')
-    expect(resolvePortalSection('volunteer', 'accounts')).toBe('tasks')
+    expect(resolvePortalSection('volunteer', 'create')).toBe('tasks')
   })
 })

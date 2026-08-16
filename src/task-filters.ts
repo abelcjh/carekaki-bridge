@@ -45,14 +45,12 @@ export function taskDisplayLabel(id: string): string {
 export type VolunteerMarketplaceTask = {
   status: string
   scheduledAt: string
-  referralOnly: boolean
 }
 
 export function openVolunteerTasks<T extends VolunteerMarketplaceTask>(tasks: T[], now: string): T[] {
   const nowTime = new Date(now).getTime()
   return tasks.filter((task) =>
-    !task.referralOnly
-    && (task.status === 'Open' || task.status === 'Escalated')
+    task.status === 'Open'
     && new Date(task.scheduledAt).getTime() > nowTime,
   )
 }

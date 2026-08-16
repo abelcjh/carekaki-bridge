@@ -4,18 +4,15 @@ import App from './App'
 import { getFooterAwareGuideBottom } from './judge-guide-state'
 
 describe('public homepage service model', () => {
-  it('describes direct volunteer task selection without hospital approval or triage', () => {
+  it('describes immediate publication and direct volunteer confirmation', () => {
     const markup = renderToStaticMarkup(<App />)
     const homeCopy = markup.toLowerCase()
 
-    expect(homeCopy).toContain('eligible volunteers choose and offer directly')
-    expect(homeCopy).toContain('without waiting for hospital staff to approve routine matches')
+    expect(homeCopy).toContain('in-scope requests publish immediately')
+    expect(homeCopy).toContain('confirm a suitable task directly')
     expect(homeCopy).not.toMatch(/\btriage\b/)
     expect(homeCopy).not.toMatch(/\breview\b/)
-    expect(homeCopy).not.toContain('ah-reviewed')
-    expect(homeCopy).not.toContain('checks the match')
-    expect(homeCopy).not.toContain('retain oversight')
-    expect(homeCopy).not.toContain('review every open task')
+    expect(homeCopy).not.toMatch(/\bapprove(?:d|s|ing)?\b/)
   })
 })
 
