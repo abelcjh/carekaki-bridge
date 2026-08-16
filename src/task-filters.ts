@@ -42,6 +42,21 @@ export function taskDisplayLabel(id: string): string {
   return `Task ${id.replace(/^[^-]+-/, '')}`
 }
 
+export type VolunteerMarketplaceTask = {
+  status: string
+  scheduledAt: string
+  referralOnly: boolean
+}
+
+export function openVolunteerTasks<T extends VolunteerMarketplaceTask>(tasks: T[], now: string): T[] {
+  const nowTime = new Date(now).getTime()
+  return tasks.filter((task) =>
+    !task.referralOnly
+    && (task.status === 'Open' || task.status === 'Escalated')
+    && new Date(task.scheduledAt).getTime() > nowTime,
+  )
+}
+
 export function filterTaskMap<T extends FilterableTask>(tasks: T[], filters: TaskMapFilters, ownLocation: Coordinates | null): T[] {
   const radius = filters.radiusKm === 'All' ? null : Number(filters.radiusKm)
   const locationQuery = filters.specificLocation.trim().toLowerCase()

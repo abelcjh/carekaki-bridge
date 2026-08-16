@@ -65,7 +65,7 @@ Reddit supports only directional hypotheses: practical delegation may feel lower
 ## What changed in the prototype
 
 - Replaced a dense dashboard aesthetic with a calm editorial hierarchy: one main action, large type, restrained palette, generous whitespace and recognisable task cards.
-- Added a **Silent Task** control as the core inclusion mechanism rather than a minor feature, with explicit identity fields hidden from volunteers.
+- Reworked task creation so every volunteer-facing request includes the complete instructions, caregiver contact and exact service location, with the preview making that disclosure explicit before publishing.
 - Split the demo into caregiver, volunteer and AH-admin interfaces so account administration, matching authority and privacy custody are visible.
 - Added varied categories, skill readiness, private progress, verified service-time estimates, reliability and an opt-in team goal.
 - Added urgent and task-specific female-support routing as an admin-reviewed safeguarding flow, never as permission for personal or clinical care.
@@ -79,11 +79,11 @@ Reddit supports only directional hypotheses: practical delegation may feel lower
 3. Volunteer screening, confidentiality acknowledgement and scenario-based briefing.
 4. Daily moderation / matching rhythm, and an escalation SLA.
 5. Completion receipt fields: task, volunteer, action, outcome, escalation, reviewer.
-6. Baseline and follow-up caregiver measure. Track uptake, silent-task share, completion, repeat use, volunteer retention, caregiver confidence / burden, and **zero volunteer clinical-advice incidents**.
+6. Baseline and follow-up caregiver measure. Track uptake, open-task completion, repeat use, volunteer retention, caregiver confidence / burden, and **zero volunteer clinical-advice incidents**.
 
 ## Deliberately not claimed
 
-- No claim that the UI, incentive system or Silent Task flow improves wellbeing without a local pilot.
+- No claim that the UI, incentive system or complete-detail task flow improves wellbeing without a local pilot.
 - No claim that social-media discussions represent Singapore caregivers.
 - No claim that volunteers replace clinicians, counsellors, family support, AIC, NUHS or AH pathways.
 
@@ -113,11 +113,11 @@ ReliefKaki should hard-filter before ranking:
 - language and accessibility preference;
 - safeguarding, capacity, block and supervision constraints.
 
-Then present an explainable recommendation — *“available Tuesday, trained for Digital Help, near your area”* — alongside manual choice / coordinator help. Do not pitch opaque AI matching. Exact address, diagnosis and personal circumstance remain hidden until an approved assignment and just-in-time consent.
+Then present an explainable recommendation — *“available Tuesday, trained for Digital Help, near your area”* — alongside manual choice / coordinator help. Do not pitch opaque AI matching. Open volunteer tasks include the full instructions, caregiver contact and exact service location needed for the work; unrelated diagnosis or personal circumstances remain outside the task record.
 
 ### 3. Use a visible Trust Passport, not a magical safety badge
 
-[CareProtect](https://www.care.com/about/safety/) and volunteer-onboarding platforms treat checks as one element of a continuing safety system. The suggested Trust Passport is: **Identity checked · Orientation complete · Safeguarding / Silent Task training complete · eligible task tiers · expiry / renewal status**. It must say “screened, trained and coordinator-supported”, not “guaranteed safe”.
+[CareProtect](https://www.care.com/about/safety/) and volunteer-onboarding platforms treat checks as one element of a continuing safety system. The suggested Trust Passport is: **Identity checked · Orientation complete · Safeguarding and confidentiality training complete · eligible task tiers · expiry / renewal status**. It must say “screened, trained and coordinator-supported”, not “guaranteed safe”.
 
 A practical tiering pattern:
 
@@ -136,8 +136,8 @@ Singapore’s [PDPC social-service guidance](https://www.pdpc.gov.sg/-/media/fil
 
 Design consequence:
 
-- pre-match show zone / transport burden, not a full address;
-- collect only task-relevant details; reveal contact/address only to the approved helper via explicit consent;
+- show the exact task service point, contact and complete instructions needed for volunteers to assess and coordinate an open request;
+- collect only task-relevant details, give caregivers a clear disclosure preview and avoid unrelated medical or personal data;
 - no photos or social posts; no personal WhatsApp account as the record for sensitive instructions;
 - coordinator owns retention/deletion, incident review and escalation;
 - model professional/community pathways as a separate consent-based **referral lane**, rather than pretending that a volunteer completion equals a clinical/service referral.
@@ -156,7 +156,7 @@ A [Reddit corpus analysis](https://www.mdpi.com/1660-4601/20/3/1933) supports th
 
 Singapore’s public [SG Healthcare Corps listing](https://www.volunteer.gov.sg/scheme-detail/?code=SHC-MOH) says Care Volunteers apply only after an information session and training. A current [SGH Nursing Care Buddies listing](https://www.volunteer.gov.sg/volunteer/opportunity/details/?id=9737d219-924a-f111-ac85-027d80ecb760) adds interview, orientation, certified training and defined service-session commitments before hospital-ward support. The tasks in that SGH programme include patient-care activities that remain outside ReliefKaki’s boundary; it is **not** evidence that ReliefKaki volunteers should undertake them.
 
-**Product consequence adopted:** the post-request confirmation now makes the three gates visible: coordinator scope check, offer only to a volunteer cleared for that task type, and minimum practical details only after an approved match. This is a prototype transparency improvement, not a claim that ReliefKaki has an accredited programme, screening process or operational approval. The Ministry of Health’s [caregiving overview](https://www.moh.gov.sg/ageing-well/caregiving/) also describes caregiver support as spanning resources, respite, financial, workplace, training and community-network support; it does not validate this product or replace formal referral pathways.
+**Product consequence adopted:** the post-request confirmation now makes the three gates visible: coordinator scope check, offer only to a volunteer cleared for that task type, and complete practical details on every open volunteer task. This is a prototype transparency improvement, not a claim that ReliefKaki has an accredited programme, screening process or operational approval. The Ministry of Health’s [caregiving overview](https://www.moh.gov.sg/ageing-well/caregiving/) also describes caregiver support as spanning resources, respite, financial, workplace, training and community-network support; it does not validate this product or replace formal referral pathways.
 
 ### 7. Readiness belongs on the opportunity, before assignment (13 August 2026)
 
@@ -172,11 +172,11 @@ The official [HealthStart youth-volunteer listing](https://www.volunteer.gov.sg/
 
 **Product consequence adopted:** readiness is now executable demo logic. The active volunteer has an explicit set of training tags. An open task exposes **Offer to help** only when its required tag is present. A missing tag produces a disabled, reason-labelled state. Urgent or sensitive accompaniment begins behind a separate AH safety lock; an administrator must confirm the bounded non-clinical scope before it reaches the readiness-qualified offer pool. A task-specific female-support preference does not bypass that gate or count as a skill. These tags and decisions remain illustrative pending AH policy, safeguarding and training approval.
 
-### 9. Pseudonymity must cover free text, not only profile fields (13 August 2026)
+### 9. Complete task disclosure must be explicit and purposeful (13 August 2026)
 
 The [PDPC Advisory Guidelines for the Social Service Sector](https://www.pdpc.gov.sg/-/media/files/pdpc/pdf-files/advisory-guidelines/advisory-guidelines-for-the-social-service-sector_18-january-2024.pdf) say the agency remains responsible for volunteers acting on its behalf, should disclose personal data on a need-to-know basis, and should give each volunteer only an appropriate amount of client data. PDPC’s [Guide to Basic Anonymisation](https://www.pdpc.gov.sg/-/media/files/pdpc/pdf-files/advisory-guidelines/guide-to-basic-anonymisation-(updated-24-july-2024).pdf) also recommends removing direct identifiers and generalising precise location where the detailed attribute is not required. These sources do not certify ReliefKaki’s implementation or determine AH’s eventual legal basis, retention rules or data-protection design.
 
-**Product consequence adopted:** Silent Task now runs a deterministic privacy preflight over caregiver-entered task text and blocks submission when it finds obvious phone, email, NRIC/FIN, six-digit postal-code/exact-block or explicitly stated personal-name patterns. It explains what to remove and keeps the caregiver in control of the edit. This is a conservative first layer, not anonymisation assurance: indirect identifiers, unusual wording and contextual re-identification still require AH review, policy, consent design and a formal motivated-intruder/re-identification assessment before any pilot.
+**Product consequence adopted:** the caregiver form now requires a name and contact number and previews the full volunteer-facing task card before publication. Every open, unexpired task includes the complete instructions and exact service location because those details are necessary for volunteers to assess and coordinate the work. The interface makes this disclosure visible rather than implying anonymisation. A production pilot would still require AH-approved notices, lawful basis or consent, role controls, auditability, retention rules and a formal data-protection assessment.
 
 ### 10. An exclusion list must be an executable route, not footer copy (14 August 2026)
 
@@ -194,7 +194,7 @@ Two source-verifiable public-product comparators reinforce the judge-visible pat
 
 ### 12. Public information, authentication and operations need separate contexts (14 August 2026)
 
-Volunteer-management products commonly separate public opportunity discovery and programme explanation from authenticated volunteer/coordinator operations. That separation reduces first-visit complexity, prevents task/account controls from looking publicly available, and lets every signed-in workspace lead with the current user's status, next action and exceptions. For ReliefKaki, it also makes minimum-necessary disclosure legible: public visitors see the service model, an authenticated caregiver sees private requests, an eligible volunteer sees bounded task aliases, and an AH administrator sees safeguarding and account controls.
+Volunteer-management products commonly separate public opportunity discovery and programme explanation from authenticated volunteer/coordinator operations. That separation reduces first-visit complexity, prevents task/account controls from looking publicly available, and lets every signed-in workspace lead with the current user's status, next action and exceptions. For ReliefKaki, it also makes role-specific purpose legible: public visitors see the service model, a caregiver sees only their own request workspace, authenticated volunteers see every open and unexpired task across caregiver accounts with complete coordination details, and an AH administrator sees safeguarding and account controls.
 
 [NIST SP 800-63B](https://pages.nist.gov/800-63-4/sp800-63b.html) distinguishes authentication (establishing control of an account-bound authenticator), session management and attributes asserted to a relying party. The prototype is not a production authenticator or AH identity provider, so it labels its demo status explicitly. It demonstrates the intended authorization boundary by mapping each demo identity to one role, keeping signed-in identity and assurance visible, removing the old unrestricted role switch and requiring sign-out before changing accounts. A real pilot would still need an AH-approved identity provider, MFA/assurance decision, account recovery, session timeout, audit logs and privacy/security assessment.
 
@@ -204,12 +204,12 @@ Volunteer-management products commonly separate public opportunity discovery and
 
 ### 13. Time, geography and unfilled capacity need operational states (14 August 2026)
 
-The task-first comparators above treat schedule, locality, capacity and coordinator intervention as operational data rather than decorative labels. The privacy standard also requires different location precision by role: a volunteer can decide whether travel is feasible from a zone or public service point, while an accountable coordinator can access the protected operational point only when programme work requires it. A real pilot still needs AH-approved geocoding, consent, audit, retention and just-in-time disclosure rules.
+The task-first comparators above treat schedule, locality, capacity and coordinator intervention as operational data rather than decorative labels. ReliefKaki's current prototype treats the exact service location as required task information and shows it in every authenticated volunteer's open-task map. A real pilot still needs AH-approved geocoding, caregiver notice and consent design, role controls, audit, retention and clear rules for when a task leaves the open marketplace.
 
-**Product consequence adopted:** every demo task now stores an absolute creation and scheduled timestamp, formats both in Singapore time and exposes a visibly ticking SGT operations clock. Role-aware Google Maps views display public hospital or meeting points, a protected exact demo point to the caregiver and AH admin, and only a 2 km Queenstown zone to volunteers for home tasks. A deterministic seven-day capacity rule automatically creates an AH notification whenever the confirmed headcount remains below the required count. The alert can move through coordinator sourcing, incremental sourced-volunteer confirmation and resolution, or, only after sourcing has begun, closure with a retained caregiver-facing notice. Google Workspace OAuth is not represented as a Maps Platform credential; this static prototype uses Google Maps embeds and deep links without embedding a secret browser key.
+**Product consequence adopted:** every demo task now stores an absolute creation and scheduled timestamp, formats both in Singapore time and exposes a visibly ticking SGT operations clock. The caregiver map shows that signed-in caregiver's own tasks; the volunteer map shows exact demo service points for every open, unexpired task from all caregiver accounts. A deterministic seven-day capacity rule automatically creates an AH notification whenever the confirmed headcount remains below the required count. The alert can move through coordinator sourcing, incremental sourced-volunteer confirmation and resolution, or, only after sourcing has begun, closure with a retained caregiver-facing notice. Google Workspace OAuth is not represented as a Maps Platform credential; this static prototype uses Google Maps embeds and deep links without embedding a secret browser key.
 
 ### 14. Conversation language is a task-fit gate, not a profile inference (16 August 2026)
 
 AIC’s current [Silver Generation volunteer page](https://www.aic.sg/Age-Well/Silver-Generation-Office/Be-a-volunteer) makes conversational language an explicit role requirement alongside training and engagement practice. YWCA of Singapore’s official [CaregivHER programme announcement](https://ywca.org.sg/blog/caregivher-programme-launch/) separately confirms a local model of trained, matched volunteers providing regular non-clinical caregiver check-ins. A June 2026 [YWCA LinkedIn recruitment post](https://www.linkedin.com/posts/ywca-singapore_ywcasg-ywcasingapore-womenempowerment-activity-7472860615452213249-SDuI) says those volunteers are paired by language and compatibility and should refer complex concerns to programme staff. The LinkedIn detail is organisational self-reporting and is used only as a directional operating-model signal; neither source validates ReliefKaki’s language options, matching rule or outcomes.
 
-**Product consequence adopted:** a caregiver can now select a conversation language only when the bounded task needs one, with “No preference” as the default. The requirement appears on the privacy-safe task preview and volunteer/admin task views. Volunteer offers are deterministically disabled when either the required readiness tag or stated conversation language is missing, and the UI names every unmet condition. The prototype does not infer language from a caregiver’s name, ethnicity or free text, does not treat language as a safety credential, and does not claim that the illustrative English/Mandarin volunteer profile represents AH’s workforce. Supported languages, proficiency levels, interpreter pathways and when language should be a hard gate all require AH and caregiver validation.
+**Product consequence adopted:** a caregiver can now select a conversation language only when the bounded task needs one, with “No preference” as the default. The requirement appears on the complete task preview and volunteer/admin task views. Volunteer offers are deterministically disabled when either the required readiness tag or stated conversation language is missing, and the UI names every unmet condition. The prototype does not infer language from a caregiver’s name, ethnicity or free text, does not treat language as a safety credential, and does not claim that the illustrative English/Mandarin volunteer profile represents AH’s workforce. Supported languages, proficiency levels, interpreter pathways and when language should be a hard gate all require AH and caregiver validation.

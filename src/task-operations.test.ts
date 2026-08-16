@@ -98,13 +98,13 @@ describe('unmet task capacity lifecycle', () => {
   })
 })
 
-describe('role-aware task geography', () => {
-  it('shows volunteers only the privacy-safe caregiver zone', () => {
+describe('task geography', () => {
+  it('shows volunteers the exact task location needed to complete the request', () => {
     expect(taskLocationForRole(exactHome, 'volunteer')).toEqual({
-      label: exactHome.publicLabel,
-      lat: exactHome.publicLat,
-      lng: exactHome.publicLng,
-      precision: 'Approximate 2 km zone',
+      label: exactHome.exactLabel,
+      lat: exactHome.exactLat,
+      lng: exactHome.exactLng,
+      precision: 'Exact task location',
     })
   })
 

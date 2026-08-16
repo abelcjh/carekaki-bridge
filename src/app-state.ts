@@ -22,7 +22,7 @@ export const demoAccounts: DemoAccount[] = [
     password: 'reliefkaki',
     name: 'Marcus Lim',
     id: 'C-204',
-    assurance: 'Anonymous to volunteers',
+    assurance: 'Complete task details shared',
   },
   {
     role: 'volunteer',

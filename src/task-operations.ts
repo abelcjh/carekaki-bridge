@@ -149,19 +149,10 @@ export function closeTaskForCapacity<T extends CapacityTask>(task: T, now: strin
 }
 
 export function taskLocationForRole(location: TaskLocation, role: Role): VisibleTaskLocation {
-  const canSeeProtectedPoint = role === 'admin' || role === 'caregiver' || location.kind !== 'home'
-  if (canSeeProtectedPoint) {
-    return {
-      label: location.exactLabel,
-      lat: location.exactLat,
-      lng: location.exactLng,
-      precision: location.kind === 'home' ? (role === 'caregiver' ? 'Exact task location' : 'Protected exact location') : 'Exact service point',
-    }
-  }
   return {
-    label: location.publicLabel,
-    lat: location.publicLat,
-    lng: location.publicLng,
-    precision: location.privacyRadiusM ? `Approximate ${location.privacyRadiusM / 1000} km zone` : 'Public service point',
+    label: location.exactLabel,
+    lat: location.exactLat,
+    lng: location.exactLng,
+    precision: location.kind === 'home' ? (role === 'admin' ? 'Protected exact location' : 'Exact task location') : 'Exact service point',
   }
 }

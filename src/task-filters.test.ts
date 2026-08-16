@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { distanceKm, filterTaskMap, taskDisplayLabel, type FilterableTask, type TaskMapFilters } from './task-filters'
+import { distanceKm, filterTaskMap, openVolunteerTasks, taskDisplayLabel, type FilterableTask, type TaskMapFilters } from './task-filters'
 
 const tasks: FilterableTask[] = [
   { id: 'CK-204', category: 'Errands', status: 'Open', createdAt: '2026-08-10T00:00:00.000Z', lat: 1.2868, lng: 103.8011, locationLabel: 'Alexandra Hospital' },
@@ -60,6 +60,25 @@ describe('caregiver task-map filters', () => {
       specificAnchor: { lat: 1.2897, lng: 103.8166 },
     }, null)
     expect(matching.map((task) => task.id)).toEqual(['CK-206'])
+  })
+})
+
+describe('volunteer open-task marketplace', () => {
+  it('shows every unexpired open task across caregiver accounts', () => {
+    const marketplaceTasks = [
+      { id: 'CK-301', ownerId: 'C-204', status: 'Open', scheduledAt: '2026-08-16T04:00:00.000Z', referralOnly: false },
+      { id: 'CK-302', ownerId: 'C-205', status: 'Open', scheduledAt: '2026-08-16T05:00:00.000Z', referralOnly: false },
+      { id: 'CK-303', ownerId: 'C-206', status: 'Open', scheduledAt: '2026-08-16T01:00:00.000Z', referralOnly: false },
+      { id: 'CK-304', ownerId: 'C-207', status: 'Matched', scheduledAt: '2026-08-16T06:00:00.000Z', referralOnly: false },
+      { id: 'CK-305', ownerId: 'C-208', status: 'Escalated', scheduledAt: '2026-08-16T07:00:00.000Z', referralOnly: false },
+      { id: 'CK-306', ownerId: 'C-209', status: 'Open', scheduledAt: '2026-08-16T08:00:00.000Z', referralOnly: true },
+    ]
+
+    expect(openVolunteerTasks(marketplaceTasks, '2026-08-16T02:00:00.000Z').map((task) => task.id)).toEqual([
+      'CK-301',
+      'CK-302',
+      'CK-305',
+    ])
   })
 })
 
