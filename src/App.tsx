@@ -7,6 +7,7 @@ import { defaultPortalSection, portalSectionsForRole, resolvePortalSection, type
 import { taskContactForVolunteer, validateTaskContact } from './task-contact'
 import { filterTaskMap, openVolunteerTasks, taskDisplayLabel, type Coordinates, type TaskMapFilters } from './task-filters'
 import { taskLanguages, volunteerMatchGaps, volunteerTaskAction, type TaskLanguage } from './volunteer-matching'
+import { volunteerTaskRecord } from './volunteer-task-record'
 import {
   confirmVolunteerDirectly,
   formatSingaporeClock,
@@ -103,10 +104,11 @@ const initialTasks: Task[] = [
   { id: 'CK-209', title: 'Show me how to join a telehealth call', category: 'Digital help', language: 'English', scheduledAt: hoursFromInitialisation(50), createdAt: hoursFromInitialisation(-48), location: locationCatalog.commonwealth, ownerId: 'C-206', caregiverName: 'Daniel Tan', caregiverPhone: '+65 9000 0206', urgent: false, femalePreferred: false, status: 'Open', points: 35, viaHours: 0.5, difficulty: 'Skilled', skill: 'Digital help ready', volunteer: '', completion: null, volunteersNeeded: 1, confirmedVolunteers: [], capacityState: 'Recruiting' },
   { id: 'CK-210', title: 'Collect printed caregiver programme information', category: 'Errands', language: 'No preference', scheduledAt: hoursFromInitialisation(72), createdAt: hoursFromInitialisation(-54), location: locationCatalog.bukitMerah, ownerId: 'C-207', caregiverName: 'Priya Nair', caregiverPhone: '+65 9000 0207', urgent: false, femalePreferred: false, status: 'Open', points: 40, viaHours: 1, difficulty: 'Light', skill: 'Errands ready', volunteer: '', completion: null, volunteersNeeded: 1, confirmedVolunteers: [], capacityState: 'Recruiting' },
   { id: 'CK-211', title: 'Buy simple breakfast items from the market', category: 'Meals & home', language: 'Mandarin', scheduledAt: hoursFromInitialisation(-5), createdAt: hoursFromInitialisation(-30), location: locationCatalog.ghimMoh, ownerId: 'C-204', caregiverName: 'Marcus Lim', caregiverPhone: '+65 9123 4567', urgent: false, femalePreferred: false, status: 'Done', points: 45, viaHours: 1, difficulty: 'Light', skill: 'Meals & home ready', volunteer: 'Maya T.', completion: { submittedAt: '16 Aug 2026 · 11:10 am SGT', reflection: 'I followed the written list and confirmed the handoff at the agreed meeting point.' }, volunteersNeeded: 1, confirmedVolunteers: ['Maya T.'], capacityState: 'Covered' },
-  { id: 'CK-212', title: 'Meet me at the station and guide me to the shuttle', category: 'Wayfinding', language: 'English', scheduledAt: hoursFromInitialisation(32), createdAt: hoursFromInitialisation(-96), location: locationCatalog.telokBlangah, ownerId: 'C-204', caregiverName: 'Marcus Lim', caregiverPhone: '+65 9123 4567', urgent: false, femalePreferred: false, status: 'Open', points: 45, viaHours: 1, difficulty: 'Light', skill: 'Wayfinding ready', volunteer: '', completion: null, volunteersNeeded: 1, confirmedVolunteers: [], capacityState: 'Recruiting' },
+  { id: 'CK-212', title: 'Meet me at the station and guide me to the shuttle', category: 'Wayfinding', language: 'English', scheduledAt: hoursFromInitialisation(32), createdAt: hoursFromInitialisation(-96), location: locationCatalog.telokBlangah, ownerId: 'C-204', caregiverName: 'Marcus Lim', caregiverPhone: '+65 9123 4567', urgent: false, femalePreferred: false, status: 'Matched', points: 45, viaHours: 1, difficulty: 'Light', skill: 'Wayfinding ready', volunteer: 'Maya T.', completion: null, volunteersNeeded: 1, confirmedVolunteers: ['Maya T.'], capacityState: 'Covered' },
   { id: 'CK-213', title: 'Help scan and organise two appointment letters', category: 'Admin & forms', language: 'English', scheduledAt: hoursFromInitialisation(44), createdAt: hoursFromInitialisation(-120), location: locationCatalog.queenstownLibrary, ownerId: 'C-207', caregiverName: 'Priya Nair', caregiverPhone: '+65 9000 0207', urgent: false, femalePreferred: false, status: 'Open', points: 50, viaHours: 1, difficulty: 'Skilled', skill: 'Forms briefing', volunteer: '', completion: null, volunteersNeeded: 1, confirmedVolunteers: [], capacityState: 'Recruiting' },
   { id: 'CK-214', title: 'Sit with dad while I make two essential calls nearby', category: 'Companionship', language: 'Mandarin', scheduledAt: hoursFromInitialisation(30), createdAt: hoursFromInitialisation(-144), location: locationCatalog.home, ownerId: 'C-204', caregiverName: 'Marcus Lim', caregiverPhone: '+65 9123 4567', urgent: false, femalePreferred: false, status: 'Open', points: 55, viaHours: 1, difficulty: 'Weightier', skill: 'Safeguarding + accompaniment', volunteer: '', completion: null, volunteersNeeded: 2, confirmedVolunteers: ['Nur A.'], capacityState: 'Recruiting' },
   { id: 'CK-215', title: 'Return a borrowed mobility aid to the hospital desk', category: 'Errands', language: 'No preference', scheduledAt: hoursFromInitialisation(78), createdAt: hoursFromInitialisation(-168), location: locationCatalog.ah, ownerId: 'C-204', caregiverName: 'Marcus Lim', caregiverPhone: '+65 9123 4567', urgent: false, femalePreferred: false, status: 'Open', points: 40, viaHours: 1, difficulty: 'Light', skill: 'Errands ready', volunteer: '', completion: null, volunteersNeeded: 1, confirmedVolunteers: [], capacityState: 'Recruiting' },
+  { id: 'CK-216', title: 'Walk with me from the lobby to the outpatient wing', category: 'Wayfinding', language: 'English', scheduledAt: hoursFromInitialisation(-0.5), createdAt: hoursFromInitialisation(-24), location: locationCatalog.ah, ownerId: 'C-205', caregiverName: 'Siti Noor', caregiverPhone: '+65 9000 0205', urgent: false, femalePreferred: false, status: 'Matched', points: 45, viaHours: 1, difficulty: 'Light', skill: 'Wayfinding ready', volunteer: 'Maya T.', completion: null, volunteersNeeded: 1, confirmedVolunteers: ['Maya T.'], capacityState: 'Covered' },
 ]
 
 const categories: Category[] = ['Errands', 'Digital help', 'Wayfinding', 'Meals & home', 'Admin & forms', 'Companionship', 'Sensitive accompaniment']
@@ -603,6 +605,7 @@ export default function App() {
     volunteerMarketplaceTasks.some((openTask) => openTask.id === task.id)
     || (task.volunteer === 'Maya T.' && task.status === 'Matched'),
   )
+  const volunteerTaskRows = volunteerTaskRecord(tasks, 'Maya T.', now)
   const completionReceipts = tasks.filter((task) => task.completion)
   const completedForMaya = tasks.filter((task) => task.volunteer === 'Maya T.' && task.completion)
   const recordedPoints = 620 + completedForMaya.reduce((total, task) => total + task.points, 0)
@@ -776,6 +779,33 @@ export default function App() {
             <div className="task-sharing-note"><span>✓</span><p><b>Complete details are shared with volunteers.</b> Every active volunteer can review the instructions, caregiver contact and exact task location while this task is open and unexpired.</p></div>
           </aside>
         </div></>}
+
+        {role === 'volunteer' && activePortalSection === 'my-tasks' && <div className="volunteer-view volunteer-task-record-view">
+          <section className="volunteer-task-record" aria-label="My volunteer tasks">
+            <div className="volunteer-task-record-head"><div><p className="eyebrow">MY ASSIGNED TASK RECORD</p><h3>Every task on one timeline.</h3><p>Review completed work, tasks happening now, and confirmed tasks whose start date is still ahead.</p></div><Badge tone="blue">Volunteer only</Badge></div>
+            <div className="volunteer-task-summary" aria-live="polite">
+              <article><span>ALL ASSIGNED</span><b>{volunteerTaskRows.length}</b><small>past, present and future</small></article>
+              <article><span>IN PROGRESS</span><b>{volunteerTaskRows.filter((task) => task.timeline === 'Present').length}</b><small>started and not completed</small></article>
+              <article><span>UPCOMING</span><b>{volunteerTaskRows.filter((task) => task.timeline === 'Future').length}</b><small>start date still ahead</small></article>
+              <article><span>PAST TASKS</span><b>{volunteerTaskRows.filter((task) => task.timeline === 'Past').length}</b><small>completed records</small></article>
+            </div>
+            {volunteerTaskRows.length > 0 ? <div className="volunteer-task-table-wrap"><table className="volunteer-task-table">
+              <caption>All past, present and future tasks assigned to Maya Tan</caption>
+              <thead><tr><th scope="col">Timeline</th><th scope="col">Task</th><th scope="col">Start</th><th scope="col">Location</th><th scope="col">Service</th><th scope="col">Status</th></tr></thead>
+              <tbody>{volunteerTaskRows.map((task) => {
+                const location = taskLocationForRole(task.location, 'volunteer')
+                return <tr key={task.id}>
+                  <td data-label="Timeline"><Badge tone={task.timeline === 'Past' ? 'green' : task.timeline === 'Present' ? 'amber' : 'blue'}>{task.timeline}</Badge></td>
+                  <td data-label="Task" className="volunteer-task-title"><span>{taskDisplayLabel(task.id)}</span><b>{task.title}</b><small>{task.category} · {task.language === 'No preference' ? 'Any language' : task.language}</small></td>
+                  <td data-label="Start"><time dateTime={task.scheduledAt}>{formatSingaporeDateTime(task.scheduledAt)}</time></td>
+                  <td data-label="Location"><b>{location.label}</b><small>{location.precision}</small></td>
+                  <td data-label="Service"><b>{task.viaHours}h</b><small>{task.points} points</small></td>
+                  <td data-label="Status"><Badge tone={task.status === 'Done' ? 'green' : 'blue'}>{task.status}</Badge></td>
+                </tr>
+              })}</tbody>
+            </table></div> : <div className="volunteer-task-record-empty"><b>No confirmed tasks yet.</b><span>Tasks you choose will appear here as soon as you confirm them.</span></div>}
+          </section>
+        </div>}
 
         {role === 'volunteer' && activePortalSection === 'recognition' && <div className="volunteer-view volunteer-receipts-view">
           <section className="volunteer-recognition-page" aria-label="Volunteer recognition summary">

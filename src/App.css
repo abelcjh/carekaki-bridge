@@ -771,6 +771,34 @@ input:focus-visible {
 .volunteer-recognition-page .map-recognition-head { padding: 22px; }
 .volunteer-recognition-page .map-recognition-head h3 { margin: 4px 0 0; color: var(--text); font: 500 29px/1.1 'Playfair Display', serif; }
 .volunteer-recognition-page .map-readiness { margin: 0; padding: 18px 22px; border-top: 1px solid var(--border); }
+.volunteer-task-record { border: 1px solid var(--border); background: var(--surface); }
+.volunteer-task-record-head { padding: 25px 26px; display: flex; align-items: flex-start; justify-content: space-between; gap: 28px; background: var(--surface-soft); }
+.volunteer-task-record-head h3 { margin: 4px 0 9px; color: var(--text); font: 500 clamp(29px, 4vw, 42px)/1.05 'Playfair Display', serif; }
+.volunteer-task-record-head p:last-child { max-width: 680px; margin: 0; color: var(--text-muted); font-size: 10px; line-height: 1.55; }
+.volunteer-task-summary { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.volunteer-task-summary article { min-height: 100px; padding: 17px 19px; border-right: 1px solid var(--border); display: flex; flex-direction: column; background: var(--surface); }
+.volunteer-task-summary article:last-child { border-right: 0; }
+.volunteer-task-summary span, .volunteer-task-summary b, .volunteer-task-summary small { display: block; }
+.volunteer-task-summary span { color: var(--text-subtle); font: 500 8px 'DM Mono', monospace; }
+.volunteer-task-summary b { margin-top: 8px; color: var(--text); font: 500 28px/1 'Playfair Display', serif; }
+.volunteer-task-summary small { margin-top: auto; padding-top: 8px; color: var(--text-muted); font-size: 8px; }
+.volunteer-task-table-wrap { width: 100%; overflow-x: auto; }
+.volunteer-task-table { width: 100%; min-width: 900px; border-collapse: collapse; background: var(--surface); color: var(--text); }
+.volunteer-task-table caption { width: 1px; height: 1px; padding: 0; position: absolute; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.volunteer-task-table th { padding: 13px 14px; border-bottom: 1px solid var(--border-strong); background: var(--surface-soft); color: var(--text-subtle); font: 500 8px 'DM Mono', monospace; text-align: left; text-transform: uppercase; }
+.volunteer-task-table td { padding: 17px 14px; border-bottom: 1px solid var(--border); color: var(--text-muted); font-size: 10px; line-height: 1.45; vertical-align: top; }
+.volunteer-task-table tbody tr:last-child td { border-bottom: 0; }
+.volunteer-task-table tbody tr:hover { background: var(--surface-soft); }
+.volunteer-task-table td b, .volunteer-task-table td small, .volunteer-task-title span { display: block; }
+.volunteer-task-table td b { color: var(--text); font-size: 10px; }
+.volunteer-task-table td small { margin-top: 4px; color: var(--text-subtle); font-size: 8px; }
+.volunteer-task-table time { display: block; min-width: 145px; color: var(--text); font-weight: 650; }
+.volunteer-task-title { min-width: 250px; }
+.volunteer-task-title span { margin-bottom: 5px; color: var(--accent); font: 500 8px 'DM Mono', monospace; }
+.volunteer-task-title b { font-size: 11px !important; }
+.volunteer-task-record-empty { padding: 30px 26px; display: flex; flex-direction: column; gap: 6px; }
+.volunteer-task-record-empty b { color: var(--text); font-size: 13px; }
+.volunteer-task-record-empty span { color: var(--text-muted); font-size: 10px; }
 .admin-overview-intro { padding: 28px; border: 1px solid var(--border); background: var(--surface-soft); }
 .admin-overview-intro h3 { max-width: 700px; margin: 7px 0 10px; color: var(--text); font: 500 clamp(28px, 4vw, 46px)/1.02 'Playfair Display', serif; }
 .admin-overview-intro > p:last-child { max-width: 760px; margin: 0; color: var(--text-muted); font-size: 10px; line-height: 1.6; }
@@ -980,6 +1008,21 @@ input:focus-visible {
 .caregiver-alerts article p { margin: 9px 0 5px; color: var(--text); font-size: 11px; }
 .caregiver-alerts article small { color: var(--text-muted); font-size: 9px; }
 
+@media (max-width: 900px) {
+  .volunteer-task-table-wrap { overflow-x: visible; }
+  .volunteer-task-table { min-width: 0; }
+  .volunteer-task-table thead { display: none; }
+  .volunteer-task-table tbody, .volunteer-task-table tr, .volunteer-task-table td { display: block; }
+  .volunteer-task-table tr { margin: 12px; border: 1px solid var(--border); background: var(--surface); }
+  .volunteer-task-table td { min-height: 48px; padding: 12px; border-bottom: 1px solid var(--border); display: grid; grid-template-columns: 80px minmax(0, 1fr); align-items: start; gap: 4px 12px; }
+  .volunteer-task-table td:last-child { border-bottom: 0; }
+  .volunteer-task-table td::before { content: attr(data-label); grid-column: 1; grid-row: 1 / span 4; color: var(--text-subtle); font: 500 7px 'DM Mono', monospace; text-transform: uppercase; }
+  .volunteer-task-table td > * { grid-column: 2; }
+  .volunteer-task-table .badge { justify-self: start; }
+  .volunteer-task-title { min-width: 0; }
+  .volunteer-task-table time { min-width: 0; }
+}
+
 @media (max-width: 1000px) {
   .public-links, .portal-context { display: none; }
   .login-layout { grid-template-columns: 1fr 0.85fr; gap: 40px; }
@@ -1062,7 +1105,22 @@ input:focus-visible {
   .admin-actions { align-items: start; flex-direction: column; }
   .service-receipt { grid-template-columns: 1fr; }
   .receipt-verdict { min-width: 0; align-items: start; text-align: left; }
-  .receipt-shelf-head { align-items: start; flex-direction: column; }
+  .receipt-shelf-head, .volunteer-task-record-head { align-items: start; flex-direction: column; }
+  .volunteer-task-summary { grid-template-columns: 1fr 1fr; }
+  .volunteer-task-summary article:nth-child(2) { border-right: 0; }
+  .volunteer-task-summary article:nth-child(-n+2) { border-bottom: 1px solid var(--border); }
+  .volunteer-task-table-wrap { overflow-x: visible; }
+  .volunteer-task-table { min-width: 0; }
+  .volunteer-task-table thead { display: none; }
+  .volunteer-task-table tbody, .volunteer-task-table tr, .volunteer-task-table td { display: block; }
+  .volunteer-task-table tr { margin: 12px; border: 1px solid var(--border); background: var(--surface); }
+  .volunteer-task-table td { min-height: 48px; padding: 12px; border-bottom: 1px solid var(--border); display: grid; grid-template-columns: 80px minmax(0, 1fr); align-items: start; gap: 4px 12px; }
+  .volunteer-task-table td:last-child { border-bottom: 0; }
+  .volunteer-task-table td::before { content: attr(data-label); grid-column: 1; grid-row: 1 / span 4; color: var(--text-subtle); font: 500 7px 'DM Mono', monospace; text-transform: uppercase; }
+  .volunteer-task-table td > * { grid-column: 2; }
+  .volunteer-task-table .badge { justify-self: start; }
+  .volunteer-task-title { min-width: 0; }
+  .volunteer-task-table time { min-width: 0; }
   .request-steps li { grid-template-columns: 1fr; gap: 4px; }
 
 }

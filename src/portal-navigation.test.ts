@@ -10,8 +10,12 @@ describe('role portal navigation', () => {
     expect(defaultPortalSection('caregiver')).toBe('tasks')
   })
 
-  it('gives volunteers separate task discovery and recognition pages', () => {
-    expect(portalSectionsForRole('volunteer').map((section) => section.id)).toEqual(['tasks', 'recognition'])
+  it('gives volunteers separate discovery, task record and recognition pages', () => {
+    expect(portalSectionsForRole('volunteer').map((section) => ({ id: section.id, label: section.label }))).toEqual([
+      { id: 'tasks', label: 'Find tasks' },
+      { id: 'my-tasks', label: 'My tasks' },
+      { id: 'recognition', label: 'Recognition & receipts' },
+    ])
   })
 
   it('falls back to the role homepage when a section belongs to another role', () => {

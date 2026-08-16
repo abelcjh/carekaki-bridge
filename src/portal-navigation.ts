@@ -1,6 +1,6 @@
 import type { Role } from './app-state'
 
-export type PortalSectionId = 'tasks' | 'create' | 'recognition'
+export type PortalSectionId = 'tasks' | 'create' | 'my-tasks' | 'recognition'
 
 export type PortalSection = {
   id: PortalSectionId
@@ -15,6 +15,7 @@ const portalSections: Record<Role, readonly PortalSection[]> = {
   ],
   volunteer: [
     { id: 'tasks', label: 'Find tasks', description: 'Map, filters and direct task confirmation' },
+    { id: 'my-tasks', label: 'My tasks', description: 'Past, present and upcoming assigned tasks' },
     { id: 'recognition', label: 'Recognition & receipts', description: 'Your completed service and private records' },
   ],
 }
