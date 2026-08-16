@@ -659,8 +659,8 @@ footer .mark { width: 20px; height: 20px; }
 .realtime-ops-bar > div:last-child span { display: flex; align-items: baseline; gap: 6px; }
 .realtime-ops-bar > div:last-child b { color: var(--text); font-size: 14px; }
 .schedule-row { margin: 18px 0 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-.schedule-row label > small { margin-left: 5px; color: var(--text-subtle); font: 500 8px 'DM Mono', monospace; text-transform: uppercase; }
-.request-card .schedule-row input, .request-card .schedule-row select {
+.schedule-row label > small, .language-preference label > small { margin-left: 5px; color: var(--text-subtle); font: 500 8px 'DM Mono', monospace; text-transform: uppercase; }
+.request-card .schedule-row input, .request-card .schedule-row select, .request-card .language-preference select {
   width: 100%;
   min-height: 48px;
   margin-top: 7px;
@@ -673,6 +673,8 @@ footer .mark { width: 20px; height: 20px; }
   color-scheme: inherit;
   font: inherit;
 }
+.language-preference { margin: 2px 0 14px; padding: 12px 14px; display: grid; grid-template-columns: minmax(180px, 0.8fr) 1.2fr; align-items: end; gap: 18px; border-left: 3px solid var(--info-text); background: var(--info-bg); }
+.language-preference p { margin: 0 0 6px; color: var(--text-muted); font-size: 9px; line-height: 1.45; }
 .schedule-error { margin-top: -7px; }
 .task-map-section { margin: 0; padding: 28px 34px 34px; }
 .capacity-alert-panel { margin-bottom: 18px; border: 1px solid var(--danger-border); background: var(--surface-raised); }
@@ -748,7 +750,7 @@ footer .mark { width: 20px; height: 20px; }
   .identity-card { display: none; }
   .caregiver-grid { min-height: 0; }
   .request-card, .privacy-panel, .volunteer-view, .admin-view { padding: 25px 20px; }
-  .form-row, .option-row, .contact-fields, .schedule-row, .task-map-layout, .capacity-alert-list dl { grid-template-columns: 1fr; }
+  .form-row, .option-row, .contact-fields, .schedule-row, .language-preference, .task-map-layout, .capacity-alert-list dl { grid-template-columns: 1fr; }
   .task-map-section { padding: 24px 20px 28px; }
   .task-map-head, .capacity-alert-head, .capacity-alert-title, .map-caption { align-items: flex-start; flex-direction: column; }
   .task-map-list { max-height: 240px; border-right: 0; border-bottom: 1px solid var(--border); }
