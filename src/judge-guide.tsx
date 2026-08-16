@@ -1,8 +1,8 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, type RefObject } from 'react'
 import expoQrCode from './assets/reliefkaki-expo-qr.png'
-import { expoGoDeepLink } from './judge-guide-state'
+import { expoGoDeepLink, getFooterAwareGuideBottom } from './judge-guide-state'
 
-export function JudgeExpoGuide({ open, onOpen, onDismiss }: { open: boolean; onOpen: () => void; onDismiss: () => void }) {
+export function JudgeExpoGuide({ open, onOpen, onDismiss, footerRef }: { open: boolean; onOpen: () => void; onDismiss: () => void; footerRef?: RefObject<HTMLElement | null> }) {
   const triggerRef = useRef<HTMLButtonElement>(null)
   const dialogRef = useRef<HTMLElement>(null)
   const closeRef = useRef<HTMLButtonElement>(null)
@@ -50,6 +50,27 @@ export function JudgeExpoGuide({ open, onOpen, onDismiss }: { open: boolean; onO
       if (returnFocusRef.current?.isConnected) returnFocusRef.current.focus()
     }
   }, [open, onDismiss])
+
+  useEffect(() => {
+    const trigger = triggerRef.current
+    const footer = footerRef?.current
+    if (!trigger || !footer) return
+
+    const updateTriggerBottom = () => {
+      const gap = window.matchMedia('(max-width: 720px)').matches ? 12 : 20
+      trigger.style.bottom = `${getFooterAwareGuideBottom(window.innerHeight, footer.getBoundingClientRect().top, gap)}px`
+    }
+
+    updateTriggerBottom()
+    window.addEventListener('scroll', updateTriggerBottom, { passive: true })
+    window.addEventListener('resize', updateTriggerBottom)
+
+    return () => {
+      window.removeEventListener('scroll', updateTriggerBottom)
+      window.removeEventListener('resize', updateTriggerBottom)
+      trigger.style.removeProperty('bottom')
+    }
+  }, [footerRef])
 
   const openFromTrigger = () => {
     returnFocusRef.current = triggerRef.current

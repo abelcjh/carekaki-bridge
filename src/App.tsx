@@ -205,12 +205,12 @@ function LegalNotice({ kind, onClose }: { kind: LegalDocument; onClose: () => vo
   </div>
 }
 
-function SiteFooter({ portal = false }: { portal?: boolean }) {
+function SiteFooter({ portal = false, footerRef }: { portal?: boolean; footerRef?: React.Ref<HTMLElement> }) {
   const [legalDocument, setLegalDocument] = useState<LegalDocument | null>(null)
   const year = new Date().getFullYear()
 
   return <>
-    <footer className={`site-footer ${portal ? 'portal-footer' : ''}`}>
+    <footer ref={footerRef} className={`site-footer ${portal ? 'portal-footer' : ''}`}>
       <div className="footer-brand"><a className="brand" href="#top"><Mark /><span>relief<span className="brand-light">kaki</span></span></a><span>Clear tasks. Visible relief. Managed with care.</span></div>
       <div className="footer-meta"><b>© {year} SparkX⁺Change. All rights reserved.</b><span>ReliefKaki · Alexandra Hospital · interactive concept demo</span></div>
       <nav className="footer-links" aria-label="Legal and social links"><button type="button" onClick={() => setLegalDocument('privacy')}>Privacy Policy</button><button type="button" onClick={() => setLegalDocument('terms')}>Terms of Use</button><a href="https://www.instagram.com/spark.x.change/" target="_blank" rel="noreferrer" aria-label="SparkX Change on Instagram"><InstagramIcon /><span>Instagram</span></a></nav>
@@ -423,6 +423,7 @@ function TaskMap({ tasks, role, now, ownLocation, trackingStatus, onCreateTask, 
 }
 
 function PublicHome({ theme, onThemeChange, onOpenPortal }: { theme: Theme; onThemeChange: (theme: Theme) => void; onOpenPortal: () => void }) {
+  const footerRef = useRef<HTMLElement>(null)
   const [judgeGuideOpen, setJudgeGuideOpen] = useState(() => {
     if (typeof window === 'undefined') return true
     try {
@@ -451,24 +452,24 @@ function PublicHome({ theme, onThemeChange, onOpenPortal }: { theme: Theme; onTh
       <div className="hero-copy">
         <p className="eyebrow">ALEXANDRA HOSPITAL · CAREGIVER RESPITE PILOT</p>
         <h1>One small ask.<br /><em>One lighter day.</em></h1>
-        <p className="lede">ReliefKaki turns a practical burden into a bounded task with clear instructions, contact details and location. Trained student volunteers can offer support while hospital administrators retain oversight.</p>
+        <p className="lede">ReliefKaki turns a practical burden into a bounded task with clear instructions, contact details and location. Eligible student volunteers choose directly from one shared open task board.</p>
         <div className="hero-actions"><button className="button button-dark" type="button" onClick={onOpenPortal}>Sign in to ReliefKaki <Arrow /></button><a className="button-link" href="#how-it-works">See how it works <span>↓</span></a></div>
         <div className="trust-row"><span><b>01</b> complete request</span><i></i><span><b>02</b> eligible offer</span><i></i><span><b>03</b> verified receipt</span></div>
       </div>
       <div className="hero-visual">
-        <img src={heroImage} alt="A caregiver and student volunteer reviewing a practical checklist together" />
+        <img src={heroImage} alt="A caregiver and student volunteer going through a practical checklist together" />
         <div className="image-wash"></div>
-        <div className="floating-card"><span className="soft-label">OPEN TASK BOARD</span><strong>“One clear ask.<br />Every detail ready.”</strong><div><span className="mini-dot"></span> Volunteers can review the full task before offering</div></div>
+        <div className="floating-card"><span className="soft-label">OPEN TASK BOARD</span><strong>“One clear ask.<br />Every detail ready.”</strong><div><span className="mini-dot"></span> Volunteers see every detail before offering</div></div>
         <div className="hero-stamp"><span>RELIEF</span><b>24</b><span>KAKI</span></div>
       </div>
     </section>
 
     <section className="public-section process-section" id="how-it-works">
-      <div className="section-intro"><p className="eyebrow">HOW THE SERVICE WORKS</p><h2>A clear handoff, not an unmoderated marketplace.</h2><p>Volunteers can review every open task and its complete details. An offer becomes an assignment only after an AH administrator checks the match.</p></div>
+      <div className="section-intro"><p className="eyebrow">HOW THE SERVICE WORKS</p><h2>A clear handoff from caregiver to volunteer.</h2><p>Caregivers publish complete tasks to one shared board. Eligible volunteers choose and offer directly, without waiting for hospital staff to approve routine matches.</p></div>
       <ol className="process-grid">
         <li><span>01</span><h3>Ask clearly</h3><p>A caregiver posts the complete instructions, contact details, timing and exact service location.</p></li>
-        <li><span>02</span><h3>Check fit</h3><p>Training, availability, scope and safeguarding are checked before a volunteer can be confirmed.</p></li>
-        <li><span>03</span><h3>Complete safely</h3><p>The task closes with a private reflection and an AH-reviewed completion receipt.</p></li>
+        <li><span>02</span><h3>Choose directly</h3><p>Eligible volunteers filter the open board, check the full details and offer on a task that fits.</p></li>
+        <li><span>03</span><h3>Complete safely</h3><p>The caregiver and volunteer coordinate the handoff, then close the task with a private reflection and completion receipt.</p></li>
       </ol>
     </section>
 
@@ -477,16 +478,16 @@ function PublicHome({ theme, onThemeChange, onOpenPortal }: { theme: Theme; onTh
       <div className="role-cards">
         <article><span className="role-icon">C</span><p className="eyebrow">CAREGIVER</p><h3>Control the ask</h3><p>Post one bounded practical task with the full instructions, contact details and location, then follow its status.</p></article>
         <article><span className="role-icon">V</span><p className="eyebrow">VOLUNTEER</p><h3>Choose a safe fit</h3><p>Filter and map every unexpired open task from all caregivers, then offer where your readiness fits.</p></article>
-        <article><span className="role-icon">AH</span><p className="eyebrow">HOSPITAL ADMIN</p><h3>Own the safeguards</h3><p>Triage scope, approve matches, monitor readiness, redirect excluded work and verify completion records.</p></article>
+        <article><span className="role-icon">AH</span><p className="eyebrow">HOSPITAL ADMIN</p><h3>Keep the service safe</h3><p>Manage access, training, escalations and programme visibility without approving routine tasks.</p></article>
       </div>
     </section>
 
-    <section className="safety-section" id="safety"><div><p className="eyebrow">THE RELIEFKAKI PROMISE</p><h2>Warmth needs<br /><em>clear edges.</em></h2></div><div className="safety-grid"><article><span>↳</span><h3>We do</h3><p>Errands, meals, reminder setup, wayfinding, basic forms, companionship and bounded accompaniment.</p></article><article><span>×</span><h3>We do not</h3><p>Medication, personal care, clinical advice, lifting or transfers, finances, diagnosis or emergency response.</p></article><article><span>!</span><h3>We escalate</h3><p>Urgent and sensitive requests go to a named AH administrator for review, referral and recovery.</p></article></div></section>
+    <section className="safety-section" id="safety"><div><p className="eyebrow">THE RELIEFKAKI PROMISE</p><h2>Warmth needs<br /><em>clear edges.</em></h2></div><div className="safety-grid"><article><span>↳</span><h3>We do</h3><p>Errands, meals, reminder setup, wayfinding, basic forms, companionship and bounded accompaniment.</p></article><article><span>×</span><h3>We do not</h3><p>Medication, personal care, clinical advice, lifting or transfers, finances, diagnosis or emergency response.</p></article><article><span>!</span><h3>We redirect</h3><p>Urgent, sensitive or out-of-scope requests leave the volunteer board and follow the appropriate hospital or emergency support path.</p></article></div></section>
 
-    <section className="access-banner"><div><p className="eyebrow">AUTHENTICATED OPERATIONS</p><h2>Ready to enter your workspace?</h2><p>Caregiver, volunteer and AH-admin tools stay behind a role-bound sign-in.</p></div><button className="button button-dark" type="button" onClick={onOpenPortal}>Access the demo portal <Arrow /></button></section>
+    <section className="access-banner"><div><p className="eyebrow">AUTHENTICATED OPERATIONS</p><h2>Ready to enter your workspace?</h2><p>Caregiver, volunteer and AH-admin tools stay behind a role-bound sign-in. Routine task matching happens directly between eligible users.</p></div><button className="button button-dark" type="button" onClick={onOpenPortal}>Access the demo portal <Arrow /></button></section>
 
-    <SiteFooter />
-    <JudgeExpoGuide open={judgeGuideOpen} onOpen={() => setJudgeGuideOpen(true)} onDismiss={dismissJudgeGuide} />
+    <SiteFooter footerRef={footerRef} />
+    <JudgeExpoGuide footerRef={footerRef} open={judgeGuideOpen} onOpen={() => setJudgeGuideOpen(true)} onDismiss={dismissJudgeGuide} />
   </main>
 }
 

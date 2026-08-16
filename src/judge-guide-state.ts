@@ -4,3 +4,7 @@ export const expoGoDeepLink = 'exp://u.expo.dev/640b1e39-9017-489b-9397-15d9f129
 export function shouldShowJudgeGuide(storedValue: string | null) {
   return storedValue !== '1'
 }
+
+export function getFooterAwareGuideBottom(viewportHeight: number, footerTop: number, gap: number) {
+  return Math.max(gap, viewportHeight - footerTop + gap)
+}
