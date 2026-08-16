@@ -59,6 +59,8 @@ describe('unmet task capacity lifecycle', () => {
     expect(task.capacityState).toBe('AH help required')
     expect(task.escalatedAt).toBe('2026-08-14T08:00:00.000Z')
     expect(task.adminNotification).toContain('0 of 2 volunteers confirmed')
+    expect(task.adminNotification).toContain('Task 207')
+    expect(task.adminNotification).not.toContain('CK-')
   })
 
   it('does not escalate a task that already has enough confirmed volunteers', () => {
@@ -91,6 +93,8 @@ describe('unmet task capacity lifecycle', () => {
     expect(closed.status).toBe('Closed')
     expect(closed.capacityState).toBe('Closed · capacity unavailable')
     expect(closed.caregiverNotice).toContain('could not find enough suitable volunteers')
+    expect(closed.caregiverNotice).toContain('Task 207')
+    expect(closed.caregiverNotice).not.toContain('CK-')
   })
 })
 
@@ -101,6 +105,15 @@ describe('role-aware task geography', () => {
       lat: exactHome.publicLat,
       lng: exactHome.publicLng,
       precision: 'Approximate 2 km zone',
+    })
+  })
+
+  it('shows the caregiver their exact task location without a privacy warning', () => {
+    expect(taskLocationForRole(exactHome, 'caregiver')).toEqual({
+      label: exactHome.exactLabel,
+      lat: exactHome.exactLat,
+      lng: exactHome.exactLng,
+      precision: 'Exact task location',
     })
   })
 

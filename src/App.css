@@ -431,6 +431,12 @@ footer .mark { width: 20px; height: 20px; }
 .profile-details dd { margin: 0; color: var(--text); font-size: 10px; font-weight: 650; text-align: right; }
 .profile-actions { margin-top: 17px; display: grid; gap: 8px; }
 .profile-actions .button { width: 100%; }
+.location-tracking-setting { margin-top: 15px; padding: 13px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 18px; cursor: pointer; }
+.location-tracking-setting span, .location-tracking-setting b, .location-tracking-setting small { display: block; }
+.location-tracking-setting b { color: var(--text); font-size: 11px; }
+.location-tracking-setting small { margin-top: 3px; color: var(--text-muted); font-size: 9px; }
+.location-tracking-setting input { width: 36px; height: 20px; flex: none; accent-color: var(--accent); }
+.location-tracking-note { margin: 8px 0 0; color: var(--text-subtle); font-size: 8px; line-height: 1.45; }
 .workspace {
   width: min(1380px, calc(100% - 48px));
   margin: 0 auto 36px;
@@ -647,16 +653,34 @@ footer .mark { width: 20px; height: 20px; }
 .singapore-clock time { margin-top: 4px; color: var(--text-muted); font-size: 10px; }
 .task-map-section { margin-top: 32px; padding-top: 28px; border-top: 1px solid var(--border); }
 .task-map-head { margin-bottom: 16px; display: flex; align-items: end; justify-content: space-between; gap: 20px; }
-.task-map-head h3 { margin: 0; color: var(--text); font: 500 28px/1.1 'Playfair Display', serif; }
+.task-map-head h3 { margin: 0; color: var(--text); font: 500 32px/1.1 'Playfair Display', serif; }
 .task-map-head p { max-width: 650px; margin: 7px 0 0; color: var(--text-muted); font-size: 10px; }
-.task-map-layout { display: grid; grid-template-columns: minmax(220px, 0.65fr) minmax(0, 1.35fr); border: 1px solid var(--border); }
-.task-map-list { max-height: 390px; overflow: auto; border-right: 1px solid var(--border); background: var(--surface); }
+.task-map-head-actions { display: flex; align-items: center; justify-content: flex-end; gap: 9px; }
+.compact-button { min-height: 32px; padding: 7px 12px; font-size: 9px; }
+.task-map-filters { margin-bottom: 16px; padding: 14px; border: 1px solid var(--border); display: grid; grid-template-columns: repeat(7, minmax(120px, 1fr)); align-items: end; gap: 10px; background: var(--surface-soft); }
+.task-map-filters label { color: var(--text-subtle); font: 500 8px 'DM Mono', monospace; text-transform: uppercase; }
+.task-map-filters select, .task-map-filters input { width: 100%; min-height: 39px; margin-top: 6px; padding: 8px 9px; border: 1px solid var(--border); border-radius: 0; background: var(--field); color: var(--text); color-scheme: inherit; font: 500 10px 'Inter', sans-serif; text-transform: none; }
+.task-map-filters select:disabled { opacity: 0.55; }
+.specific-location-filter { grid-column: span 2; }
+.filter-location-status { grid-column: 1 / -2; margin: 0; color: var(--text-muted); font-size: 9px; }
+.filter-location-status.active { color: var(--success-text); }
+.filter-location-status.blocked, .filter-location-status.unavailable { color: var(--danger-text); }
+.clear-filters { min-height: 39px; padding: 8px 10px; border: 1px solid var(--border-strong); background: transparent; color: var(--accent); font-size: 9px; font-weight: 700; }
+.task-map-layout { display: grid; grid-template-columns: minmax(280px, 0.72fr) minmax(0, 1.28fr); border: 1px solid var(--border); }
+.task-map-list { max-height: 520px; overflow-y: scroll; scrollbar-gutter: stable; scrollbar-width: thin; scrollbar-color: var(--border-strong) var(--surface-soft); border-right: 1px solid var(--border); background: var(--surface); }
+.task-map-list::-webkit-scrollbar { width: 10px; }
+.task-map-list::-webkit-scrollbar-track { background: var(--surface-soft); }
+.task-map-list::-webkit-scrollbar-thumb { border: 2px solid var(--surface-soft); background: var(--border-strong); }
 .task-map-list button { width: 100%; padding: 14px; border: 0; border-bottom: 1px solid var(--border); display: grid; gap: 5px; text-align: left; background: transparent; color: var(--text); }
 .task-map-list button.selected { background: var(--surface-tint); box-shadow: inset 3px 0 var(--accent); }
 .task-map-list button > span { display: flex; justify-content: space-between; color: var(--text-subtle); font: 500 8px 'DM Mono', monospace; }
 .task-map-list strong { font-size: 11px; }
 .task-map-list small { color: var(--text-muted); font-size: 9px; }
-.google-map-panel iframe, .remote-map-state { width: 100%; height: 320px; border: 0; }
+.google-map-panel iframe, .remote-map-state { width: 100%; height: 440px; border: 0; }
+.task-map-empty { min-height: 240px; border: 1px solid var(--border); display: grid; place-content: center; gap: 6px; text-align: center; background: var(--surface-soft); }
+.task-map-empty b { color: var(--text); font-size: 14px; }
+.task-map-empty span { color: var(--text-muted); font-size: 10px; }
+.back-to-task-map { margin: 24px 34px 0; padding: 9px 0; border: 0; background: transparent; color: var(--accent); font-size: 10px; font-weight: 700; }
 .remote-map-state { display: grid; place-content: center; text-align: center; background: var(--surface-soft); color: var(--text); }
 .remote-map-state > span { font-size: 32px; }
 .remote-map-state h4 { margin: 8px 0 4px; }
@@ -731,6 +755,7 @@ footer .mark { width: 20px; height: 20px; }
   .public-links, .portal-context { display: none; }
   .login-layout { grid-template-columns: 1fr 0.85fr; gap: 40px; }
   .caregiver-grid, .admin-columns { grid-template-columns: 1fr; }
+  .task-map-filters { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .request-card { border-right: 0; border-bottom: 1px solid var(--border); }
   .task-grid { grid-template-columns: 1fr; }
   .volunteer-strip, .admin-metrics { grid-template-columns: repeat(2, 1fr); }
@@ -777,7 +802,12 @@ footer .mark { width: 20px; height: 20px; }
   .form-row, .option-row, .contact-fields, .schedule-row, .language-preference, .task-map-layout, .capacity-alert-list dl { grid-template-columns: 1fr; }
   .task-map-section { padding: 24px 20px 28px; }
   .task-map-head, .capacity-alert-head, .capacity-alert-title, .map-caption { align-items: flex-start; flex-direction: column; }
-  .task-map-list { max-height: 240px; border-right: 0; border-bottom: 1px solid var(--border); }
+  .task-map-head-actions { width: 100%; justify-content: space-between; }
+  .task-map-filters { grid-template-columns: 1fr 1fr; }
+  .specific-location-filter, .filter-location-status { grid-column: 1 / -1; }
+  .task-map-list { max-height: 320px; border-right: 0; border-bottom: 1px solid var(--border); }
+  .google-map-panel iframe, .remote-map-state { height: 320px; }
+  .back-to-task-map { margin: 18px 20px 0; }
   .singapore-clock { display: block; }
   .caregiver-alerts { margin: 0 20px 22px; }
   .volunteer-strip, .admin-metrics { grid-template-columns: 1fr 1fr; }

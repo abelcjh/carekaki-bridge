@@ -1,3 +1,5 @@
+import { taskDisplayLabel } from './task-filters'
+
 export type TaskContactInput = {
   id: string
   silent: boolean
@@ -15,7 +17,7 @@ export type VolunteerTaskContact = {
 export function taskContactForVolunteer(input: TaskContactInput): VolunteerTaskContact {
   if (input.silent) {
     return {
-      displayName: `Care request ${input.id}`,
+      displayName: taskDisplayLabel(input.id),
       contactNumber: 'Hidden',
       contactVisible: false,
       communication: 'Checklist only',

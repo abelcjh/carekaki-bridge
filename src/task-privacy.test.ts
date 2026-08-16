@@ -9,7 +9,7 @@ describe('task contact disclosure', () => {
       caregiverName: 'Marcus Lim',
       caregiverPhone: '+65 9123 4567',
     })).toEqual({
-      displayName: 'Care request CK-208',
+      displayName: 'Task 208',
       contactNumber: 'Hidden',
       contactVisible: false,
       communication: 'Checklist only',
