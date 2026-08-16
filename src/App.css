@@ -307,20 +307,94 @@ input:focus-visible {
 .access-banner h2 { margin-bottom: 10px; color: #17221e; font-size: clamp(35px, 4vw, 54px); }
 .access-banner p:last-child { margin: 0; color: #25332e; }
 .access-banner .button-dark { flex: none; background: #20352f; color: #fffaf2; }
-footer {
-  width: min(1380px, calc(100% - 48px));
-  margin: 0 auto;
-  padding: 29px 0 35px;
-  border-top: 1px solid var(--border);
-  display: flex;
+.site-footer {
+  width: 100%;
+  margin: 0;
+  padding: 28px max(24px, calc((100vw - 1380px) / 2));
+  border-top: 1px solid #52645c;
+  display: grid;
+  grid-template-columns: minmax(210px, 0.9fr) minmax(300px, 1.2fr) auto;
   align-items: center;
-  gap: 22px;
-  color: var(--text-muted);
+  gap: 32px;
+  background: var(--surface-strong);
+  color: var(--text-on-strong);
   font-size: 10px;
 }
-footer p { margin: 0 auto; }
-footer .brand { font-size: 16px; }
-footer .mark { width: 20px; height: 20px; }
+.site-footer .brand { color: var(--text-on-strong); font-size: 16px; }
+.site-footer .brand-light { color: #b9c9c2; }
+.site-footer .mark { width: 20px; height: 20px; }
+.site-footer .mark span:first-child { background: #f7f1e7; }
+.footer-brand, .footer-meta { display: flex; flex-direction: column; gap: 7px; }
+.footer-brand > span, .footer-meta > span { color: #b9c9c2; line-height: 1.5; }
+.footer-meta b { color: var(--text-on-strong); font-size: 10px; font-weight: 650; }
+.footer-links { display: flex; align-items: center; justify-content: flex-end; gap: 7px 17px; }
+.footer-links button, .footer-links a {
+  min-height: 38px;
+  padding: 7px 0;
+  border: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: transparent;
+  color: #d9e3de;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 650;
+  text-decoration: none;
+}
+.footer-links button:hover, .footer-links a:hover { color: #ffffff; text-decoration: underline; text-underline-offset: 4px; }
+.instagram-icon { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; }
+.instagram-icon .instagram-dot { fill: currentColor; stroke: none; }
+
+.legal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  padding: 24px;
+  display: grid;
+  place-items: center;
+  background: rgba(6, 12, 10, 0.74);
+  backdrop-filter: blur(7px);
+}
+.legal-dialog {
+  width: min(860px, 100%);
+  max-height: min(850px, calc(100vh - 48px));
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow: hidden;
+  background: var(--surface-raised);
+  color: var(--text);
+  box-shadow: 0 32px 90px rgba(0, 0, 0, 0.38);
+}
+.legal-head {
+  padding: 25px 28px 22px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 30px;
+  background: var(--surface-tint);
+}
+.legal-head span { color: var(--accent); font: 600 8px 'DM Mono', monospace; letter-spacing: 0.1em; }
+.legal-head h2 { margin: 6px 0 4px; color: var(--text); font: 500 38px/1 'Playfair Display', serif; }
+.legal-head p { margin: 0; color: var(--text-muted); font-size: 9px; }
+.legal-head > button { width: 38px; height: 38px; flex: none; border: 1px solid var(--border); border-radius: 50%; background: var(--surface-raised); color: var(--text); font-size: 24px; line-height: 1; }
+.legal-head > button:hover { border-color: var(--accent); color: var(--accent); }
+.legal-content { padding: 25px 28px 34px; overflow-y: auto; scrollbar-gutter: stable; }
+.legal-summary { margin: 0 0 28px; padding: 17px 18px; border-left: 3px solid var(--accent); background: var(--surface-soft); color: var(--text-muted); font-size: 12px; line-height: 1.65; }
+.legal-summary b { color: var(--text); }
+.legal-content section { padding: 18px 0; border-top: 1px solid var(--border); }
+.legal-content h3 { margin: 0 0 8px; color: var(--text); font-size: 15px; letter-spacing: -0.02em; }
+.legal-content p, .legal-content li { color: var(--text-muted); font-size: 11px; line-height: 1.68; }
+.legal-content section > p:last-child { margin-bottom: 0; }
+.legal-content ul { margin: 8px 0 0; padding-left: 20px; }
+.legal-content li + li { margin-top: 7px; }
+.legal-content li b { color: var(--text); }
+.legal-foot { padding: 15px 28px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 20px; background: var(--surface-soft); }
+.legal-foot > a { display: inline-flex; align-items: center; gap: 8px; color: var(--accent); font-size: 10px; font-weight: 700; }
+.legal-foot .button { min-width: 126px; }
 
 /* Authentication */
 .login-page { min-height: 100vh; }
@@ -621,7 +695,7 @@ footer .mark { width: 20px; height: 20px; }
 .empty-queue { padding: 26px 22px; display: flex; flex-direction: column; gap: 5px; }
 .empty-queue b { color: var(--text); font-size: 12px; }
 .empty-queue span { color: var(--text-muted); font-size: 10px; }
-.portal-footer { margin-bottom: 20px; justify-content: space-between; }
+.portal-footer { margin-top: 36px; }
 
 .contact-fields { margin: 0 0 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .request-card input[type='tel'], .contact-fields input {
@@ -784,8 +858,14 @@ footer .mark { width: 20px; height: 20px; }
   .safety-section { padding: 60px 24px; gap: 35px; }
   .access-banner { width: min(100% - 24px, 1216px); margin: 65px auto; padding: 38px 25px; display: block; }
   .access-banner .button { width: 100%; margin-top: 25px; }
-  footer { width: min(100% - 24px, 1380px); flex-wrap: wrap; gap: 14px; }
-  footer p { order: 3; width: 100%; }
+  .site-footer { padding: 26px 20px; grid-template-columns: 1fr; gap: 18px; }
+  .footer-links { justify-content: flex-start; flex-wrap: wrap; }
+  .legal-overlay { padding: 10px; }
+  .legal-dialog { max-height: calc(100vh - 20px); }
+  .legal-head { padding: 20px; }
+  .legal-head h2 { font-size: 32px; }
+  .legal-content { padding: 20px; }
+  .legal-foot { padding: 13px 20px; }
   .login-layout { width: min(100% - 24px, 1120px); margin-top: 20px; grid-template-columns: 1fr; gap: 30px; }
   .login-context { padding-top: 20px; }
   .login-context h1 { font-size: clamp(40px, 12vw, 58px); }
@@ -823,7 +903,7 @@ footer .mark { width: 20px; height: 20px; }
   .receipt-verdict { min-width: 0; align-items: start; text-align: left; }
   .receipt-shelf-head { align-items: start; flex-direction: column; }
   .request-steps li { grid-template-columns: 1fr; gap: 4px; }
-  .portal-footer { align-items: start; flex-direction: column; }
+
 }
 
 @media (max-width: 410px) {

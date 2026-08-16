@@ -155,6 +155,81 @@ function Mark() {
 
 function Arrow() { return <span className="arrow">↗</span> }
 
+type LegalDocument = 'privacy' | 'terms'
+
+function InstagramIcon() {
+  return <svg className="instagram-icon" aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4.25" /><circle className="instagram-dot" cx="17.4" cy="6.7" r="1" /></svg>
+}
+
+function LegalNotice({ kind, onClose }: { kind: LegalDocument; onClose: () => void }) {
+  const closeRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    closeRef.current?.focus()
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', closeOnEscape)
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener('keydown', closeOnEscape)
+    }
+  }, [onClose])
+
+  const isPrivacy = kind === 'privacy'
+  const title = isPrivacy ? 'Privacy Policy' : 'Terms of Use'
+
+  return <div className="legal-overlay" role="presentation" onMouseDown={(event) => { if (event.currentTarget === event.target) onClose() }}>
+    <section className="legal-dialog" role="dialog" aria-modal="true" aria-labelledby="legal-title">
+      <header className="legal-head">
+        <div><span>RELIEFKAKI · LEGAL</span><h2 id="legal-title">{title}</h2><p>Effective 16 August 2026</p></div>
+        <button ref={closeRef} type="button" aria-label={`Close ${title}`} onClick={onClose}>×</button>
+      </header>
+      <div className="legal-content">
+        {isPrivacy ? <>
+          <p className="legal-summary"><b>Your privacy matters.</b> ReliefKaki is currently an interactive concept demo for the SparkX⁺Change caregiver-respite project. It is not connected to Alexandra Hospital production systems and should not be used to submit real personal, medical or emergency information.</p>
+          <section><h3>1. What this policy covers</h3><p>This policy explains how the ReliefKaki demo handles information when you browse the website, explore a demo workspace, use location-based task filtering or follow an external link.</p></section>
+          <section><h3>2. Information handled by the demo</h3><ul><li><b>Information you enter:</b> text and selections entered into task forms are used to demonstrate the interface. They remain in the page’s temporary browser state and are not submitted to a ReliefKaki backend.</li><li><b>Theme preference:</b> your light or dark mode choice is saved in your browser’s local storage.</li><li><b>Optional location:</b> if you enable “Track my location,” the browser supplies approximate coordinates while the page is open so tasks can be filtered by distance. ReliefKaki does not store those coordinates.</li><li><b>Standard technical data:</b> the website host and embedded or linked services may receive normal request data such as IP address, browser type and access time under their own policies.</li></ul></section>
+          <section><h3>3. How information is used</h3><p>Information is used only to operate the demo experience, display privacy-safe task views, apply requested preferences, calculate distance filters and protect the service against misuse. The demo does not sell personal information or use it for advertising.</p></section>
+          <section><h3>4. Third-party services</h3><p>ReliefKaki is hosted on GitHub Pages and embeds Google Maps for location previews. The Instagram link opens an external SparkX⁺Change account. GitHub, Google and Instagram may process technical data under their own privacy terms. Opening those services is optional.</p></section>
+          <section><h3>5. Sharing and retention</h3><p>The current demo has no ReliefKaki account database and does not retain task-form entries after the page is refreshed or closed. Browser preferences remain on your device until you clear site data. We may disclose information if required by law or necessary to protect users and the service, but the current demo is not designed to receive sensitive records.</p></section>
+          <section><h3>6. Your choices and safety</h3><ul><li>Do not enter real names, phone numbers, addresses, identity numbers, medical details or confidential care information.</li><li>Keep location tracking off unless you want to test the distance filter. You can disable it at any time in Settings or through your browser permissions.</li><li>Clear this site’s local storage to remove the saved theme preference.</li><li>Never use Instagram direct messages to send health or other sensitive personal information.</li></ul></section>
+          <section><h3>7. Future pilots and policy changes</h3><p>A live pilot would require separate approvals, security controls, data-retention rules and a revised privacy notice before real participant data is collected. We may update this policy as the concept develops and will change the effective date when we do.</p></section>
+          <section><h3>8. Contact</h3><p>For general privacy questions about this concept, contact SparkX⁺Change through its official Instagram profile. Please do not include personal, medical or emergency information in your message.</p></section>
+        </> : <>
+          <p className="legal-summary"><b>Please use this demo responsibly.</b> These Terms of Use govern access to the ReliefKaki concept website. By using it, you agree to these terms. If you do not agree, please stop using the site.</p>
+          <section><h3>1. Concept-demo status</h3><p>ReliefKaki is an interactive prototype created for the SparkX⁺Change caregiver-respite project. It is not an operational Alexandra Hospital service, does not create a caregiver-volunteer relationship and cannot arrange real care, transport, appointments or volunteer assignments.</p></section>
+          <section><h3>2. Not medical or emergency support</h3><p>The site does not provide medical advice, diagnosis, treatment, personal care or emergency response. Do not rely on it for urgent decisions. In Singapore, call <b>995</b> for a life-threatening emergency or contact an appropriate qualified service provider.</p></section>
+          <section><h3>3. Demo access and acceptable use</h3><ul><li>Use only the supplied fictional demo profiles and non-sensitive sample information.</li><li>Do not attempt to identify, contact or impersonate real caregivers, volunteers, hospital staff or other people.</li><li>Do not probe for vulnerabilities, disrupt the site, automate abusive traffic, upload malicious material or bypass access controls.</li><li>Do not present demo outputs, task statuses, maps, points or receipts as real hospital or volunteer records.</li></ul></section>
+          <section><h3>4. Privacy and submitted content</h3><p>You are responsible for content you enter. Do not submit real personal, health, financial or confidential information. The current demo processes entries temporarily in your browser as described in the Privacy Policy.</p></section>
+          <section><h3>5. Intellectual property</h3><p>The ReliefKaki name, interface, written content, graphics and project materials are owned by or licensed to SparkX⁺Change unless otherwise stated. You may view and demonstrate the site for personal, educational and evaluation purposes. You may not copy, sell, publish, remove notices from or create misleading derivative uses of the materials without permission.</p></section>
+          <section><h3>6. Third-party services and links</h3><p>Maps, hosting and social links are provided by third parties. Their terms and privacy policies apply when you use them. ReliefKaki is not responsible for the availability, accuracy or practices of external services.</p></section>
+          <section><h3>7. Availability and disclaimer</h3><p>The site is provided “as is” and “as available” for concept evaluation. Features may be changed, suspended or removed without notice. To the fullest extent permitted by law, SparkX⁺Change disclaims implied warranties and is not liable for loss arising from reliance on demo content, unavailable features or misuse of the site.</p></section>
+          <section><h3>8. Suspension, changes and governing law</h3><p>Access may be restricted for misuse or security reasons. We may update these terms as the project develops. These terms are governed by the laws of Singapore, and any dispute is subject to the jurisdiction of the Singapore courts.</p></section>
+          <section><h3>9. Contact</h3><p>For general questions or permission requests, contact SparkX⁺Change through its official Instagram profile. Do not send sensitive personal or health information through Instagram.</p></section>
+        </>}
+      </div>
+      <div className="legal-foot"><a href="https://www.instagram.com/spark.x.change/" target="_blank" rel="noreferrer"><InstagramIcon /> @spark.x.change</a><button className="button button-dark" type="button" onClick={onClose}>I understand</button></div>
+    </section>
+  </div>
+}
+
+function SiteFooter({ portal = false }: { portal?: boolean }) {
+  const [legalDocument, setLegalDocument] = useState<LegalDocument | null>(null)
+  const year = new Date().getFullYear()
+
+  return <>
+    <footer className={`site-footer ${portal ? 'portal-footer' : ''}`}>
+      <div className="footer-brand"><a className="brand" href="#top"><Mark /><span>relief<span className="brand-light">kaki</span></span></a><span>Silent help. Visible relief. Managed with care.</span></div>
+      <div className="footer-meta"><b>© {year} SparkX⁺Change. All rights reserved.</b><span>ReliefKaki · Alexandra Hospital · interactive concept demo</span></div>
+      <nav className="footer-links" aria-label="Legal and social links"><button type="button" onClick={() => setLegalDocument('privacy')}>Privacy Policy</button><button type="button" onClick={() => setLegalDocument('terms')}>Terms of Use</button><a href="https://www.instagram.com/spark.x.change/" target="_blank" rel="noreferrer" aria-label="SparkX Change on Instagram"><InstagramIcon /><span>Instagram</span></a></nav>
+    </footer>
+    {legalDocument && <LegalNotice kind={legalDocument} onClose={() => setLegalDocument(null)} />}
+  </>
+}
+
 function Badge({ children, tone = 'plain' }: { children: React.ReactNode; tone?: 'plain' | 'green' | 'amber' | 'red' | 'blue' }) {
   return <span className={`badge ${tone}`}>{children}</span>
 }
@@ -328,7 +403,7 @@ function PublicHome({ theme, onThemeChange, onOpenPortal }: { theme: Theme; onTh
 
     <section className="access-banner"><div><p className="eyebrow">AUTHENTICATED OPERATIONS</p><h2>Ready to enter your workspace?</h2><p>Caregiver, volunteer and AH-admin tools stay behind a role-bound sign-in.</p></div><button className="button button-dark" type="button" onClick={onOpenPortal}>Access the demo portal <Arrow /></button></section>
 
-    <footer><a className="brand" href="#top"><Mark /><span>relief<span className="brand-light">kaki</span></span></a><p>Silent help. Visible relief. Managed with care.</p><span>SparkX⁺Change · Alexandra Hospital · interactive concept demo</span></footer>
+    <SiteFooter />
   </main>
 }
 
@@ -376,6 +451,7 @@ function LoginPage({ theme, onThemeChange, onBack, onAuthenticated }: { theme: T
         <p className="login-help">Need access? In a live pilot, an AH programme administrator would create or approve your account.</p>
       </div>
     </section>
+    <SiteFooter />
   </main>
 }
 
@@ -715,7 +791,7 @@ export default function App() {
         </div>}
       </section>
 
-      <footer className="portal-footer"><span>ReliefKaki · role-bound interactive demo</span><span>Operational data shown here is illustrative.</span></footer>
+      <SiteFooter portal />
     </main>
   )
 }
